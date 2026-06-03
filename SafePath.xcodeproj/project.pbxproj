@@ -7,24 +7,77 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F150C8A2FD01BCB0029E15F /* SafePathWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3F150C892FD01BCB0029E15F /* SafePathWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		526631442FA3A7210003F97E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 526631432FA3A7210003F97E /* FirebaseAuth */; };
 		526631462FA3A72D0003F97E /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 526631452FA3A72D0003F97E /* FirebaseFirestore */; };
 		526631482FA3B07E0003F97E /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 526631472FA3B07E0003F97E /* FirebaseCore */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		3F150C8B2FD01BCB0029E15F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 526630E62FA39A560003F97E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F150C882FD01BCB0029E15F;
+			remoteInfo = "SafePathWatch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3F150C962FD01BCC0029E15F /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				3F150C8A2FD01BCB0029E15F /* SafePathWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		3F150C842FD01BCB0029E15F /* SafePathWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafePathWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F150C892FD01BCB0029E15F /* SafePathWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SafePathWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		526630EE2FA39A560003F97E /* SafePath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafePath.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3F150CB62FD01D2B0029E15F /* Exceptions for "SafePath" folder in "SafePathWatch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Shared/Connectivity/WatchConnectivityManager.swift,
+				Shared/Connectivity/WatchConnectivityModels.swift,
+			);
+			target = 3F150C882FD01BCB0029E15F /* SafePathWatch Watch App */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		3F150C8D2FD01BCB0029E15F /* SafePathWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "SafePathWatch Watch App";
+			sourceTree = "<group>";
+		};
 		526630F02FA39A560003F97E /* SafePath */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3F150CB62FD01D2B0029E15F /* Exceptions for "SafePath" folder in "SafePathWatch Watch App" target */,
+			);
 			path = SafePath;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3F150C862FD01BCB0029E15F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		526630EB2FA39A560003F97E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				526630F02FA39A560003F97E /* SafePath */,
+				3F150C8D2FD01BCB0029E15F /* SafePathWatch Watch App */,
 				526630EF2FA39A560003F97E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +104,8 @@
 			isa = PBXGroup;
 			children = (
 				526630EE2FA39A560003F97E /* SafePath.app */,
+				3F150C842FD01BCB0029E15F /* SafePathWatch.app */,
+				3F150C892FD01BCB0029E15F /* SafePathWatch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -57,6 +113,47 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3F150C832FD01BCB0029E15F /* SafePathWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F150C9A2FD01BCC0029E15F /* Build configuration list for PBXNativeTarget "SafePathWatch" */;
+			buildPhases = (
+				3F150C822FD01BCB0029E15F /* Resources */,
+				3F150C962FD01BCC0029E15F /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3F150C8C2FD01BCB0029E15F /* PBXTargetDependency */,
+			);
+			name = SafePathWatch;
+			packageProductDependencies = (
+			);
+			productName = SafePathWatch;
+			productReference = 3F150C842FD01BCB0029E15F /* SafePathWatch.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
+		3F150C882FD01BCB0029E15F /* SafePathWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F150C992FD01BCC0029E15F /* Build configuration list for PBXNativeTarget "SafePathWatch Watch App" */;
+			buildPhases = (
+				3F150C852FD01BCB0029E15F /* Sources */,
+				3F150C862FD01BCB0029E15F /* Frameworks */,
+				3F150C872FD01BCB0029E15F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3F150C8D2FD01BCB0029E15F /* SafePathWatch Watch App */,
+			);
+			name = "SafePathWatch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "SafePathWatch Watch App";
+			productReference = 3F150C892FD01BCB0029E15F /* SafePathWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 		526630ED2FA39A560003F97E /* SafePath */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 526630F92FA39A590003F97E /* Build configuration list for PBXNativeTarget "SafePath" */;
@@ -89,9 +186,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2620;
+				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
+					3F150C832FD01BCB0029E15F = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					3F150C882FD01BCB0029E15F = {
+						CreatedOnToolsVersion = 26.5;
+					};
 					526630ED2FA39A560003F97E = {
 						CreatedOnToolsVersion = 26.2;
 					};
@@ -115,11 +218,27 @@
 			projectRoot = "";
 			targets = (
 				526630ED2FA39A560003F97E /* SafePath */,
+				3F150C832FD01BCB0029E15F /* SafePathWatch */,
+				3F150C882FD01BCB0029E15F /* SafePathWatch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3F150C822FD01BCB0029E15F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3F150C872FD01BCB0029E15F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		526630EC2FA39A560003F97E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -130,6 +249,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3F150C852FD01BCB0029E15F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		526630EA2FA39A560003F97E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -139,7 +265,109 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		3F150C8C2FD01BCB0029E15F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F150C882FD01BCB0029E15F /* SafePathWatch Watch App */;
+			targetProxy = 3F150C8B2FD01BCB0029E15F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		3F150C942FD01BCC0029E15F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_KEY_CFBundleDisplayName = SafePathWatch;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SafePathWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3F150C952FD01BCC0029E15F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_KEY_CFBundleDisplayName = SafePathWatch;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SafePathWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		3F150C972FD01BCC0029E15F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SafePathWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SafePathWatch.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		3F150C982FD01BCC0029E15F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SafePathWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SafePathWatch.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
 		526630F72FA39A590003F97E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -326,6 +554,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3F150C992FD01BCC0029E15F /* Build configuration list for PBXNativeTarget "SafePathWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F150C972FD01BCC0029E15F /* Debug */,
+				3F150C982FD01BCC0029E15F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3F150C9A2FD01BCC0029E15F /* Build configuration list for PBXNativeTarget "SafePathWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F150C942FD01BCC0029E15F /* Debug */,
+				3F150C952FD01BCC0029E15F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		526630E92FA39A560003F97E /* Build configuration list for PBXProject "SafePath" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

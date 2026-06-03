@@ -49,6 +49,8 @@ struct Shelter: Codable, Identifiable {
     let latitude: Double
     let longitude: Double
     let capacity: Int
+    let availableCapacity: Int?
+    let contact: String?
     let facilities: [String]
     let shelterType: ShelterType
     let disasterTypeSupported: [String]
@@ -111,6 +113,8 @@ extension Shelter {
         latitude: -7.3071,
         longitude: 112.7358,
         capacity: 1200,
+        availableCapacity: 1100,
+        contact: "081234567891",
         facilities: ["water", "food", "toilet", "sleeping_area"],
         shelterType: .openArea,
         disasterTypeSupported: ["earthquake"],
@@ -128,6 +132,8 @@ extension Shelter {
         latitude: -7.2619,
         longitude: 112.7487,
         capacity: 500,
+        availableCapacity: 50,
+        contact: "081234567892",
         facilities: ["water", "toilet", "charging"],
         shelterType: .building,
         disasterTypeSupported: ["flood"],

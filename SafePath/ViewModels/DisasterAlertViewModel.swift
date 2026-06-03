@@ -66,6 +66,9 @@ final class DisasterAlertViewModel: ObservableObject {
             )
             nearbyAlerts = alerts
             
+            // Sync with Apple Watch
+            sendLatestAlertToWatch()
+            
             // Schedule local notifications for high-severity nearby alerts
             for alert in alerts where alert.severity == .critical || alert.severity == .high {
                 scheduleLocalNotification(for: alert)
@@ -115,5 +118,21 @@ final class DisasterAlertViewModel: ObservableObject {
     
     var highSeverityAlerts: [DisasterAlert] {
         allAlerts.filter { $0.severity == .critical || $0.severity == .high }
+    }
+    
+    // MARK: - WatchConnectivity
+    
+    func sendLatestAlertToWatch() {
+        guard let latest = allAlerts.first ?? nearbyAlerts.first else { return }
+        
+        let payload: [String: Any] = [
+            WCPayloadKeys.messageType.rawValue: WCMessageType.newAlert.rawValue,
+            WCPayloadKeys.alertType.rawValue: latest.typeDisplayName,
+            WCPayloadKeys.alertSeverity.rawValue: latest.severity.displayName,
+            WCPayloadKeys.alertLocation.rawValue: latest.locationName,
+            WCPayloadKeys.alertTimestamp.rawValue: Date().timeIntervalSince1970
+        ]
+        
+        IOSConnectivityManager.shared.sendToWatch(payload: payload)
     }
 }

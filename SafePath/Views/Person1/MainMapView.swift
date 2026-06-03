@@ -176,7 +176,7 @@ struct MainMapView: View {
                 }
             }
         }
-        .onChange(of: locationService.currentLocation?.latitude) { _ in
+        .onChange(of: locationService.currentLocation?.latitude) { oldValue, newValue in
             // Recalculate route when location changes
             if let loc = locationService.currentLocation, let shelter = shelterVM.selectedShelter {
                 Task { await routeVM.recalculateIfNeeded(newLocation: loc, shelter: shelter) }
