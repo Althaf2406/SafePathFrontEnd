@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 /// Person 2: Edit Profile view matching the visual style in Screenshot 4.
-struct ProfileView: View {
+struct EditProfileView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var fullName: String = "Citizen User"
@@ -300,5 +300,5 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView()
+    EditProfileView()
 }

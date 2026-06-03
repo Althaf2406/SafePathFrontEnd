@@ -4,10 +4,12 @@ import Combine
 /// Person 2: User login screen matching the screenshot design.
 struct LoginView: View {
 
-    @State private var email: String = ""
-    @State private var password: String = ""
+    @State private var email: String = "admin@gmail.com"
+    @State private var password: String = "123456"
     @State private var isPasswordVisible: Bool = false
     @State private var navigateToRegister: Bool = false
+    @EnvironmentObject var userVM: UserManagementViewModel
+    @State private var showAlert = false
 
     var body: some View {
         NavigationStack {
@@ -93,9 +95,19 @@ struct LoginView: View {
 
                     // MARK: - Login Button
                     Button(action: {
-                        // TODO: Person 2 — trigger login via UserManagementViewModel
+                        Task {
+                            await userVM.login(email: email, password: password)
+                            // RootView automatically switches to AppRouter when isLoggedIn = true
+                            if userVM.errorMessage != nil {
+                                showAlert = true
+                            }
+                        }
                     }) {
                         HStack(spacing: 8) {
+                            if userVM.isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            }
                             Text("Login")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                             Image(systemName: "arrow.right")
@@ -108,6 +120,7 @@ struct LoginView: View {
                         .cornerRadius(14)
                         .shadow(color: SafePathColors.primaryBlue.opacity(0.3), radius: 8, y: 4)
                     }
+                    .disabled(userVM.isLoading)
                     .padding(.horizontal, 24)
 
                     // MARK: - Divider OR
@@ -169,6 +182,13 @@ struct LoginView: View {
             }
             .navigationDestination(isPresented: $navigateToRegister) {
                 RegisterView()
+            }
+            .alert("Login Failed", isPresented: $showAlert) {
+                Button("OK", role: .cancel) {
+                    userVM.clearError()
+                }
+            } message: {
+                Text(userVM.errorMessage ?? "An unknown error occurred.")
             }
         }
     }
