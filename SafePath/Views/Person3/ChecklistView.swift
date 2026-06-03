@@ -73,7 +73,7 @@ struct ChecklistView: View {
                         .foregroundColor(SafePathColors.primaryBlue)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: ProfileView()) {
+                    NavigationLink(destination: ProfilePageView()) {
                         Image(systemName: "person.crop.circle.fill")
                             .foregroundColor(SafePathColors.primaryBlue)
                             .font(.title3)
