@@ -7,8 +7,8 @@ final class DisasterAlertRepository {
     private let api: APIService
     
     @MainActor
-    init(api: APIService = .shared) {
-        self.api = api
+    init(api: APIService? = nil) {
+        self.api = api ?? APIService.shared
     }
     
     /// Fetch all disaster alerts.

@@ -50,8 +50,8 @@ struct ShelterDetailView: View {
     // MARK: - Map Preview
     
     private var mapPreview: some View {
-        Map(coordinateRegion: $mapRegion, annotationItems: [shelter]) { s in
-            MapAnnotation(coordinate: s.coordinate) {
+        Map(initialPosition: .region(mapRegion)) {
+            Annotation("", coordinate: shelter.coordinate) {
                 Image(systemName: "building.2.fill")
                     .font(.title2)
                     .foregroundColor(SafePathColors.accentBlue)
