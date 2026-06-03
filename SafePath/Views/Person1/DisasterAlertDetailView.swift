@@ -136,8 +136,8 @@ struct DisasterAlertDetailView: View {
     // MARK: - Map Preview
     private var mapPreview: some View {
         ZStack(alignment: .bottomLeading) {
-            Map(coordinateRegion: $mapRegion, annotationItems: [alert]) { item in
-                MapAnnotation(coordinate: item.coordinate) {
+            Map(initialPosition: .region(mapRegion)) {
+                Annotation("", coordinate: alert.coordinate) {
                     ZStack {
                         Circle()
                             .stroke(SafePathColors.dangerRed, lineWidth: 1.5)

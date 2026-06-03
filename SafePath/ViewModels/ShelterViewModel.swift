@@ -68,6 +68,9 @@ final class ShelterViewModel: ObservableObject {
                 radiusKm: radiusKm
             )
             nearbyShelters = data
+            
+            // Sync with Apple Watch
+            sendNearestShelterToWatch()
         } catch {
             print("Failed to fetch nearby shelters: \(error.localizedDescription)")
         }
@@ -155,6 +158,24 @@ final class ShelterViewModel: ObservableObject {
         }
         
         return candidates.first
+    }
+    
+    // MARK: - WatchConnectivity
+    
+    func sendNearestShelterToWatch() {
+        guard let nearest = findNearestAvailable() else { return }
+        
+        let payload: [String: Any] = [
+            WCPayloadKeys.messageType.rawValue: WCMessageType.nearestShelter.rawValue,
+            WCPayloadKeys.shelterName.rawValue: nearest.name,
+            WCPayloadKeys.shelterType.rawValue: "Relief Center", // Mocking based on typical shelter structure
+            WCPayloadKeys.shelterCapacity.rawValue: "\(nearest.capacity)",
+            WCPayloadKeys.shelterDistance.rawValue: nearest.distanceKm != nil ? String(format: "%.1f km", nearest.distanceKm!) : "Unknown",
+            WCPayloadKeys.shelterAddress.rawValue: nearest.address,
+            WCPayloadKeys.shelterDisasterTypes.rawValue: nearest.disasterTypeSupported.joined(separator: ", ")
+        ]
+        
+        IOSConnectivityManager.shared.sendToWatch(payload: payload)
     }
 }
 

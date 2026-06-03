@@ -12,8 +12,10 @@ final class RouteRepository {
         to shelter: Shelter
     ) async throws -> EvacuationRoute {
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: shelter.coordinate))
+        let originLoc = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
+        request.source = MKMapItem(location: originLoc, address: nil)
+        let destLoc = CLLocation(latitude: shelter.coordinate.latitude, longitude: shelter.coordinate.longitude)
+        request.destination = MKMapItem(location: destLoc, address: nil)
         request.transportType = .walking
         request.requestsAlternateRoutes = true
         
@@ -41,8 +43,10 @@ final class RouteRepository {
         to shelter: Shelter
     ) async throws -> (primary: EvacuationRoute, alternatives: [EvacuationRoute]) {
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: shelter.coordinate))
+        let originLoc = CLLocation(latitude: origin.latitude, longitude: origin.longitude)
+        request.source = MKMapItem(location: originLoc, address: nil)
+        let destLoc = CLLocation(latitude: shelter.coordinate.latitude, longitude: shelter.coordinate.longitude)
+        request.destination = MKMapItem(location: destLoc, address: nil)
         request.transportType = .walking
         request.requestsAlternateRoutes = true
         

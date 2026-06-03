@@ -112,6 +112,7 @@ enum APIEndpoint {
         }
     }
     
+    /// Full URL combining base URL and path.
     var url: URL? {
         URL(string: AppConstants.apiBaseURL + path)
     }

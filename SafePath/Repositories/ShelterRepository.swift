@@ -6,8 +6,9 @@ final class ShelterRepository {
     
     private let api: APIService
     
-    init(api: APIService = .shared) {
-        self.api = api
+    @MainActor
+    init(api: APIService? = nil) {
+        self.api = api ?? APIService.shared
     }
     
     /// Fetch all shelters.
