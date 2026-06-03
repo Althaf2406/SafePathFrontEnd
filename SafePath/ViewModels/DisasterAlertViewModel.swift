@@ -66,6 +66,9 @@ final class DisasterAlertViewModel: ObservableObject {
             )
             nearbyAlerts = alerts
             
+            // Sync with Apple Watch
+            sendLatestAlertToWatch()
+            
             // Schedule local notifications for high-severity nearby alerts
             for alert in alerts where alert.severity == .critical || alert.severity == .high {
                 scheduleLocalNotification(for: alert)

@@ -1,24 +1,7 @@
-//
-//  ContentView.swift
-//  SafePathWatch Watch App
-//
-//  Created by student on 03/06/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        WatchHomeView()
     }
-}
-
-#Preview {
-    ContentView()
 }
