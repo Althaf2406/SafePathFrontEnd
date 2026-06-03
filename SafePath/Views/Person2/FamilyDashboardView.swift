@@ -71,43 +71,7 @@ struct FamilyDashboardView: View {
                             )
                         }
                         
-                        Divider().padding(.vertical, 8)
-                        
-                        Text("Testing Routes")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        
-                        NavigationLink(destination: LiveLocationFamilyView()) {
-                            Text("Live Location")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.green.opacity(0.2))
-                                .cornerRadius(10)
-                        }
-                        
-                        NavigationLink(destination: EmergencyStatusView()) {
-                            Text("Emergency Status")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.red.opacity(0.2))
-                                .cornerRadius(10)
-                        }
-                        
-                        NavigationLink(destination: FamilyNotificationsView()) {
-                            Text("Family Notifications")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.orange.opacity(0.2))
-                                .cornerRadius(10)
-                        }
-                        
-                        NavigationLink(destination: LoginView()) {
-                            Text("Login Page")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue.opacity(0.2))
-                                .cornerRadius(10)
-                        }
+                        // Removed testing routes
                     }
                     .padding(.horizontal, 24)
                     
