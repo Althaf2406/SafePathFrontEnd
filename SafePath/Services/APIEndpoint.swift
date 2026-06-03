@@ -36,6 +36,9 @@ enum APIEndpoint {
     case triggerSOS
     case resolveSOS(sosID: String)
     
+    //preparedness
+    case getAllItem
+    
     var path: String {
         switch self {
         case .disasterAlerts:
@@ -94,7 +97,12 @@ enum APIEndpoint {
             return "/emergency/sos"
         case .resolveSOS(let sosID):
             return "/emergency/sos/\(sosID)/resolve"
+            
+            //checklist item
+        case .getAllItem:
+            return "/item"
         }
+        
     }
     
     var method: String {
