@@ -107,18 +107,20 @@ final class UserManagementViewModel: ObservableObject {
         isLoading = false
     }
 
-    /// PUT /user/profile — Updates name, phone, or profile image.
-    func updateProfile(name: String? = nil, phone: String? = nil, profileImageURL: String? = nil) async {
+    /// PUT /user/profile — Updates name, phone, profile image, or location.
+    func updateProfile(name: String? = nil, phone: String? = nil, profileImageURL: String? = nil, latitude: Double? = nil, longitude: Double? = nil) async {
         guard var user = currentUser else { return }
         isLoading = true
         errorMessage = nil
 
         // ── MOCK ── replace with real API call when backend is ready:
-        // currentUser = try await repository.updateProfile(authToken: token, name: name, phone: phone, profileImageURL: profileImageURL)
+        // currentUser = try await repository.updateProfile(authToken: token, name: name, phone: phone, profileImageURL: profileImageURL, latitude: latitude, longitude: longitude)
         try? await Task.sleep(nanoseconds: 800_000_000)
         if let name             = name             { user.name            = name }
         if let phone            = phone            { user.phone           = phone }
         if let profileImageURL  = profileImageURL  { user.profileImageURL = profileImageURL }
+        if let latitude         = latitude         { user.lastLatitude    = latitude }
+        if let longitude        = longitude        { user.lastLongitude   = longitude }
         // ── END MOCK ──
 
         self.currentUser = user

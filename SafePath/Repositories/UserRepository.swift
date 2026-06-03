@@ -41,17 +41,20 @@ final class UserRepository {
         return try await api.send(.userProfile, authToken: authToken)
     }
 
-    /// PUT /user/profile
     func updateProfile(
         authToken: String,
         name: String? = nil,
         phone: String? = nil,
-        profileImageURL: String? = nil
+        profileImageURL: String? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil
     ) async throws -> User {
         var body: [String: Any] = [:]
         if let name            = name            { body["name"]              = name }
         if let phone           = phone           { body["phone"]             = phone }
         if let profileImageURL = profileImageURL { body["profile_image_url"] = profileImageURL }
+        if let latitude        = latitude        { body["latitude"]          = latitude }
+        if let longitude       = longitude       { body["longitude"]         = longitude }
 
         return try await api.send(.updateProfile, authToken: authToken, body: body)
     }
