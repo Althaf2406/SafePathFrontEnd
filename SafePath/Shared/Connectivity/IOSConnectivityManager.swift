@@ -16,9 +16,20 @@ class IOSConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
     
+    private var pendingPayloads: [[String: Any]] = []
+    
     func sendToWatch(payload: [String: Any]) {
-        guard WCSession.isSupported(), WCSession.default.activationState == .activated else { return }
+        guard WCSession.isSupported() else { return }
         
+        if WCSession.default.activationState == .activated {
+            sendNow(payload)
+        } else {
+            pendingPayloads.append(payload)
+            WCSession.default.activate()
+        }
+    }
+    
+    private func sendNow(_ payload: [String: Any]) {
         do {
             try WCSession.default.updateApplicationContext(payload)
         } catch {
@@ -41,6 +52,15 @@ class IOSConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             return
         }
         print("WCSession activated on iOS with state: \(activationState.rawValue)")
+        
+        if activationState == .activated {
+            DispatchQueue.main.async {
+                for payload in self.pendingPayloads {
+                    self.sendNow(payload)
+                }
+                self.pendingPayloads.removeAll()
+            }
+        }
     }
     
     #if os(iOS)

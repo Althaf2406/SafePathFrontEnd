@@ -44,6 +44,9 @@ final class EvacuationRouteViewModel: ObservableObject {
             )
             currentRoute = primary
             alternativeRoutes = alternatives
+            
+            // Sync with Apple Watch
+            sendRouteSummaryToWatch()
         } catch {
             routeError = error.localizedDescription
             currentRoute = nil

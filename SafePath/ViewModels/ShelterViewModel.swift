@@ -68,6 +68,9 @@ final class ShelterViewModel: ObservableObject {
                 radiusKm: radiusKm
             )
             nearbyShelters = data
+            
+            // Sync with Apple Watch
+            sendNearestShelterToWatch()
         } catch {
             print("Failed to fetch nearby shelters: \(error.localizedDescription)")
         }

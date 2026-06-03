@@ -26,6 +26,13 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             return
         }
         print("WCSession activated with state: \(activationState.rawValue)")
+        
+        // Process any context received while inactive
+        DispatchQueue.main.async {
+            if !session.receivedApplicationContext.isEmpty {
+                self.handlePayload(session.receivedApplicationContext)
+            }
+        }
     }
     
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
