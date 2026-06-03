@@ -198,3 +198,7 @@ struct EmergencyStatusView: View {
         )
     }
 }
+
+#Preview{
+    EmergencyStatusView()
+}

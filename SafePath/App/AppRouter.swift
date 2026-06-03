@@ -4,7 +4,8 @@ import Combine
 /// Tab-based navigation for SafePath matching the screenshots.
 struct AppRouter: View {
     @EnvironmentObject var locationService: LocationService
-    @State private var selectedTab: Tab = .prep
+    @EnvironmentObject var userVM: UserManagementViewModel
+    @State private var selectedTab: Tab = .family
     
     enum Tab: String {
         case home     = "Home"
@@ -42,7 +43,13 @@ struct AppRouter: View {
             .tag(Tab.shelter)
             
             // ── Tab 4: Family (Person 2 Placeholder UI) ───────────────────
-            CreateFamilyGroupView()
+            NavigationStack {
+                if let user = userVM.currentUser, !user.familyGroupIDs.isEmpty {
+                    ActiveFamilyDashboardView()
+                } else {
+                    FamilyDashboardView()
+                }
+            }
                 .tabItem {
                     Label("Family", systemImage: "person.2.fill")
                 }
@@ -65,6 +72,7 @@ struct AppRouter_Previews: PreviewProvider {
     static var previews: some View {
         AppRouter()
             .environmentObject(LocationService())
+            .environmentObject(UserManagementViewModel())
     }
 }
 #endif

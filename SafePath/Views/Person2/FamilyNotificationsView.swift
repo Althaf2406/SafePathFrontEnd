@@ -121,3 +121,7 @@ struct FamilyNotificationsView: View {
         .shadow(color: Color.black.opacity(0.02), radius: 5, y: 2)
     }
 }
+
+#Preview{
+    FamilyNotificationsView()
+}

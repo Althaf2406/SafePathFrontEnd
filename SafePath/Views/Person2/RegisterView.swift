@@ -12,6 +12,14 @@ struct RegisterView: View {
     @State private var isPasswordVisible: Bool = false
     @State private var isConfirmVisible:  Bool = false
 
+    @StateObject private var viewModel = UserManagementViewModel()
+    @State private var showAlert = false
+
+    // NOTE: @StateObject left here intentionally — RegisterView is pushed
+    // inside LoginView's NavigationStack which already has the @EnvironmentObject.
+    // We override with a local copy to avoid the "already logged in" state
+    // causing double-dismiss issues during registration flow.
+
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -42,10 +50,34 @@ struct RegisterView: View {
 
                 // MARK: - Register Button
                 Button(action: {
-                    // TODO: Person 2 — trigger register via UserManagementViewModel
+                    Task {
+                        guard password == confirmPassword else {
+                            viewModel.errorMessage = "Passwords do not match."
+                            showAlert = true
+                            return
+                        }
+                        guard !fullName.trimmingCharacters(in: .whitespaces).isEmpty else {
+                            viewModel.errorMessage = "Please enter your full name."
+                            showAlert = true
+                            return
+                        }
+                        await viewModel.register(name: fullName, email: email, password: password)
+                        if viewModel.isLoggedIn {
+                            dismiss()
+                        } else if viewModel.errorMessage != nil {
+                            showAlert = true
+                        }
+                    }
                 }) {
-                    Text("Register")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                    HStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                .padding(.trailing, 8)
+                        }
+                        Text("Register")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                    }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 17)
@@ -53,6 +85,7 @@ struct RegisterView: View {
                         .cornerRadius(14)
                         .shadow(color: SafePathColors.primaryBlue.opacity(0.3), radius: 8, y: 4)
                 }
+                .disabled(viewModel.isLoading)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 20)
 
@@ -127,6 +160,13 @@ struct RegisterView: View {
         }
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
+        .alert("Registration Failed", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {
+                viewModel.clearError()
+            }
+        } message: {
+            Text(viewModel.errorMessage ?? "An unknown error occurred.")
+        }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
