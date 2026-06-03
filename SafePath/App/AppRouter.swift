@@ -65,6 +65,7 @@ struct AppRouter_Previews: PreviewProvider {
     static var previews: some View {
         AppRouter()
             .environmentObject(LocationService())
+            .environmentObject(PreparednessViewModel())
     }
 }
 #endif

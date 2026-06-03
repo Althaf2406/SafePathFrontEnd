@@ -1,44 +1,19 @@
-//
-//  PreparednessView.swift
-//  SafePath
-//
-//  Created by Shatrya Christiano on 03/06/26.
-//
-
-
-//
-//  PreparednessView.swift
-//  SafePath
-//
-//  Created by Shatrya Christiano on 03/06/26.
-//
-
-
-//
-//  PreparednessView.swift
-//  SafePath
-//
-//  Created by Shatrya Christiano on 30/05/26.
-//
-
-
 import SwiftUI
 
 struct PreparednessView: View {
     @EnvironmentObject var viewModel: PreparednessViewModel
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Header Subtitle (Karena NavigationTitle hanya teks besar)
                     Text("Be ready before disaster happens.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         .padding(.top, -10)
-                    
+
                     overallReadinessCard
                     localRiskProfileCard
                     emergencyKitCard
@@ -46,13 +21,16 @@ struct PreparednessView: View {
                 }
                 .padding()
             }
-            .background(Color(UIColor.systemGroupedBackground)) // Warna background khas Apple
+            .background(Color(UIColor.systemGroupedBackground))
             .navigationTitle("Preparedness")
+            .task {
+                await viewModel.load()
+            }
         }
     }
-    
-    // MARK: - Subviews
-    
+
+    // MARK: - Overall Readiness
+
     private var overallReadinessCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -61,14 +39,11 @@ struct PreparednessView: View {
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(.secondary)
-                    
+
                     HStack(alignment: .firstTextBaseline) {
                         Text("\(Int(viewModel.overallReadiness * 100))%")
                             .font(.system(size: 40, weight: .bold))
                             .foregroundColor(.blue)
-//                        Text("Fair")
-//                            .font(.headline)
-//                            .foregroundColor(.blue)
                     }
                 }
                 Spacer()
@@ -79,17 +54,19 @@ struct PreparednessView: View {
                     .background(Color.blue.opacity(0.1))
                     .clipShape(Circle())
             }
-            
+
             ProgressView(value: viewModel.overallReadiness)
                 .tint(.blue)
-            
-//            Text("Complete your Emergency Kit to reach 80%")
-//                .font(.caption)
-//                .foregroundColor(.secondary)
+
+            Text("\(viewModel.completedItemsCount) of \(viewModel.totalItemsCount) items prepared")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
         .cardStyle()
     }
-    
+
+    // MARK: - Local Risk Profile
+
     private var localRiskProfileCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -98,31 +75,39 @@ struct PreparednessView: View {
                     .font(.headline)
             }
             .foregroundColor(.primary)
-            
-            ForEach(viewModel.riskProfiles) { risk in
-                HStack {
-                    Image(systemName: risk.iconName)
-                        .foregroundColor(risk.level.color)
-                        .frame(width: 30, height: 30)
-                        .background(risk.level.color.opacity(0.1))
-                        .clipShape(Circle())
-                    
-                    Text(risk.type)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    RiskBadge(level: risk.level)
+
+            if viewModel.riskProfiles.isEmpty {
+                Text("Loading risk profiles...")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(viewModel.riskProfiles) { risk in
+                    HStack {
+                        Image(systemName: risk.iconName)
+                            .foregroundColor(risk.level.color)
+                            .frame(width: 30, height: 30)
+                            .background(risk.level.color.opacity(0.1))
+                            .clipShape(Circle())
+
+                        Text(risk.type)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+
+                        Spacer()
+
+                        RiskBadge(level: risk.level)
+                    }
+                    .padding()
+                    .background(risk.level.color.opacity(0.05))
+                    .cornerRadius(12)
                 }
-                .padding()
-                .background(risk.level.color.opacity(0.05))
-                .cornerRadius(12)
             }
         }
         .cardStyle()
     }
-    
+
+    // MARK: - Emergency Kit
+
     private var emergencyKitCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -130,81 +115,113 @@ struct PreparednessView: View {
                 Text("Emergency Kit")
                     .font(.headline)
             }
-            
+
             Text("Essential items for 72-hour survival.")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
+
             HStack(spacing: 24) {
                 CircularProgressView(
                     progress: viewModel.overallReadiness,
                     text: "\(viewModel.completedItemsCount)/\(viewModel.totalItemsCount)"
                 )
-                
+
                 VStack(alignment: .leading, spacing: 12) {
                     ForEach(viewModel.emergencyKit) { item in
-                        HStack {
-                            Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(item.isCompleted ? .green : .secondary)
-                            Text(item.name)
-                                .foregroundColor(item.isCompleted ? .secondary : .primary)
-                                .strikethrough(item.isCompleted)
+                        Button(action: {
+                            Task { await viewModel.toggleItem(item) }
+                        }) {
+                            HStack {
+                                Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(item.isChecked ? .green : .secondary)
+                                Text(item.name)
+                                    .foregroundColor(item.isChecked ? .secondary : .primary)
+                                    .strikethrough(item.isChecked)
+                                    .multilineTextAlignment(.leading)
+                            }
                         }
-                        .font(.subheadline)                    }
+                        .font(.subheadline)
+                        .buttonStyle(.plain)
+                    }
                 }
+            }
+
+            if let error = viewModel.errorMessage {
+                Text(error)
+                    .font(.caption)
+                    .foregroundColor(.red)
             }
         }
         .cardStyle()
     }
-    
+
+    // MARK: - Quick Actions
+
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Quick Actions")
                 .font(.headline)
                 .padding(.top, 8)
-            
+
             HStack(spacing: 12) {
                 QuickActionButton(
                     title: "Emergency Checklist",
                     icon: "checklist",
-                    backgroundColor: Color(red: 0.1, green: 0.2, blue: 0.5), // Dark Blue
+                    backgroundColor: Color(red: 0.1, green: 0.2, blue: 0.5),
                     foregroundColor: .white,
                     action: CustomizeChecklistView()
                 )
-                
+
                 QuickActionButton(
                     title: "First Aid Guide",
-                    icon: "bandage", // SF Symbol yang lebih native untuk P3K
+                    icon: "bandage",
                     backgroundColor: Color.blue.opacity(0.15),
                     foregroundColor: .primary,
                     action: FirstAidGuideView()
                 )
             }
-            
+
             QuickActionButton(
-                title: "Offline Resources",
-                icon: "wifi.slash",
+                title: "Disaster Prep Guide",
+                icon: "book.fill",
                 backgroundColor: Color.blue.opacity(0.15),
                 foregroundColor: .primary,
+                action: DisasterPreparationGuideView(),
                 isFullWidth: true
             )
         }
     }
 }
 
+// MARK: - Risk Badge Component
+
+struct RiskBadge: View {
+    let level: RiskLevel
+
+    var body: some View {
+        Text(level.rawValue)
+            .font(.caption)
+            .fontWeight(.bold)
+            .foregroundColor(.white)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(level.color)
+            .cornerRadius(8)
+    }
+}
+
 // MARK: - Quick Action Button Component
-struct QuickActionButton: View {
+
+struct QuickActionButton<Destination: View>: View {
     let title: String
     let icon: String
     let backgroundColor: Color
     let foregroundColor: Color
-    let action: any View
+    let action: Destination
     var isFullWidth: Bool = false
-    
+
     var body: some View {
-        NavigationLink {
-            
-        } label: {
+        NavigationLink(destination: action) {
             VStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.title2)
@@ -220,12 +237,15 @@ struct QuickActionButton: View {
             .background(backgroundColor)
             .foregroundColor(foregroundColor)
             .cornerRadius(12)
-        }    }
+        }
+    }
 }
 
 // MARK: - Preview
+
 struct PreparednessView_Previews: PreviewProvider {
     static var previews: some View {
         PreparednessView()
+            .environmentObject(PreparednessViewModel())
     }
 }

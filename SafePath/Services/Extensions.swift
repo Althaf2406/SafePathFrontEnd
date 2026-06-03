@@ -74,12 +74,21 @@ extension Double {
 // MARK: - View Helpers
 
 extension View {
-    /// Apply SafePath card styling
+    /// Apply SafePath card styling (SafePath design system)
     func safePathCard() -> some View {
         self
             .background(SafePathColors.cardBackground)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
+    }
+
+    /// Standard white card style used across Preparedness screens.
+    func cardStyle() -> some View {
+        self
+            .padding(16)
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
     }
 }
 

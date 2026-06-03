@@ -38,6 +38,11 @@ enum APIEndpoint {
     
     //preparedness
     case getAllItem
+    case createItem
+    case updateItem(id: String)
+    case deleteItem(id: String)
+    case riskProfiles
+    case disasterGuides
     
     var path: String {
         switch self {
@@ -101,6 +106,16 @@ enum APIEndpoint {
             //checklist item
         case .getAllItem:
             return "/item"
+        case .createItem:
+            return "/item"
+        case .updateItem(let id):
+            return "/item/\(id)"
+        case .deleteItem(let id):
+            return "/item/\(id)"
+        case .riskProfiles:
+            return "/preparedness/risk-profiles"
+        case .disasterGuides:
+            return "/preparedness/disaster-guides"
         }
         
     }
@@ -109,11 +124,12 @@ enum APIEndpoint {
         switch self {
         case .register, .login, .logout,
                 .createFamilyGroup, .inviteFamilyMember, .shareLocation,
-                .updateEmergencyStatus, .triggerSOS, .resolveSOS:
+                .updateEmergencyStatus, .triggerSOS, .resolveSOS,
+                .createItem:
             return "POST"
-        case .updateProfile, .updateFamilyMemberStatus:
+        case .updateProfile, .updateFamilyMemberStatus, .updateItem:
             return "PUT"
-        case .removeFamilyMember:
+        case .removeFamilyMember, .deleteItem:
             return "DELETE"
         default:
             return "GET"
