@@ -10,6 +10,9 @@ struct CreateFamilyGroupView: View {
     @State private var isCodeGenerated: Bool = true
     @State private var showCopiedAlert = false
     
+    @EnvironmentObject var userVM: UserManagementViewModel
+    @StateObject private var familyVM = FamilySafetyViewModel()
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -43,11 +46,7 @@ struct CreateFamilyGroupView: View {
                 // Info Box at Bottom
                 infoBox
                 
-                // TODO comment
-                Text("// TODO: Person 2: Integrate code generation API and group registration with PostgreSQL.")
-                    .font(.system(size: 10))
-                    .foregroundColor(SafePathColors.textSecondary)
-                    .padding(.horizontal, 4)
+                // Requirements fulfilled
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
@@ -94,9 +93,30 @@ struct CreateFamilyGroupView: View {
                 )
             
             Button(action: {
-                // Placeholder creation trigger
+                Task {
+                    guard let token = userVM.currentUser?.authToken else { return }
+                    await familyVM.createGroup(authToken: token, name: groupName)
+                    
+                    if familyVM.errorMessage == nil, let createdGroup = familyVM.familyGroup {
+                        inviteCode = createdGroup.inviteCode
+                        
+                        // Update local user state so AppRouter switches to ActiveFamilyDashboardView
+                        if var user = userVM.currentUser {
+                            user.familyGroupIDs.append(createdGroup.id)
+                            userVM.currentUser = user
+                        }
+                        
+                        // Wait a moment for them to see the real invite code before dismissing
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            dismiss()
+                        }
+                    }
+                }
             }) {
                 HStack {
+                    if familyVM.isLoading {
+                        ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    }
                     Text("Create Group")
                     Image(systemName: "chevron.right")
                 }
@@ -107,6 +127,7 @@ struct CreateFamilyGroupView: View {
                 .background(SafePathColors.primaryBlue)
                 .cornerRadius(12)
             }
+            .disabled(familyVM.isLoading || groupName.isEmpty)
         }
         .padding(16)
         .background(Color.white)
