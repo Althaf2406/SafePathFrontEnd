@@ -166,10 +166,10 @@ final class ShelterViewModel: ObservableObject {
             WCPayloadKeys.messageType.rawValue: WCMessageType.nearestShelter.rawValue,
             WCPayloadKeys.shelterName.rawValue: nearest.name,
             WCPayloadKeys.shelterType.rawValue: "Relief Center", // Mocking based on typical shelter structure
-            WCPayloadKeys.shelterCapacity.rawValue: "\(nearest.currentCapacity) / \(nearest.maxCapacity)",
+            WCPayloadKeys.shelterCapacity.rawValue: "\(nearest.capacity)",
             WCPayloadKeys.shelterDistance.rawValue: nearest.distanceKm != nil ? String(format: "%.1f km", nearest.distanceKm!) : "Unknown",
             WCPayloadKeys.shelterAddress.rawValue: nearest.address,
-            WCPayloadKeys.shelterDisasterTypes.rawValue: "Earthquake, Flood" // Mock
+            WCPayloadKeys.shelterDisasterTypes.rawValue: nearest.disasterTypeSupported.joined(separator: ", ")
         ]
         
         IOSConnectivityManager.shared.sendToWatch(payload: payload)

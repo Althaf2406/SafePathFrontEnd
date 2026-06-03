@@ -98,7 +98,7 @@ final class EvacuationRouteViewModel: ObservableObject {
         
         let payload: [String: Any] = [
             WCPayloadKeys.messageType.rawValue: WCMessageType.routeSummary.rawValue,
-            WCPayloadKeys.routeDestination.rawValue: route.destinationName,
+            WCPayloadKeys.routeDestination.rawValue: route.shelterName,
             WCPayloadKeys.routeETA.rawValue: route.etaDisplay,
             WCPayloadKeys.routeDistance.rawValue: route.distanceDisplay
         ]

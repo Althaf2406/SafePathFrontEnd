@@ -6,6 +6,7 @@ final class ShelterRepository {
     
     private let api: APIService
     
+    @MainActor
     init(api: APIService = .shared) {
         self.api = api
     }

@@ -1,5 +1,6 @@
 import Foundation
 import WatchConnectivity
+import Combine
 
 /// Manages connectivity on the WatchOS side.
 class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
@@ -54,4 +55,13 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             self.routeSummary = payload
         }
     }
+    
+    #if os(iOS)
+    func sessionDidBecomeInactive(_ session: WCSession) {
+    }
+    
+    func sessionDidDeactivate(_ session: WCSession) {
+        session.activate()
+    }
+    #endif
 }

@@ -6,6 +6,7 @@ final class DisasterAlertRepository {
     
     private let api: APIService
     
+    @MainActor
     init(api: APIService = .shared) {
         self.api = api
     }

@@ -1,5 +1,6 @@
 import Foundation
 import WatchConnectivity
+import Combine
 
 /// Manages connectivity on the iOS side.
 class IOSConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
