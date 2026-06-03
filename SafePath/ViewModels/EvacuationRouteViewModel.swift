@@ -90,4 +90,19 @@ final class EvacuationRouteViewModel: ObservableObject {
     var hasRoute: Bool {
         currentRoute != nil
     }
+    
+    // MARK: - WatchConnectivity
+    
+    func sendRouteSummaryToWatch() {
+        guard let route = currentRoute else { return }
+        
+        let payload: [String: Any] = [
+            WCPayloadKeys.messageType.rawValue: WCMessageType.routeSummary.rawValue,
+            WCPayloadKeys.routeDestination.rawValue: route.destinationName,
+            WCPayloadKeys.routeETA.rawValue: route.etaDisplay,
+            WCPayloadKeys.routeDistance.rawValue: route.distanceDisplay
+        ]
+        
+        IOSConnectivityManager.shared.sendToWatch(payload: payload)
+    }
 }

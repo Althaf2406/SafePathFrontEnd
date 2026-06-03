@@ -156,5 +156,23 @@ final class ShelterViewModel: ObservableObject {
         
         return candidates.first
     }
+    
+    // MARK: - WatchConnectivity
+    
+    func sendNearestShelterToWatch() {
+        guard let nearest = findNearestAvailable() else { return }
+        
+        let payload: [String: Any] = [
+            WCPayloadKeys.messageType.rawValue: WCMessageType.nearestShelter.rawValue,
+            WCPayloadKeys.shelterName.rawValue: nearest.name,
+            WCPayloadKeys.shelterType.rawValue: "Relief Center", // Mocking based on typical shelter structure
+            WCPayloadKeys.shelterCapacity.rawValue: "\(nearest.currentCapacity) / \(nearest.maxCapacity)",
+            WCPayloadKeys.shelterDistance.rawValue: nearest.distanceKm != nil ? String(format: "%.1f km", nearest.distanceKm!) : "Unknown",
+            WCPayloadKeys.shelterAddress.rawValue: nearest.address,
+            WCPayloadKeys.shelterDisasterTypes.rawValue: "Earthquake, Flood" // Mock
+        ]
+        
+        IOSConnectivityManager.shared.sendToWatch(payload: payload)
+    }
 }
 
