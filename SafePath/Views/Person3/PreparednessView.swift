@@ -144,11 +144,11 @@ struct PreparednessView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     ForEach(viewModel.emergencyKit) { item in
                         HStack {
-                            Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(item.isCompleted ? .green : .secondary)
+                            Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(item.isChecked ? .green : .secondary)
                             Text(item.name)
-                                .foregroundColor(item.isCompleted ? .secondary : .primary)
-                                .strikethrough(item.isCompleted)
+                                .foregroundColor(item.isChecked ? .secondary : .primary)
+                                .strikethrough(item.isChecked)
                         }
                         .font(.subheadline)                    }
                 }
@@ -169,7 +169,7 @@ struct PreparednessView: View {
                     icon: "checklist",
                     backgroundColor: Color(red: 0.1, green: 0.2, blue: 0.5), // Dark Blue
                     foregroundColor: .white,
-                    action: CustomizeChecklistView()
+                    action: Text("Checklist Coming Soon")
                 )
                 
                 QuickActionButton(
@@ -177,7 +177,7 @@ struct PreparednessView: View {
                     icon: "bandage", // SF Symbol yang lebih native untuk P3K
                     backgroundColor: Color.blue.opacity(0.15),
                     foregroundColor: .primary,
-                    action: FirstAidGuideView()
+                    action: Text("First Aid Coming Soon")
                 )
             }
             
@@ -186,6 +186,7 @@ struct PreparednessView: View {
                 icon: "wifi.slash",
                 backgroundColor: Color.blue.opacity(0.15),
                 foregroundColor: .primary,
+                action: Text("Offline Resources"),
                 isFullWidth: true
             )
         }
@@ -203,7 +204,7 @@ struct QuickActionButton: View {
     
     var body: some View {
         NavigationLink {
-            
+            AnyView(action)
         } label: {
             VStack(spacing: 8) {
                 Image(systemName: icon)
@@ -223,9 +224,61 @@ struct QuickActionButton: View {
         }    }
 }
 
+// MARK: - Missing Components
+
+struct RiskBadge: View {
+    let level: RiskLevel
+    var body: some View {
+        Text(level.rawValue)
+            .font(.caption)
+            .fontWeight(.bold)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(level.color.opacity(0.2))
+            .foregroundColor(level.color)
+            .cornerRadius(8)
+    }
+}
+
+struct CircularProgressView: View {
+    let progress: Double
+    let text: String
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(lineWidth: 6)
+                .opacity(0.3)
+                .foregroundColor(.blue)
+            
+            Circle()
+                .trim(from: 0.0, to: CGFloat(min(progress, 1.0)))
+                .stroke(style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
+                .foregroundColor(.blue)
+                .rotationEffect(Angle(degrees: 270.0))
+            
+            Text(text)
+                .font(.caption)
+                .fontWeight(.bold)
+        }
+        .frame(width: 50, height: 50)
+    }
+}
+
+extension View {
+    func cardStyle() -> some View {
+        self
+            .padding()
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
+    }
+}
+
 // MARK: - Preview
 struct PreparednessView_Previews: PreviewProvider {
     static var previews: some View {
         PreparednessView()
+            .environmentObject(PreparednessViewModel())
     }
 }
