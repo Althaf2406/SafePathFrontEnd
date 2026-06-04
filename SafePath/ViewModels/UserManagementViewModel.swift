@@ -22,6 +22,21 @@ final class UserManagementViewModel: ObservableObject {
 
     init() {
         restoreSession()
+        #if DEBUG
+        // Inject Dummy Data for UI Testing Person 2
+        if self.currentUser == nil {
+            self.currentUser = User(
+                id: "dummy-123",
+                name: "Dummy Tester",
+                email: "dummy@example.com",
+                lastLatitude: -7.2504,
+                lastLongitude: 112.7688,
+                authToken: "mock-token-123",
+                familyGroupIDs: ["DUMMY_GROUP_123"]
+            )
+            self.isLoggedIn = true
+        }
+        #endif
     }
 
     // MARK: - Auth Actions
@@ -79,12 +94,9 @@ final class UserManagementViewModel: ObservableObject {
     func logout() async {
         isLoading = true
 
-        // ── MOCK ── replace with real API call when backend is ready:
-        // if let token = currentUser?.authToken {
-        //     try? await repository.logout(authToken: token)
-        // }
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        // ── END MOCK ──
+        if let token = currentUser?.authToken {
+            try? await repository.logout(authToken: token)
+        }
 
         clearSession()
         isLoading = false
@@ -94,38 +106,36 @@ final class UserManagementViewModel: ObservableObject {
 
     /// GET /user/profile — Fetches the latest profile from backend.
     func fetchProfile() async {
-        guard currentUser?.authToken != nil else { return }
+        guard let token = currentUser?.authToken else { return }
         isLoading = true
         errorMessage = nil
 
-        // ── MOCK ── replace with real API call when backend is ready:
-        // currentUser = try await repository.fetchProfile(authToken: token)
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        // No-op for mock — profile already in currentUser
-        // ── END MOCK ──
+        do {
+            let user = try await repository.fetchProfile(authToken: token)
+            self.currentUser = user
+            persistSession(user)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
 
         isLoading = false
     }
 
     /// PUT /user/profile — Updates name, phone, profile image, or location.
     func updateProfile(name: String? = nil, phone: String? = nil, profileImageURL: String? = nil, latitude: Double? = nil, longitude: Double? = nil) async {
-        guard var user = currentUser else { return }
+        guard let token = currentUser?.authToken else { return }
         isLoading = true
         errorMessage = nil
 
-        // ── MOCK ── replace with real API call when backend is ready:
-        // currentUser = try await repository.updateProfile(authToken: token, name: name, phone: phone, profileImageURL: profileImageURL, latitude: latitude, longitude: longitude)
-        try? await Task.sleep(nanoseconds: 800_000_000)
-        if let name             = name             { user.name            = name }
-        if let phone            = phone            { user.phone           = phone }
-        if let profileImageURL  = profileImageURL  { user.profileImageURL = profileImageURL }
-        if let latitude         = latitude         { user.lastLatitude    = latitude }
-        if let longitude        = longitude        { user.lastLongitude   = longitude }
-        // ── END MOCK ──
-
-        self.currentUser = user
-        self.isLoading   = false
-        persistSession(user)
+        do {
+            let updatedUser = try await repository.updateProfile(authToken: token, name: name, phone: phone, profileImageURL: profileImageURL, latitude: latitude, longitude: longitude)
+            self.currentUser = updatedUser
+            self.isLoading   = false
+            persistSession(updatedUser)
+        } catch {
+            errorMessage = error.localizedDescription
+            self.isLoading = false
+        }
     }
 
     // MARK: - Helpers

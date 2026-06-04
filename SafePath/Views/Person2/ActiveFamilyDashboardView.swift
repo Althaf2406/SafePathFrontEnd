@@ -157,54 +157,72 @@ struct ActiveFamilyDashboardView: View {
                     
                     // MARK: - Box Buttons for Navigation
                     VStack(spacing: 16) {
-                        NavigationLink(destination: LiveLocationFamilyView()) {
+                        
+                        // NEW: Giant SOS Button
+                        NavigationLink(destination: EmergencyStatusView()) {
                             HStack {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("Live Location")
-                                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                                        .foregroundColor(.white)
-                                    Text("Track family members on the map")
-                                        .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(.white.opacity(0.8))
-                                }
                                 Spacer()
-                                Image(systemName: "map.fill")
-                                    .font(.system(size: 30))
-                                    .foregroundColor(.white.opacity(0.9))
+                                VStack(spacing: 8) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.system(size: 44))
+                                    Text("EMERGENCY SOS")
+                                        .font(.system(size: 22, weight: .black, design: .rounded))
+                                        .tracking(1.5)
+                                }
+                                .foregroundColor(.white)
+                                Spacer()
                             }
-                            .padding(20)
-                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 28)
                             .background(
-                                LinearGradient(colors: [SafePathColors.primaryBlue, SafePathColors.primaryBlue.opacity(0.8)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                LinearGradient(colors: [SafePathColors.dangerRed, Color.red.opacity(0.8)], startPoint: .top, endPoint: .bottom)
                             )
-                            .cornerRadius(20)
-                            .shadow(color: SafePathColors.primaryBlue.opacity(0.3), radius: 8, y: 4)
+                            .cornerRadius(24)
+                            .shadow(color: SafePathColors.dangerRed.opacity(0.4), radius: 12, y: 8)
                         }
                         
-                        NavigationLink(destination: FamilyNotificationsView()) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("Family Notifications")
-                                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                                        .foregroundColor(SafePathColors.primaryBlue)
-                                    Text("View emergency alerts and updates")
-                                        .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(SafePathColors.textSecondary)
+                        // Secondary Grid Actions
+                        HStack(spacing: 16) {
+                            NavigationLink(destination: LiveLocationFamilyView()) {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    Image(systemName: "map.fill")
+                                        .font(.system(size: 28))
+                                        .foregroundColor(.white)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Live Map")
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                            .foregroundColor(.white)
+                                        Text("Track Family")
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.8))
+                                    }
                                 }
-                                Spacer()
-                                Image(systemName: "bell.badge.fill")
-                                    .font(.system(size: 30))
-                                    .foregroundColor(SafePathColors.primaryBlue.opacity(0.8))
+                                .padding(16)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(SafePathColors.primaryBlue)
+                                .cornerRadius(20)
+                                .shadow(color: SafePathColors.primaryBlue.opacity(0.3), radius: 8, y: 4)
                             }
-                            .padding(20)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white)
-                            .cornerRadius(20)
-                            .shadow(color: Color.black.opacity(0.06), radius: 8, y: 4)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(SafePathColors.primaryBlue.opacity(0.1), lineWidth: 1)
-                            )
+                            
+                            NavigationLink(destination: FamilyNotificationsView()) {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    Image(systemName: "bell.badge.fill")
+                                        .font(.system(size: 28))
+                                        .foregroundColor(SafePathColors.primaryBlue)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Alerts")
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                            .foregroundColor(SafePathColors.textPrimary)
+                                        Text("History")
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(SafePathColors.textSecondary)
+                                    }
+                                }
+                                .padding(16)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.white)
+                                .cornerRadius(20)
+                                .shadow(color: Color.black.opacity(0.04), radius: 8, y: 4)
+                            }
                         }
                     }
                     .padding(.horizontal, 20)
@@ -232,9 +250,18 @@ struct ActiveFamilyDashboardView: View {
                 Spacer()
                 
                 HStack(spacing: 16) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(SafePathColors.textPrimary)
+                    NavigationLink(destination: FamilyNotificationsView()) {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 22))
+                                .foregroundColor(SafePathColors.primaryBlue)
+                            
+                            Circle()
+                                .fill(SafePathColors.dangerRed)
+                                .frame(width: 10, height: 10)
+                                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                        }
+                    }
                     
                     NavigationLink(destination: ProfilePageView()) {
                         Image(systemName: "person.crop.circle.fill")
