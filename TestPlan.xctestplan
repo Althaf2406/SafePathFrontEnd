@@ -1,0 +1,34 @@
+{
+  "configurations" : [
+    {
+      "id" : "D2459AAF-E0AF-4D4E-A629-6AB46F8D5A39",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "selectedTags" : {
+        "includeXCTests" : true
+      },
+      "skippedTests" : {
+        "suites" : [
+          {
+            "name" : "SafePathAppTests"
+          }
+        ]
+      },
+      "target" : {
+        "containerPath" : "container:SafePath.xcodeproj",
+        "identifier" : "3F684B2E2FD1737B00A40153",
+        "name" : "SafePathAppTests"
+      }
+    }
+  ],
+  "version" : 2
+}

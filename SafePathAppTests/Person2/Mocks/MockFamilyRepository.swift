@@ -1,4 +1,5 @@
 import Foundation
+@testable import SafePath
 
 final class MockFamilyRepository: FamilyRepositoryProtocol {
     var shouldThrowError = false
@@ -10,44 +11,44 @@ final class MockFamilyRepository: FamilyRepositoryProtocol {
     var didCallRemoveMember = false
     var didCallShareLocation = false
 
-    func createGroup(authToken: String, name: String) async throws -> FamilyGroup {
+    func createGroup(name: String) async throws -> FamilyGroup {
         if shouldThrowError { throw URLError(.badServerResponse) }
         return groupToReturn
     }
 
-    func fetchGroup(authToken: String, groupID: String) async throws -> FamilyGroup {
+    func fetchGroup(groupID: String) async throws -> FamilyGroup {
         if shouldThrowError { throw URLError(.badServerResponse) }
         return groupToReturn
     }
 
-    func fetchAllGroups(authToken: String) async throws -> [FamilyGroup] {
+    func fetchAllGroups() async throws -> [FamilyGroup] {
         if shouldThrowError { throw URLError(.badServerResponse) }
         return groupsToReturn
     }
 
-    func inviteMember(authToken: String, groupID: String, phone: String?, email: String?) async throws -> FamilyMember {
+    func inviteMember(groupID: String, phone: String?, email: String?) async throws -> FamilyMember {
         if shouldThrowError { throw URLError(.badServerResponse) }
         return memberToReturn
     }
 
-    func removeMember(authToken: String, groupID: String, memberID: String) async throws {
+    func removeMember(groupID: String, memberID: String) async throws {
         if shouldThrowError { throw URLError(.badServerResponse) }
         didCallRemoveMember = true
     }
 
-    func updateMemberStatus(authToken: String, groupID: String, memberID: String, status: FamilyMember.MemberStatus) async throws -> FamilyMember {
+    func updateMemberStatus(groupID: String, memberID: String, status: FamilyMember.MemberStatus) async throws -> FamilyMember {
         if shouldThrowError { throw URLError(.badServerResponse) }
         var updated = memberToReturn
         updated.status = status
         return updated
     }
 
-    func shareLocation(authToken: String, groupID: String, latitude: Double, longitude: Double) async throws {
+    func shareLocation(groupID: String, latitude: Double, longitude: Double) async throws {
         if shouldThrowError { throw URLError(.badServerResponse) }
         didCallShareLocation = true
     }
 
-    func fetchFamilyLocations(authToken: String, groupID: String) async throws -> [FamilyMember] {
+    func fetchFamilyLocations(groupID: String) async throws -> [FamilyMember] {
         if shouldThrowError { throw URLError(.badServerResponse) }
         return locationsToReturn
     }

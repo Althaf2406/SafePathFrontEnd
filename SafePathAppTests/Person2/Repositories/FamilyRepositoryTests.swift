@@ -1,8 +1,10 @@
 import Foundation
 import Testing
+@testable import SafePath
 
 
 @Suite("FamilyRepository Tests")
+@MainActor
 struct FamilyRepositoryTests {
 
     @Test("Fungsi: fetchAllGroups() - Skenario Berhasil")
@@ -12,7 +14,7 @@ struct FamilyRepositoryTests {
         mockAPI.responseToReturn = [mockGroup]
         
         let repo = FamilyRepository(api: mockAPI)
-        let groups = try await repo.fetchAllGroups(authToken: "token")
+        let groups = try await repo.fetchAllGroups()
         
         #expect(groups.count == 1)
         #expect(groups.first?.name == "API Group")
@@ -26,7 +28,7 @@ struct FamilyRepositoryTests {
         let repo = FamilyRepository(api: mockAPI)
         
         do {
-            _ = try await repo.createGroup(authToken: "token", name: "Test")
+            _ = try await repo.createGroup(name: "Test")
             Issue.record("Diharapkan error, tapi sukses")
         } catch {
             #expect(error != nil)

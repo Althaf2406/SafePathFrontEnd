@@ -12,11 +12,11 @@ final class DisasterPreparationViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     init(
-        prepRepository: DisasterPreparationRepositoryProtocol = DisasterPreparationRepository(),
-        checklistRepository: ChecklistRepositoryProtocol = ChecklistRepository()
+        prepRepository: DisasterPreparationRepositoryProtocol? = nil,
+        checklistRepository: ChecklistRepositoryProtocol? = nil
     ) {
-        self.prepRepository = prepRepository
-        self.checklistRepository = checklistRepository
+        self.prepRepository = prepRepository ?? DisasterPreparationRepository()
+        self.checklistRepository = checklistRepository ?? ChecklistRepository()
         loadGuides()
     }
     
@@ -38,20 +38,6 @@ final class DisasterPreparationViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func toggleChecklistItem(_ item: ChecklistItem) {
-        var updatedItem = item
-        updatedItem.isChecked.toggle()
-        
-        checklistRepository.saveCustomItem(updatedItem)
-            .receive(on: RunLoop.main)
-            .sink { _ in } receiveValue: { [weak self] _ in
-                // Reload checklist to reflect the change
-                if let disasterType = self?.checklistItems.first(where: { $0.id == updatedItem.id })?.disasterType {
-                    self?.loadChecklist(for: disasterType)
-                }
-            }
-            .store(in: &cancellables)
-    }
 }
 
 //

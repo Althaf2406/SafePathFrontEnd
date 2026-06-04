@@ -14,7 +14,6 @@ final class EmergencyStatusRepository: EmergencyStatusRepositoryProtocol {
 
     /// POST /emergency/status
     func updateStatus(
-        authToken: String,
         status: EmergencyStatus.EmergencyStatusType,
         message: String? = nil,
         latitude: Double? = nil,
@@ -25,24 +24,23 @@ final class EmergencyStatusRepository: EmergencyStatusRepositoryProtocol {
         if let latitude  = latitude  { body["latitude"]  = latitude }
         if let longitude = longitude { body["longitude"] = longitude }
 
-        return try await api.send(.updateEmergencyStatus, authToken: authToken, body: body)
+        return try await api.send(.updateEmergencyStatus, body: body)
     }
 
     /// GET /emergency/status/:userId
-    func fetchStatus(authToken: String, userID: String) async throws -> EmergencyStatus {
-        return try await api.send(.fetchEmergencyStatus(userID: userID), authToken: authToken)
+    func fetchStatus(userID: String) async throws -> EmergencyStatus {
+        return try await api.send(.fetchEmergencyStatus(userID: userID))
     }
 
     /// GET /emergency/family/:groupId/statuses
-    func fetchFamilyStatuses(authToken: String, groupID: String) async throws -> [EmergencyStatus] {
-        return try await api.send(.fetchFamilyStatuses(groupID: groupID), authToken: authToken)
+    func fetchFamilyStatuses(groupID: String) async throws -> [EmergencyStatus] {
+        return try await api.send(.fetchFamilyStatuses(groupID: groupID))
     }
 
     // MARK: - SOS Endpoints
 
     /// POST /emergency/sos
     func triggerSOS(
-        authToken: String,
         latitude: Double? = nil,
         longitude: Double? = nil,
         message: String? = nil
@@ -52,11 +50,11 @@ final class EmergencyStatusRepository: EmergencyStatusRepositoryProtocol {
         if let longitude = longitude { body["longitude"] = longitude }
         if let message   = message   { body["message"]   = message }
 
-        return try await api.send(.triggerSOS, authToken: authToken, body: body)
+        return try await api.send(.triggerSOS, body: body)
     }
 
     /// POST /emergency/sos/:sosId/resolve
-    func resolveSOS(authToken: String, sosID: String) async throws -> EmergencyStatus {
-        return try await api.send(.resolveSOS(sosID: sosID), authToken: authToken)
+    func resolveSOS(sosID: String) async throws -> EmergencyStatus {
+        return try await api.send(.resolveSOS(sosID: sosID))
     }
 }

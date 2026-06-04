@@ -227,9 +227,7 @@ struct ChecklistView: View {
     }
 }
 
-#Preview {
-    ChecklistView()
-        .environmentObject(PreparednessViewModel())
-}
-
-//
+//#Preview {
+//    ChecklistView()
+//        .environmentObject(PreparednessViewModel())
+//}

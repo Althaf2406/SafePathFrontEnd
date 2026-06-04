@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PreparednessView: View {
     @EnvironmentObject var viewModel: PreparednessViewModel
+    @EnvironmentObject var userVM: UserManagementViewModel
 
     var body: some View {
         NavigationStack {
@@ -24,7 +25,9 @@ struct PreparednessView: View {
             .background(Color(UIColor.systemGroupedBackground))
             .navigationTitle("Preparedness")
             .task {
-                await viewModel.load()
+                let lat = userVM.currentUser?.lastLatitude ?? -7.2504
+                let lng = userVM.currentUser?.lastLongitude ?? 112.7688
+                await viewModel.load(lat: lat, lng: lng)
             }
         }
     }
@@ -128,17 +131,13 @@ struct PreparednessView: View {
 
                 VStack(alignment: .leading, spacing: 12) {
                     ForEach(viewModel.emergencyKit) { item in
-                        Button(action: {
-                            Task { await viewModel.toggleItem(item) }
-                        }) {
-                            HStack {
-                                Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(item.isChecked ? .green : .secondary)
-                                Text(item.name)
-                                    .foregroundColor(item.isChecked ? .secondary : .primary)
-                                    .strikethrough(item.isChecked)
-                                    .multilineTextAlignment(.leading)
-                            }
+                        HStack {
+                            Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(item.isChecked ? .green : .secondary)
+                            Text(item.name)
+                                .foregroundColor(item.isChecked ? .secondary : .primary)
+                                .strikethrough(item.isChecked)
+                                .multilineTextAlignment(.leading)
                         }
                         .font(.subheadline)
                         .buttonStyle(.plain)
@@ -167,9 +166,9 @@ struct PreparednessView: View {
                 QuickActionButton(
                     title: "Emergency Checklist",
                     icon: "checklist",
-                    backgroundColor: Color(red: 0.1, green: 0.2, blue: 0.5),
-                    foregroundColor: .white,
-                    action: CustomizeChecklistView()
+                    backgroundColor: Color.blue.opacity(0.15),
+                    foregroundColor: .primary,
+                    action: ChecklistView()
                 )
 
                 QuickActionButton(

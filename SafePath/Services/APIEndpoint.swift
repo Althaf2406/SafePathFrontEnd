@@ -41,7 +41,7 @@ enum APIEndpoint {
     case createItem
     case updateItem(id: String)
     case deleteItem(id: String)
-    case riskProfiles
+    case riskProfiles(lat: Double, lng: Double)
     case disasterGuides
     
     var path: String {
@@ -112,8 +112,8 @@ enum APIEndpoint {
             return "/item/\(id)"
         case .deleteItem(let id):
             return "/item/\(id)"
-        case .riskProfiles:
-            return "/preparedness/risk-profiles"
+        case .riskProfiles(let lat, let lng):
+            return "/preparedness/risk-profiles?lat=\(lat)&lng=\(lng)"
         case .disasterGuides:
             return "/preparedness/disaster-guides"
         }

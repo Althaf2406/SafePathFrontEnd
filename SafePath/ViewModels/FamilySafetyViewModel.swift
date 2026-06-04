@@ -24,11 +24,11 @@ final class FamilySafetyViewModel: ObservableObject {
     // MARK: - Group Actions
 
     /// POST /family/group — Creates a new family group.
-    func createGroup(authToken: String, name: String) async {
+    func createGroup(name: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            familyGroup = try await repository.createGroup(authToken: authToken, name: name)
+            familyGroup = try await repository.createGroup(name: name)
             members = familyGroup?.members ?? []
         } catch {
             errorMessage = error.localizedDescription
@@ -37,11 +37,11 @@ final class FamilySafetyViewModel: ObservableObject {
     }
 
     /// GET /family/group/:id — Fetches group details and refreshes members list.
-    func fetchGroup(authToken: String, groupID: String) async {
+    func fetchGroup(groupID: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            familyGroup = try await repository.fetchGroup(authToken: authToken, groupID: groupID)
+            familyGroup = try await repository.fetchGroup(groupID: groupID)
             members = familyGroup?.members ?? []
         } catch {
             errorMessage = error.localizedDescription
@@ -52,13 +52,12 @@ final class FamilySafetyViewModel: ObservableObject {
     // MARK: - Member Actions
 
     /// POST /family/group/:id/invite — Invites a member by phone or email.
-    func inviteMember(authToken: String, phone: String? = nil, email: String? = nil) async {
+    func inviteMember(phone: String? = nil, email: String? = nil) async {
         guard let groupID = familyGroup?.id else { return }
         isLoading = true
         errorMessage = nil
         do {
             let newMember = try await repository.inviteMember(
-                authToken: authToken,
                 groupID: groupID,
                 phone: phone,
                 email: email
@@ -71,12 +70,12 @@ final class FamilySafetyViewModel: ObservableObject {
     }
 
     /// DELETE /family/group/:id/member/:memberId — Removes a member (admin only).
-    func removeMember(authToken: String, memberID: String) async {
-        guard let groupID = familyGroup?.id else { return }
+    func removeMember(groupID: String? = nil, memberID: String) async {
+        guard let targetGroupID = groupID ?? familyGroup?.id else { return }
         isLoading = true
         errorMessage = nil
         do {
-            try await repository.removeMember(authToken: authToken, groupID: groupID, memberID: memberID)
+            try await repository.removeMember(groupID: targetGroupID, memberID: memberID)
             members.removeAll { $0.id == memberID }
         } catch {
             errorMessage = error.localizedDescription
@@ -85,13 +84,12 @@ final class FamilySafetyViewModel: ObservableObject {
     }
 
     /// PUT /family/group/:id/member/:memberId/status — Updates a member's safety status.
-    func updateMemberStatus(authToken: String, memberID: String, status: FamilyMember.MemberStatus) async {
+    func updateMemberStatus(memberID: String, status: FamilyMember.MemberStatus) async {
         guard let groupID = familyGroup?.id else { return }
         isLoading = true
         errorMessage = nil
         do {
             let updated = try await repository.updateMemberStatus(
-                authToken: authToken,
                 groupID: groupID,
                 memberID: memberID,
                 status: status
@@ -108,12 +106,11 @@ final class FamilySafetyViewModel: ObservableObject {
     // MARK: - Location Actions
 
     /// POST /family/location — Shares current user's location with the family group.
-    func shareLocation(authToken: String, latitude: Double, longitude: Double) async {
+    func shareLocation(latitude: Double, longitude: Double) async {
         guard let groupID = familyGroup?.id else { return }
         errorMessage = nil
         do {
             try await repository.shareLocation(
-                authToken: authToken,
                 groupID: groupID,
                 latitude: latitude,
                 longitude: longitude
@@ -124,12 +121,12 @@ final class FamilySafetyViewModel: ObservableObject {
     }
 
     /// GET /family/group/:id/locations — Refreshes all member locations.
-    func fetchFamilyLocations(authToken: String) async {
-        guard let groupID = familyGroup?.id else { return }
+    func fetchFamilyLocations(groupID: String? = nil) async {
+        guard let targetGroupID = groupID ?? familyGroup?.id else { return }
         isLoading = true
         errorMessage = nil
         do {
-            members = try await repository.fetchFamilyLocations(authToken: authToken, groupID: groupID)
+            members = try await repository.fetchFamilyLocations(groupID: targetGroupID)
         } catch {
             errorMessage = error.localizedDescription
         }

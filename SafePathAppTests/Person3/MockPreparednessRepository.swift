@@ -45,7 +45,7 @@ final class MockPreparednessRepository: PreparednessRepositoryProtocol {
         itemsToReturn.removeAll(where: { $0.id == id })
     }
     
-    func fetchRiskProfiles() async throws -> [RiskProfile] {
+    func fetchRiskProfiles(lat: Double, lng: Double) async throws -> [RiskProfile] {
         if shouldThrowError {
             throw URLError(.badServerResponse)
         }

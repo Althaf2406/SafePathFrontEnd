@@ -34,19 +34,18 @@ final class UserRepository: UserRepositoryProtocol {
     }
 
     /// POST /auth/logout
-    func logout(authToken: String) async throws {
-        try await api.sendVoid(.logout, authToken: authToken)
+    func logout() async throws {
+        try await api.sendVoid(.logout)
     }
 
     // MARK: - Profile Endpoints
 
     /// GET /user/profile
-    func fetchProfile(authToken: String) async throws -> User {
-        return try await api.send(.userProfile, authToken: authToken)
+    func fetchProfile() async throws -> User {
+        return try await api.send(.userProfile)
     }
 
     func updateProfile(
-        authToken: String,
         name: String? = nil,
         phone: String? = nil,
         profileImageURL: String? = nil,
@@ -60,6 +59,6 @@ final class UserRepository: UserRepositoryProtocol {
         if let latitude        = latitude        { body["latitude"]          = latitude }
         if let longitude       = longitude       { body["longitude"]         = longitude }
 
-        return try await api.send(.updateProfile, authToken: authToken, body: body)
+        return try await api.send(.updateProfile, body: body)
     }
 }

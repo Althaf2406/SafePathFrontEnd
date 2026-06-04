@@ -12,7 +12,7 @@ struct DisasterAlertViewModelTests {
     func testFetchAlertsSuccess() async {
         let mockRepo = MockDisasterAlertRepository()
         mockRepo.alertsToReturn = [
-            TestDataFactory.mockDisasterAlert(id: "1", title: "Gempa Bumi")
+            TestDataFactory.mockDisasterAlert(id: "1", type: "earthquake")
         ]
         
         let vm = DisasterAlertViewModel(repository: mockRepo)
@@ -62,14 +62,18 @@ struct DisasterAlertViewModelTests {
     func testFetchNearbyAlertsSuccess() async {
         let mockRepo = MockDisasterAlertRepository()
         mockRepo.alertsToReturn = [
-            TestDataFactory.mockDisasterAlert(id: "near1", title: "Banjir")
+            TestDataFactory.mockDisasterAlert(
+                id: "near1",
+                type: "flood",
+                locationName: "Surabaya"
+            )
         ]
         
         let vm = DisasterAlertViewModel(repository: mockRepo)
         await vm.fetchNearbyAlerts(location: TestDataFactory.mockUserLocation())
         
         #expect(vm.nearbyAlerts.count == 1)
-        #expect(vm.nearbyAlerts.first?.title == "Banjir")
+        #expect(vm.nearbyAlerts.first?.type == "flood")
     }
     
     @Test("Fungsi: filterSeverity - Uji Severity Tingkat Tinggi")

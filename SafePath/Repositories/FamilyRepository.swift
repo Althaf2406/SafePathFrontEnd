@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// Person 2: Repository for family group API calls.
 /// Connects to Express backend family endpoints via APIService.
@@ -13,26 +14,25 @@ final class FamilyRepository: FamilyRepositoryProtocol {
     // MARK: - Group Endpoints
 
     /// POST /family/group
-    func createGroup(authToken: String, name: String) async throws -> FamilyGroup {
+    func createGroup(name: String) async throws -> FamilyGroup {
         let body: [String: Any] = ["name": name]
-        return try await api.send(.createFamilyGroup, authToken: authToken, body: body)
+        return try await api.send(.createFamilyGroup, body: body)
     }
 
     /// GET /family/group/:groupId
-    func fetchGroup(authToken: String, groupID: String) async throws -> FamilyGroup {
-        return try await api.send(.fetchFamilyGroup(groupID: groupID), authToken: authToken)
+    func fetchGroup(groupID: String) async throws -> FamilyGroup {
+        return try await api.send(.fetchFamilyGroup(groupID: groupID))
     }
 
     /// GET /family/groups
-    func fetchAllGroups(authToken: String) async throws -> [FamilyGroup] {
-        return try await api.send(.fetchAllFamilyGroups, authToken: authToken)
+    func fetchAllGroups() async throws -> [FamilyGroup] {
+        return try await api.send(.fetchAllFamilyGroups)
     }
 
     // MARK: - Member Endpoints
 
     /// POST /family/group/:groupId/invite
     func inviteMember(
-        authToken: String,
         groupID: String,
         phone: String? = nil,
         email: String? = nil
@@ -41,17 +41,16 @@ final class FamilyRepository: FamilyRepositoryProtocol {
         if let phone = phone { body["phone"] = phone }
         if let email = email { body["email"] = email }
 
-        return try await api.send(.inviteFamilyMember(groupID: groupID), authToken: authToken, body: body)
+        return try await api.send(.inviteFamilyMember(groupID: groupID), body: body)
     }
 
     /// DELETE /family/group/:groupId/member/:memberId
-    func removeMember(authToken: String, groupID: String, memberID: String) async throws {
-        try await api.sendVoid(.removeFamilyMember(groupID: groupID, memberID: memberID), authToken: authToken)
+    func removeMember(groupID: String, memberID: String) async throws {
+        try await api.sendVoid(.removeFamilyMember(groupID: groupID, memberID: memberID))
     }
 
     /// PUT /family/group/:groupId/member/:memberId/status
     func updateMemberStatus(
-        authToken: String,
         groupID: String,
         memberID: String,
         status: FamilyMember.MemberStatus
@@ -59,7 +58,6 @@ final class FamilyRepository: FamilyRepositoryProtocol {
         let body: [String: Any] = ["status": status.rawValue]
         return try await api.send(
             .updateFamilyMemberStatus(groupID: groupID, memberID: memberID),
-            authToken: authToken,
             body: body
         )
     }
@@ -68,7 +66,6 @@ final class FamilyRepository: FamilyRepositoryProtocol {
 
     /// POST /family/location
     func shareLocation(
-        authToken: String,
         groupID: String,
         latitude: Double,
         longitude: Double
@@ -78,11 +75,29 @@ final class FamilyRepository: FamilyRepositoryProtocol {
             "latitude":  latitude,
             "longitude": longitude
         ]
-        try await api.sendVoid(.shareLocation, authToken: authToken, body: body)
+        try await api.sendVoid(.shareLocation, body: body)
     }
 
     /// GET /family/group/:groupId/locations
-    func fetchFamilyLocations(authToken: String, groupID: String) async throws -> [FamilyMember] {
-        return try await api.send(.fetchFamilyLocations(groupID: groupID), authToken: authToken)
+    func fetchFamilyLocations(groupID: String) async throws -> [FamilyMember] {
+        let context = SharedModelContainer.shared.context
+        do {
+            let members: [FamilyMember] = try await api.send(.fetchFamilyLocations(groupID: groupID))
+            
+            // Cache them
+            for member in members {
+                if let lat = member.lastLatitude, let lon = member.lastLongitude {
+                    context.insert(SDFamilyMember(id: member.id, name: member.name, latitude: lat, longitude: lon, lastUpdated: member.lastUpdated ?? Date(), status: member.status.rawValue))
+                }
+            }
+            try? context.save()
+            return members
+        } catch {
+            let descriptor = FetchDescriptor<SDFamilyMember>()
+            if let cached = try? context.fetch(descriptor), !cached.isEmpty {
+                return cached.map { $0.toFamilyMember() }
+            }
+            throw error
+        }
     }
 }

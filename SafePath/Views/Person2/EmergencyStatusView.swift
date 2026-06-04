@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EmergencyStatusView: View {
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userVM: UserManagementViewModel// Menggunakan ViewModel asli kamu
     @State private var navigateToNotifications = false
     
@@ -118,6 +119,13 @@ struct EmergencyStatusView: View {
     
     private var customTopBar: some View {
         HStack {
+            Button(action: { dismiss() }) {
+                Image(systemName: "chevron.left")
+                    .foregroundColor(SafePathColors.primaryBlue)
+                    .font(.system(size: 20, weight: .semibold))
+                    .padding(.trailing, 8)
+            }
+            
             HStack(spacing: 12) {
                 Image(systemName: "location.circle.fill")
                     .foregroundColor(SafePathColors.primaryBlue)

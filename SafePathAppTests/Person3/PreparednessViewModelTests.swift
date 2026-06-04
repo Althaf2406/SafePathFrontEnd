@@ -20,7 +20,7 @@ struct PreparednessViewModelTests {
 
         let vm = PreparednessViewModel(repository: mockRepo)
         
-        await vm.load()
+        await vm.load(lat: 0, lng: 0)
 
         #expect(vm.emergencyKit.count == 2)
         #expect(vm.riskProfiles.count == 1)
@@ -54,7 +54,7 @@ struct PreparednessViewModelTests {
 
         let vm = PreparednessViewModel(repository: mockRepo)
         await vm.getAllItem()
-
+        
         await vm.toggleItem(item)
 
         #expect(mockRepo.savedItems.count == 1)
@@ -97,7 +97,7 @@ struct PreparednessViewModelTests {
 
         let vm = PreparednessViewModel(repository: mockRepo)
         
-        await vm.load()
+        await vm.load(lat: 0, lng: 0)
 
         // Karena repository gagal (throw), ViewModel harus mengisi dengan mock statis internalnya
         #expect(!vm.emergencyKit.isEmpty)

@@ -69,31 +69,7 @@ struct FirstAidGuideView: View {
                 .padding(.top, 16)
             }
             .background(SafePathColors.backgroundLight.ignoresSafeArea())
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(SafePathColors.primaryBlue)
-                            .font(.system(size: 18, weight: .semibold))
-                    }
-                }
-                ToolbarItem(placement: .principal) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "shield.fill")
-                            .foregroundColor(SafePathColors.primaryBlue)
-                            .font(.headline)
-                        Text("SafePath")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundColor(SafePathColors.primaryBlue)
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: "person.crop.circle.fill")
-                        .foregroundColor(SafePathColors.primaryBlue)
-                        .font(.title3)
-                }
-            }
+
         }
     }
 }

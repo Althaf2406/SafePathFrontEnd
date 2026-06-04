@@ -7,10 +7,41 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		024DF0562BB9C849F4BB5D37 /* MockPreparednessRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEE78B306D8B06C952A542B /* MockPreparednessRepository.swift */; };
+		049D1C098B0241FBFF52174E /* FirstAidGuideViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45EEF6C37221253BB17A15 /* FirstAidGuideViewModelTests.swift */; };
+		150EC7462DC50A45E3F21201 /* ShelterViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB840357D81C728A99CF2F5 /* ShelterViewModelTests.swift */; };
+		190E87A29F65DD571933C395 /* RouteRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E484216F2C7F1B0FBD9C19E /* RouteRepositoryTests.swift */; };
+		1A83571A857F3D04475CC1AE /* MockRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A144189EE5C321AAB1D57A /* MockRepositories.swift */; };
+		24710173BCB2EF603678DD6C /* MockAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D30A3D3F43A9F671BE38F7 /* MockAPIService.swift */; };
+		28057E803116F6A10EE5243E /* PreparednessViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ED7091D806A52D8C4E0E23 /* PreparednessViewModelTests.swift */; };
+		282FED17C294E68067261AC8 /* FamilySafetyViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEED4D591DA3B30C8CF8FBF /* FamilySafetyViewModelTests.swift */; };
+		2CBB9EEF08316E309932E026 /* TestDataFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C74C11E0C5673604D912055 /* TestDataFactory.swift */; };
+		2D8DC59593143E1A6EA0BBCD /* MockDisasterPreparationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003BF687DC208B331C2B4BC4 /* MockDisasterPreparationRepository.swift */; };
+		31C142F4C5EBD1C8AE50604E /* EvacuationRouteViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D762DCC8D026BABD3C42DB9 /* EvacuationRouteViewModelTests.swift */; };
+		33174D40E876E0163EE8C40A /* EmergencyStatusRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D679B00813AA28CFDFB76235 /* EmergencyStatusRepositoryTests.swift */; };
 		3F150C8A2FD01BCB0029E15F /* SafePathWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3F150C892FD01BCB0029E15F /* SafePathWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4525FDBAFE94A65E9FFCA55D /* MockChecklistRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D1CC584D97683A1B2E0D6D /* MockChecklistRepository.swift */; };
+		45DB4382091BA40950B2695A /* DisasterPreparationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E11D6F60CA3466969B8208B /* DisasterPreparationViewModelTests.swift */; };
 		526631442FA3A7210003F97E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 526631432FA3A7210003F97E /* FirebaseAuth */; };
 		526631462FA3A72D0003F97E /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 526631452FA3A72D0003F97E /* FirebaseFirestore */; };
 		526631482FA3B07E0003F97E /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 526631472FA3B07E0003F97E /* FirebaseCore */; };
+		5A1B8B11CA68DA2361D8A3E1 /* CustomizeChecklistViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF82FED938E7B7033944BFEA /* CustomizeChecklistViewModelTests.swift */; };
+		5C6897353DC82C5BD92985D3 /* DisasterAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CED87C0B6C8847EA3736931 /* DisasterAlertViewModelTests.swift */; };
+		7104E6D7B1B0B466DDC69E89 /* EmergencyStatusViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909693707CABAA78FDEE7E58 /* EmergencyStatusViewModelTests.swift */; };
+		712FE010233907F499C0130B /* ShelterRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE5A6E6BCE2ABB5C46CF274 /* ShelterRepositoryTests.swift */; };
+		7BFD528A823A4F7C5EEF72B4 /* FamilyRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B75B134FF1E3423D4026ABA /* FamilyRepositoryTests.swift */; };
+		812FF644AEB26068F906AC96 /* MockEmergencyStatusRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAA62EEE2F72DE7CA447DBB /* MockEmergencyStatusRepository.swift */; };
+		897226367EF64DE9F481ECBF /* SafePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792389F4C12265320F6D004 /* SafePathTests.swift */; };
+		B825191B2FD1A38600C16BEC /* TestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = B825191A2FD1A38600C16BEC /* TestPlan.xctestplan */; };
+		BCD9119433A2363263984DE9 /* LocationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962E7BDDC4D0C13722FFA1B9 /* LocationServiceTests.swift */; };
+		C1D9845FBBF9EBCD172C4B14 /* MockFamilyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F926F6579787D941EA1D15A /* MockFamilyRepository.swift */; };
+		C53FA26539EBF6EF798740DE /* MockFirstAidRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398DD9C699F3AEF2CF43E87A /* MockFirstAidRepository.swift */; };
+		D65BDC8D19D147426F38DC93 /* UserManagementViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECD451920A60752700576E0B /* UserManagementViewModelTests.swift */; };
+		DF46C151C74EF290D46F2D00 /* DisasterAlertRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9AD64016D6C1665A1B865DC /* DisasterAlertRepositoryTests.swift */; };
+		E5065258FC40ABC3F660BA92 /* TestDataFactory+Person2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DEBF1A126027A588E2C15D2 /* TestDataFactory+Person2.swift */; };
+		E6CCFCE3096C67EC6FCE3A60 /* MockUserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3BF251CD98D0B6754BA55E /* MockUserRepository.swift */; };
+		EBEB87DB73A61D141FDCAA0D /* UserRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422093B42886AADAB850B77 /* UserRepositoryTests.swift */; };
+		F6D1BA79B290428829F7121D /* SafePathAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70E3443123473C9E142361 /* SafePathAppTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -20,6 +51,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 3F150C882FD01BCB0029E15F;
 			remoteInfo = "SafePathWatch Watch App";
+		};
+		B82519012FD19D4800C16BEC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 526630E62FA39A560003F97E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 526630ED2FA39A560003F97E;
+			remoteInfo = SafePath;
 		};
 		F0D87FF4D4E5856B9210D1A1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -45,10 +83,42 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		003BF687DC208B331C2B4BC4 /* MockDisasterPreparationRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockDisasterPreparationRepository.swift; sourceTree = "<group>"; };
+		0B3BF251CD98D0B6754BA55E /* MockUserRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockUserRepository.swift; sourceTree = "<group>"; };
+		2792389F4C12265320F6D004 /* SafePathTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafePathTests.swift; sourceTree = "<group>"; };
+		2C45EEF6C37221253BB17A15 /* FirstAidGuideViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FirstAidGuideViewModelTests.swift; sourceTree = "<group>"; };
+		2D762DCC8D026BABD3C42DB9 /* EvacuationRouteViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EvacuationRouteViewModelTests.swift; sourceTree = "<group>"; };
+		2DEBF1A126027A588E2C15D2 /* TestDataFactory+Person2.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TestDataFactory+Person2.swift"; sourceTree = "<group>"; };
+		398DD9C699F3AEF2CF43E87A /* MockFirstAidRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockFirstAidRepository.swift; sourceTree = "<group>"; };
+		3B75B134FF1E3423D4026ABA /* FamilyRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FamilyRepositoryTests.swift; sourceTree = "<group>"; };
+		3C74C11E0C5673604D912055 /* TestDataFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TestDataFactory.swift; sourceTree = "<group>"; };
 		3F150C842FD01BCB0029E15F /* SafePathWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafePathWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F150C892FD01BCB0029E15F /* SafePathWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SafePathWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F684B2F2FD1737B00A40153 /* SafePathAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafePathAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E484216F2C7F1B0FBD9C19E /* RouteRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RouteRepositoryTests.swift; sourceTree = "<group>"; };
 		526630EE2FA39A560003F97E /* SafePath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafePath.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		62D30A3D3F43A9F671BE38F7 /* MockAPIService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockAPIService.swift; sourceTree = "<group>"; };
+		63D1CC584D97683A1B2E0D6D /* MockChecklistRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockChecklistRepository.swift; sourceTree = "<group>"; };
+		6CED87C0B6C8847EA3736931 /* DisasterAlertViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisasterAlertViewModelTests.swift; sourceTree = "<group>"; };
+		6F926F6579787D941EA1D15A /* MockFamilyRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockFamilyRepository.swift; sourceTree = "<group>"; };
+		7FEED4D591DA3B30C8CF8FBF /* FamilySafetyViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FamilySafetyViewModelTests.swift; sourceTree = "<group>"; };
+		88A144189EE5C321AAB1D57A /* MockRepositories.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockRepositories.swift; sourceTree = "<group>"; };
+		909693707CABAA78FDEE7E58 /* EmergencyStatusViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EmergencyStatusViewModelTests.swift; sourceTree = "<group>"; };
+		962E7BDDC4D0C13722FFA1B9 /* LocationServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationServiceTests.swift; sourceTree = "<group>"; };
+		9E11D6F60CA3466969B8208B /* DisasterPreparationViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisasterPreparationViewModelTests.swift; sourceTree = "<group>"; };
+		B82518FD2FD19D4800C16BEC /* SafePathTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafePathTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B825191A2FD1A38600C16BEC /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
+		BEAA62EEE2F72DE7CA447DBB /* MockEmergencyStatusRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockEmergencyStatusRepository.swift; sourceTree = "<group>"; };
+		BEB840357D81C728A99CF2F5 /* ShelterViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShelterViewModelTests.swift; sourceTree = "<group>"; };
+		C5ED7091D806A52D8C4E0E23 /* PreparednessViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PreparednessViewModelTests.swift; sourceTree = "<group>"; };
+		CF82FED938E7B7033944BFEA /* CustomizeChecklistViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomizeChecklistViewModelTests.swift; sourceTree = "<group>"; };
+		D679B00813AA28CFDFB76235 /* EmergencyStatusRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EmergencyStatusRepositoryTests.swift; sourceTree = "<group>"; };
+		D9AD64016D6C1665A1B865DC /* DisasterAlertRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DisasterAlertRepositoryTests.swift; sourceTree = "<group>"; };
+		DC70E3443123473C9E142361 /* SafePathAppTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SafePathAppTests.swift; sourceTree = "<group>"; };
+		DEEE78B306D8B06C952A542B /* MockPreparednessRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockPreparednessRepository.swift; sourceTree = "<group>"; };
+		ECD451920A60752700576E0B /* UserManagementViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UserManagementViewModelTests.swift; sourceTree = "<group>"; };
+		F422093B42886AADAB850B77 /* UserRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UserRepositoryTests.swift; sourceTree = "<group>"; };
+		FCE5A6E6BCE2ABB5C46CF274 /* ShelterRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShelterRepositoryTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -65,12 +135,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3F150C8D2FD01BCB0029E15F /* SafePathWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = "SafePathWatch Watch App";
-			sourceTree = "<group>";
-		};
-		3F684B302FD1737B00A40153 /* SafePathAppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SafePathAppTests;
 			sourceTree = "<group>";
 		};
 		526630F02FA39A560003F97E /* SafePath */ = {
@@ -111,13 +178,67 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		00C38829A69EC7D957AEBE07 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				F422093B42886AADAB850B77 /* UserRepositoryTests.swift */,
+				3B75B134FF1E3423D4026ABA /* FamilyRepositoryTests.swift */,
+				D679B00813AA28CFDFB76235 /* EmergencyStatusRepositoryTests.swift */,
+			);
+			name = Repositories;
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		026108542E2E41BE331D4D57 /* Person1 */ = {
+			isa = PBXGroup;
+			children = (
+				3C74C11E0C5673604D912055 /* TestDataFactory.swift */,
+				2792389F4C12265320F6D004 /* SafePathTests.swift */,
+				D9AD64016D6C1665A1B865DC /* DisasterAlertRepositoryTests.swift */,
+				6CED87C0B6C8847EA3736931 /* DisasterAlertViewModelTests.swift */,
+				FCE5A6E6BCE2ABB5C46CF274 /* ShelterRepositoryTests.swift */,
+				4E484216F2C7F1B0FBD9C19E /* RouteRepositoryTests.swift */,
+				88A144189EE5C321AAB1D57A /* MockRepositories.swift */,
+				BEB840357D81C728A99CF2F5 /* ShelterViewModelTests.swift */,
+				2D762DCC8D026BABD3C42DB9 /* EvacuationRouteViewModelTests.swift */,
+				962E7BDDC4D0C13722FFA1B9 /* LocationServiceTests.swift */,
+			);
+			name = Person1;
+			path = Person1;
+			sourceTree = "<group>";
+		};
+		3A4C976D9824927A87534018 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				0B3BF251CD98D0B6754BA55E /* MockUserRepository.swift */,
+				62D30A3D3F43A9F671BE38F7 /* MockAPIService.swift */,
+				6F926F6579787D941EA1D15A /* MockFamilyRepository.swift */,
+				BEAA62EEE2F72DE7CA447DBB /* MockEmergencyStatusRepository.swift */,
+			);
+			name = Mocks;
+			path = Mocks;
+			sourceTree = "<group>";
+		};
+		44AEAF0A3B5DBACFC3A6F90E /* SafePathAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				AE496BCC49C2D6D8B4C125A8 /* Person2 */,
+				7E37EC37215ED2B12EFCC9F7 /* Person3 */,
+				DC70E3443123473C9E142361 /* SafePathAppTests.swift */,
+				026108542E2E41BE331D4D57 /* Person1 */,
+			);
+			name = SafePathAppTests;
+			path = SafePathAppTests;
+			sourceTree = "<group>";
+		};
 		526630E52FA39A560003F97E = {
 			isa = PBXGroup;
 			children = (
+				B825191A2FD1A38600C16BEC /* TestPlan.xctestplan */,
 				526630F02FA39A560003F97E /* SafePath */,
 				3F150C8D2FD01BCB0029E15F /* SafePathWatch Watch App */,
-				3F684B302FD1737B00A40153 /* SafePathAppTests */,
 				526630EF2FA39A560003F97E /* Products */,
+				44AEAF0A3B5DBACFC3A6F90E /* SafePathAppTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -128,8 +249,48 @@
 				3F150C842FD01BCB0029E15F /* SafePathWatch.app */,
 				3F150C892FD01BCB0029E15F /* SafePathWatch Watch App.app */,
 				3F684B2F2FD1737B00A40153 /* SafePathAppTests.xctest */,
+				B82518FD2FD19D4800C16BEC /* SafePathTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6CA3B87397031CEBEDD9830E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				7FEED4D591DA3B30C8CF8FBF /* FamilySafetyViewModelTests.swift */,
+				ECD451920A60752700576E0B /* UserManagementViewModelTests.swift */,
+				909693707CABAA78FDEE7E58 /* EmergencyStatusViewModelTests.swift */,
+			);
+			name = ViewModels;
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		7E37EC37215ED2B12EFCC9F7 /* Person3 */ = {
+			isa = PBXGroup;
+			children = (
+				DEEE78B306D8B06C952A542B /* MockPreparednessRepository.swift */,
+				C5ED7091D806A52D8C4E0E23 /* PreparednessViewModelTests.swift */,
+				2C45EEF6C37221253BB17A15 /* FirstAidGuideViewModelTests.swift */,
+				63D1CC584D97683A1B2E0D6D /* MockChecklistRepository.swift */,
+				003BF687DC208B331C2B4BC4 /* MockDisasterPreparationRepository.swift */,
+				CF82FED938E7B7033944BFEA /* CustomizeChecklistViewModelTests.swift */,
+				9E11D6F60CA3466969B8208B /* DisasterPreparationViewModelTests.swift */,
+				398DD9C699F3AEF2CF43E87A /* MockFirstAidRepository.swift */,
+			);
+			name = Person3;
+			path = Person3;
+			sourceTree = "<group>";
+		};
+		AE496BCC49C2D6D8B4C125A8 /* Person2 */ = {
+			isa = PBXGroup;
+			children = (
+				3A4C976D9824927A87534018 /* Mocks */,
+				6CA3B87397031CEBEDD9830E /* ViewModels */,
+				00C38829A69EC7D957AEBE07 /* Repositories */,
+				2DEBF1A126027A588E2C15D2 /* TestDataFactory+Person2.swift */,
+			);
+			name = Person2;
+			path = Person2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -185,9 +346,6 @@
 			dependencies = (
 				4D121CF77E0048C5E025EEEC /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				3F684B302FD1737B00A40153 /* SafePathAppTests */,
-			);
 			name = SafePathAppTests;
 			productName = SafePathAppTests;
 			productReference = 3F684B2F2FD1737B00A40153 /* SafePathAppTests.xctest */;
@@ -239,6 +397,10 @@
 					};
 					526630ED2FA39A560003F97E = {
 						CreatedOnToolsVersion = 26.2;
+					};
+					B82518FC2FD19D4800C16BEC = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = 526630ED2FA39A560003F97E;
 					};
 				};
 			};
@@ -293,6 +455,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B825191B2FD1A38600C16BEC /* TestPlan.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +473,36 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6CCFCE3096C67EC6FCE3A60 /* MockUserRepository.swift in Sources */,
+				24710173BCB2EF603678DD6C /* MockAPIService.swift in Sources */,
+				C1D9845FBBF9EBCD172C4B14 /* MockFamilyRepository.swift in Sources */,
+				812FF644AEB26068F906AC96 /* MockEmergencyStatusRepository.swift in Sources */,
+				282FED17C294E68067261AC8 /* FamilySafetyViewModelTests.swift in Sources */,
+				D65BDC8D19D147426F38DC93 /* UserManagementViewModelTests.swift in Sources */,
+				7104E6D7B1B0B466DDC69E89 /* EmergencyStatusViewModelTests.swift in Sources */,
+				EBEB87DB73A61D141FDCAA0D /* UserRepositoryTests.swift in Sources */,
+				7BFD528A823A4F7C5EEF72B4 /* FamilyRepositoryTests.swift in Sources */,
+				33174D40E876E0163EE8C40A /* EmergencyStatusRepositoryTests.swift in Sources */,
+				E5065258FC40ABC3F660BA92 /* TestDataFactory+Person2.swift in Sources */,
+				024DF0562BB9C849F4BB5D37 /* MockPreparednessRepository.swift in Sources */,
+				28057E803116F6A10EE5243E /* PreparednessViewModelTests.swift in Sources */,
+				049D1C098B0241FBFF52174E /* FirstAidGuideViewModelTests.swift in Sources */,
+				4525FDBAFE94A65E9FFCA55D /* MockChecklistRepository.swift in Sources */,
+				2D8DC59593143E1A6EA0BBCD /* MockDisasterPreparationRepository.swift in Sources */,
+				5A1B8B11CA68DA2361D8A3E1 /* CustomizeChecklistViewModelTests.swift in Sources */,
+				45DB4382091BA40950B2695A /* DisasterPreparationViewModelTests.swift in Sources */,
+				C53FA26539EBF6EF798740DE /* MockFirstAidRepository.swift in Sources */,
+				F6D1BA79B290428829F7121D /* SafePathAppTests.swift in Sources */,
+				2CBB9EEF08316E309932E026 /* TestDataFactory.swift in Sources */,
+				897226367EF64DE9F481ECBF /* SafePathTests.swift in Sources */,
+				DF46C151C74EF290D46F2D00 /* DisasterAlertRepositoryTests.swift in Sources */,
+				5C6897353DC82C5BD92985D3 /* DisasterAlertViewModelTests.swift in Sources */,
+				712FE010233907F499C0130B /* ShelterRepositoryTests.swift in Sources */,
+				190E87A29F65DD571933C395 /* RouteRepositoryTests.swift in Sources */,
+				1A83571A857F3D04475CC1AE /* MockRepositories.swift in Sources */,
+				150EC7462DC50A45E3F21201 /* ShelterViewModelTests.swift in Sources */,
+				31C142F4C5EBD1C8AE50604E /* EvacuationRouteViewModelTests.swift in Sources */,
+				BCD9119433A2363263984DE9 /* LocationServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,6 +850,48 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B82519032FD19D4800C16BEC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.SafePathTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SafePath.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SafePath";
+			};
+			name = Debug;
+		};
+		B82519042FD19D4800C16BEC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.SafePathTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SafePath.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SafePath";
 			};
 			name = Release;
 		};

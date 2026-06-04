@@ -36,13 +36,20 @@ final class APIService {
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if let token = SessionManager.shared.authToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        logRequest(request)
         
         let data: Data
         let response: URLResponse
         
         do {
             (data, response) = try await session.data(for: request)
+            logResponse(response, data: data, error: nil)
         } catch {
+            logResponse(nil, data: nil, error: error, url: url.absoluteString)
             throw APIError.networkFailure(error)
         }
         
@@ -76,17 +83,20 @@ extension APIService {
     /// Returns the decoded response of type `T`.
     func send<T: Decodable>(
         _ endpoint: APIEndpoint,
-        authToken: String? = nil,
         body: [String: Any]? = nil
     ) async throws -> T {
-        let request = try buildRequest(for: endpoint, authToken: authToken, body: body)
+        let request = try buildRequest(for: endpoint, body: body)
+ 
+        logRequest(request)
  
         let data: Data
         let response: URLResponse
  
         do {
             (data, response) = try await session.data(for: request)
+            logResponse(response, data: data, error: nil)
         } catch {
+            logResponse(nil, data: nil, error: error, url: request.url?.absoluteString)
             throw APIError.networkFailure(error)
         }
  
@@ -107,16 +117,20 @@ extension APIService {
     /// Send a request that returns no meaningful response body (e.g. logout, DELETE).
     func sendVoid(
         _ endpoint: APIEndpoint,
-        authToken: String? = nil,
         body: [String: Any]? = nil
     ) async throws {
-        let request = try buildRequest(for: endpoint, authToken: authToken, body: body)
+        let request = try buildRequest(for: endpoint, body: body)
+ 
+        logRequest(request)
  
         let response: URLResponse
  
         do {
-            (_, response) = try await session.data(for: request)
+            let (responseData, res) = try await session.data(for: request)
+            response = res
+            logResponse(response, data: responseData, error: nil)
         } catch {
+            logResponse(nil, data: nil, error: error, url: request.url?.absoluteString)
             throw APIError.networkFailure(error)
         }
  
@@ -132,7 +146,6 @@ extension APIService {
  
     private func buildRequest(
         for endpoint: APIEndpoint,
-        authToken: String?,
         body: [String: Any]?
     ) throws -> URLRequest {
         guard let url = endpoint.url else {
@@ -144,7 +157,7 @@ extension APIService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
  
-        if let token = authToken {
+        if let token = SessionManager.shared.authToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         if let body = body {
@@ -152,5 +165,45 @@ extension APIService {
         }
  
         return request
+    }
+    
+    // MARK: - Logging Helpers
+    
+    private func logRequest(_ request: URLRequest) {
+        #if DEBUG
+        print("\n⬆️ =================== API REQUEST ===================")
+        print("🌐 [\(request.httpMethod ?? "GET")] \(request.url?.absoluteString ?? "")")
+        if let headers = request.allHTTPHeaderFields, !headers.isEmpty {
+            print("📝 Headers: \(headers)")
+        }
+        if let body = request.httpBody, let jsonString = String(data: body, encoding: .utf8) {
+            print("📦 Body: \(jsonString)")
+        }
+        print("======================================================\n")
+        #endif
+    }
+    
+    private func logResponse(_ response: URLResponse?, data: Data?, error: Error?, url: String? = nil) {
+        #if DEBUG
+        print("\n⬇️ =================== API RESPONSE ===================")
+        if let error = error {
+            print("❌ [ERROR] \(url ?? "")")
+            print("Description: \(error.localizedDescription)")
+        } else if let httpResponse = response as? HTTPURLResponse {
+            let statusCode = httpResponse.statusCode
+            let icon = (200...299).contains(statusCode) ? "✅" : "⚠️"
+            print("\(icon) [\(statusCode)] \(httpResponse.url?.absoluteString ?? "")")
+            
+            if let data = data, let jsonString = String(data: data, encoding: .utf8) {
+                // Truncate extremely long responses so the console doesn't hang
+                if jsonString.count > 2000 {
+                    print("📦 Data: \(jsonString.prefix(2000))... (Truncated)")
+                } else {
+                    print("📦 Data: \(jsonString)")
+                }
+            }
+        }
+        print("=======================================================\n")
+        #endif
     }
 }

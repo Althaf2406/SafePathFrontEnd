@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FirstAidGuideDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var userVM: UserManagementViewModel
     let guide: FirstAidGuide
     
     var body: some View {
@@ -31,7 +32,10 @@ struct FirstAidGuideDetailView: View {
                 // Action Buttons
                 VStack(spacing: 12) {
                     Button(action: {
-                        // Call emergency contact action
+                        let phone = userVM.currentUser?.phone ?? "911"
+                        if let url = URL(string: "tel://\(phone)") {
+                            UIApplication.shared.open(url)
+                        }
                     }) {
                         HStack {
                             Image(systemName: "staroflife.fill")
@@ -45,9 +49,7 @@ struct FirstAidGuideDetailView: View {
                         .cornerRadius(12)
                     }
                     
-                    Button(action: {
-                        // Find shelter action
-                    }) {
+                    NavigationLink(destination: MainMapView()) {
                         HStack {
                             Image(systemName: "house.fill")
                             Text("Find Shelter")
@@ -61,43 +63,25 @@ struct FirstAidGuideDetailView: View {
                     }
                 }
                 
-                // Kit Status Card
+                // Kit List
                 if !guide.requiredKit.isEmpty {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Kit Status")
+                        Text("Required Kit List")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundColor(SafePathColors.textPrimary)
                         
                         Divider()
                         
-                        VStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 12) {
                             ForEach(guide.requiredKit) { item in
-                                HStack {
-                                    Image(systemName: item.status == .inKit ? "checkmark.circle.fill" : "exclamationmark.triangle")
-                                        .foregroundColor(item.status == .inKit ? SafePathColors.textPrimary : SafePathColors.dangerRed)
-                                        .font(.system(size: 18))
-                                    
-                                    Text(item.name)
-                                        .font(.system(size: 15, weight: .medium))
+                                HStack(alignment: .top, spacing: 12) {
+                                    Text("•")
+                                        .font(.system(size: 18, weight: .bold))
                                         .foregroundColor(SafePathColors.textPrimary)
-                                    
-                                    Spacer()
-                                    
-                                    Text(item.status.rawValue)
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(item.status == .inKit ? SafePathColors.textPrimary : SafePathColors.dangerRed)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(item.status == .inKit ? SafePathColors.safeGreen.opacity(0.3) : SafePathColors.lightRedCard)
-                                        .cornerRadius(12)
+                                    Text(item.name)
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(SafePathColors.textPrimary)
                                 }
-                                .padding()
-                                .background(item.status == .inKit ? SafePathColors.backgroundLight : SafePathColors.lightRedCard.opacity(0.5))
-                                .cornerRadius(8)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(item.status == .inKit ? Color.blue.opacity(0.2) : SafePathColors.dangerRed.opacity(0.3), lineWidth: 1)
-                                )
                             }
                         }
                     }

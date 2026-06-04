@@ -1,10 +1,15 @@
 import Foundation
 import Testing
+@testable import SafePath
 
 
 @Suite("UserManagement ViewModel Tests")
 @MainActor
 struct UserManagementViewModelTests {
+    
+    init() {
+        SessionManager.shared.clearSession()
+    }
 
     @Test("Fungsi: register() - Skenario Berhasil")
     func testRegisterSuccess() async {

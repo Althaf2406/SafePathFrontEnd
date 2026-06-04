@@ -46,23 +46,6 @@ struct DisasterPreparationViewModelTests {
         #expect(vm.checklistItems.contains(where: { $0.name == "Water" }))
         #expect(!vm.checklistItems.contains(where: { $0.name == "N95 Mask" }))
     }
-
-    @Test("Fungsi: toggleChecklistItem() - Berhasil Toggle State")
-    func testToggleChecklistItem() async throws {
-        let mockPrepRepo = MockDisasterPreparationRepository()
-        let mockChecklistRepo = MockChecklistRepository()
-        
-        let item = TestDataFactory.mockChecklistItem(name: "Test", isChecked: false)
-        mockChecklistRepo.customItemsToReturn = [item]
-
-        let vm = DisasterPreparationViewModel(prepRepository: mockPrepRepo, checklistRepository: mockChecklistRepo)
-        
-        vm.toggleChecklistItem(item)
-        try await Task.sleep(nanoseconds: 10_000_000)
-
-        #expect(mockChecklistRepo.savedItems.count == 1)
-        #expect(mockChecklistRepo.savedItems.first?.isChecked == true)
-    }
 }
 
 //

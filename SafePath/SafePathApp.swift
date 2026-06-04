@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import SwiftData
 
 @main
 struct SafePathApp: App {
@@ -17,6 +18,7 @@ struct SafePathApp: App {
                     locationService.requestPermission()
                 }
         }
+        .modelContainer(SharedModelContainer.shared.container)
     }
 }
 

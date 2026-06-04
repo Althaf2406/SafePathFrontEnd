@@ -94,8 +94,7 @@ struct CreateFamilyGroupView: View {
             
             Button(action: {
                 Task {
-                    guard let token = userVM.currentUser?.authToken else { return }
-                    await familyVM.createGroup(authToken: token, name: groupName)
+                    await familyVM.createGroup(name: groupName)
                     
                     if familyVM.errorMessage == nil, let createdGroup = familyVM.familyGroup {
                         inviteCode = createdGroup.inviteCode
