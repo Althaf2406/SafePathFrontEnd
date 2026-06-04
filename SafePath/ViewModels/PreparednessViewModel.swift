@@ -121,3 +121,5 @@ final class PreparednessViewModel: ObservableObject {
         RiskProfile(id: "3", type: "Tsunami",    iconName: "water.waves",           level: .low),
     ]
 }
+
+//

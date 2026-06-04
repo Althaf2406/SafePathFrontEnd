@@ -38,3 +38,5 @@ final class FirstAidGuideViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 }
+
+//

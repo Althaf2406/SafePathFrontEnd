@@ -64,3 +64,5 @@ struct DisasterPreparationViewModelTests {
         #expect(mockChecklistRepo.savedItems.first?.isChecked == true)
     }
 }
+
+//

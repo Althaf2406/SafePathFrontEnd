@@ -104,3 +104,5 @@ struct PreparednessViewModelTests {
         #expect(!vm.riskProfiles.isEmpty)
     }
 }
+
+//

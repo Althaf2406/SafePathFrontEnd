@@ -231,3 +231,5 @@ struct ChecklistView: View {
     ChecklistView()
         .environmentObject(PreparednessViewModel())
 }
+
+//

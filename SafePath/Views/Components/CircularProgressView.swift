@@ -37,3 +37,5 @@ struct CircularProgressView: View {
 #Preview {
     CircularProgressView(progress: 0.6, text: "3/5")
 }
+
+//

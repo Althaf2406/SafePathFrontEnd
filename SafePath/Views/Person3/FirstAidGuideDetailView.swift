@@ -162,3 +162,5 @@ struct FirstAidGuideDetailView: View {
         }
     }
 }
+
+//
