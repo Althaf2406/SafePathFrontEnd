@@ -2,9 +2,14 @@ import Foundation
 import Combine
 import MapKit
 
+protocol RouteRepositoryProtocol {
+    func calculateRoute(from origin: CLLocationCoordinate2D, to shelter: Shelter) async throws -> EvacuationRoute
+    func calculateRouteWithAlternatives(from origin: CLLocationCoordinate2D, to shelter: Shelter) async throws -> (primary: EvacuationRoute, alternatives: [EvacuationRoute])
+}
+
 /// Generates real evacuation routes using MapKit MKDirections.
 @MainActor
-final class RouteRepository {
+final class RouteRepository: RouteRepositoryProtocol {
     
     /// Calculate a walking route from origin to a shelter coordinate using MapKit.
     func calculateRoute(

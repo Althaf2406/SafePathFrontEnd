@@ -2,9 +2,20 @@ import Foundation
 import CoreLocation
 import Combine
 
+protocol LocationServiceProtocol: ObservableObject {
+    var currentLocation: CLLocationCoordinate2D? { get }
+    var authorizationStatus: CLAuthorizationStatus { get }
+    var locationError: String? { get }
+    
+    func requestPermission()
+    func startUpdating()
+    func stopUpdating()
+    var isAuthorized: Bool { get }
+}
+
 /// Manages device location using CoreLocation.
 /// Publishes current coordinate and authorization status.
-final class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
+final class LocationService: NSObject, LocationServiceProtocol, CLLocationManagerDelegate {
     
     @Published var currentLocation: CLLocationCoordinate2D?
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined

@@ -21,7 +21,7 @@ final class DisasterAlertViewModel: ObservableObject {
     @Published var state: ViewState<[DisasterAlert]> = .idle
     @Published var selectedAlert: DisasterAlert?
     
-    private let repository: DisasterAlertRepository
+    private let repository: DisasterAlertRepositoryProtocol
     
     // MARK: - Integration hooks for Person 2
     var onNotifyFamily: ((DisasterAlert) -> Void)?
@@ -30,7 +30,7 @@ final class DisasterAlertViewModel: ObservableObject {
     // MARK: - Integration hooks for Person 3
     var onSaveAlertOffline: ((DisasterAlert) -> Void)?
     
-    init(repository: DisasterAlertRepository) {
+    init(repository: DisasterAlertRepositoryProtocol) {
         self.repository = repository
     }
     
