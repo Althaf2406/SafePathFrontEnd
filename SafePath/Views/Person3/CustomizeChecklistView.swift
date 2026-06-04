@@ -4,15 +4,7 @@ import Combine
 /// Person 3: Customize Checklist screen matching the visual style in Screenshot 3.
 struct CustomizeChecklistView: View {
     @Environment(\.dismiss) var dismiss
-    
-    @State private var itemName: String = ""
-    @State private var selectedCategory: String = "Lighting"
-    @State private var quantity: Int = 1
-    @State private var priority: String = "High"
-    @State private var disasterType: String = "Flood"
-    
-    let categories = ["Lighting", "Food & Water", "Medical", "Tools", "Documents"]
-    let disasterTypes = ["Flood", "Earthquake", "Tsunami", "Volcano", "Wildfire"]
+    @StateObject private var viewModel = CustomizeChecklistViewModel()
     
     var body: some View {
         ScrollView {
@@ -25,12 +17,6 @@ struct CustomizeChecklistView: View {
                 
                 // Recently Added Items Section
                 recentlyAddedSection
-                
-                // TODO comment
-                Text("// TODO: Person 3: Add actual database save and edit functions here.")
-                    .font(.system(size: 10))
-                    .foregroundColor(SafePathColors.textSecondary)
-                    .padding(.horizontal, 4)
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
@@ -87,7 +73,7 @@ struct CustomizeChecklistView: View {
                 Text("Item Name")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(SafePathColors.textPrimary)
-                TextField("e.g. Tactical Flashlight", text: $itemName)
+                TextField("e.g. Tactical Flashlight", text: $viewModel.itemName)
                     .padding()
                     .background(SafePathColors.backgroundLight.opacity(0.5))
                     .cornerRadius(12)
@@ -106,12 +92,12 @@ struct CustomizeChecklistView: View {
                         .foregroundColor(SafePathColors.textPrimary)
                     
                     Menu {
-                        ForEach(categories, id: \.self) { cat in
-                            Button(cat) { selectedCategory = cat }
+                        ForEach(viewModel.categories, id: \.self) { cat in
+                            Button(cat.displayName) { viewModel.selectedCategory = cat }
                         }
                     } label: {
                         HStack {
-                            Text(selectedCategory)
+                            Text(viewModel.selectedCategory.displayName)
                                 .foregroundColor(SafePathColors.textPrimary)
                             Spacer()
                             Image(systemName: "chevron.down")
@@ -136,11 +122,11 @@ struct CustomizeChecklistView: View {
                     
                     Menu {
                         ForEach(1...10, id: \.self) { num in
-                            Button("\(num)") { quantity = num }
+                            Button("\(num)") { viewModel.quantity = num }
                         }
                     } label: {
                         HStack {
-                            Text("\(quantity)")
+                            Text("\(viewModel.quantity)")
                                 .foregroundColor(SafePathColors.textPrimary)
                             Spacer()
                         }
@@ -165,22 +151,22 @@ struct CustomizeChecklistView: View {
                         .foregroundColor(SafePathColors.textPrimary)
                     
                     HStack(spacing: 0) {
-                        Button(action: { priority = "High" }) {
+                        Button(action: { viewModel.priority = .high }) {
                             Text("High")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(priority == "High" ? .white : SafePathColors.primaryBlue)
+                                .foregroundColor(viewModel.priority == .high ? .white : SafePathColors.primaryBlue)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 12)
-                                .background(priority == "High" ? SafePathColors.primaryBlue : SafePathColors.lightBlueCard)
+                                .background(viewModel.priority == .high ? SafePathColors.primaryBlue : SafePathColors.lightBlueCard)
                         }
                         
-                        Button(action: { priority = "Medium" }) {
+                        Button(action: { viewModel.priority = .medium }) {
                             Text("Medium")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(priority == "Medium" ? .white : SafePathColors.primaryBlue)
+                                .foregroundColor(viewModel.priority == .medium ? .white : SafePathColors.primaryBlue)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 12)
-                                .background(priority == "Medium" ? SafePathColors.primaryBlue : SafePathColors.lightBlueCard)
+                                .background(viewModel.priority == .medium ? SafePathColors.primaryBlue : SafePathColors.lightBlueCard)
                         }
                     }
                     .cornerRadius(10)
@@ -193,12 +179,12 @@ struct CustomizeChecklistView: View {
                         .foregroundColor(SafePathColors.textPrimary)
                     
                     Menu {
-                        ForEach(disasterTypes, id: \.self) { type in
-                            Button(type) { disasterType = type }
+                        ForEach(viewModel.disasterTypes, id: \.self) { type in
+                            Button(type) { viewModel.disasterType = type }
                         }
                     } label: {
                         HStack {
-                            Text(disasterType)
+                            Text(viewModel.disasterType)
                                 .foregroundColor(SafePathColors.textPrimary)
                             Spacer()
                             Image(systemName: "chevron.down")
@@ -219,7 +205,7 @@ struct CustomizeChecklistView: View {
             
             // Save Item Button
             Button(action: {
-                dismiss()
+                viewModel.saveItem()
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "square.and.arrow.down.fill")
@@ -233,13 +219,13 @@ struct CustomizeChecklistView: View {
                 .cornerRadius(12)
             }
             
-            // Delete Item Button
+            // Delete Item Button (Clear form as demo, normally tied to selected item)
             Button(action: {
-                dismiss()
+                viewModel.resetForm()
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "trash.fill")
-                    Text("Delete Item")
+                    Text("Clear Form")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                 }
                 .foregroundColor(SafePathColors.dangerRed)
@@ -268,60 +254,72 @@ struct CustomizeChecklistView: View {
                 .padding(.horizontal, 4)
             
             VStack(spacing: 12) {
-                // Item 1: First Aid Kit
-                HStack(spacing: 12) {
-                    Image(systemName: "cross.case.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(SafePathColors.safeGreen)
-                        .frame(width: 40, height: 40)
-                        .background(SafePathColors.safeGreen.opacity(0.1))
-                        .cornerRadius(10)
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("First Aid Kit")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(SafePathColors.textPrimary)
-                        Text("Medical • High Priority")
-                            .font(.system(size: 12))
-                            .foregroundColor(SafePathColors.textSecondary)
-                    }
-                    
-                    Spacer()
-                    
-                    Image(systemName: "pencil")
+                if viewModel.customItems.isEmpty {
+                    Text("No items added yet.")
+                        .font(.system(size: 14))
                         .foregroundColor(SafePathColors.textSecondary)
-                }
-                .padding(12)
-                .background(Color.white)
-                .cornerRadius(16)
-                
-                // Item 2: Water Purifier
-                HStack(spacing: 12) {
-                    Image(systemName: "drop.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(SafePathColors.dangerRed)
-                        .frame(width: 40, height: 40)
-                        .background(SafePathColors.dangerRed.opacity(0.1))
-                        .cornerRadius(10)
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Water Purifier")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(SafePathColors.textPrimary)
-                        Text("Nutrition • Qty: 2")
-                            .font(.system(size: 12))
-                            .foregroundColor(SafePathColors.textSecondary)
+                        .padding()
+                } else {
+                    ForEach(viewModel.customItems) { item in
+                        HStack(spacing: 12) {
+                            Image(systemName: iconForCategory(item.category))
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(colorForCategory(item.category))
+                                .frame(width: 40, height: 40)
+                                .background(colorForCategory(item.category).opacity(0.1))
+                                .cornerRadius(10)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.name)
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(SafePathColors.textPrimary)
+                                Text("\(item.category.displayName) • Qty: \(item.quantity ?? 1) • \(item.priority.rawValue) Priority")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(SafePathColors.textSecondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                viewModel.deleteItem(id: item.id)
+                            }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(SafePathColors.dangerRed)
+                            }
+                        }
+                        .padding(12)
+                        .background(Color.white)
+                        .cornerRadius(16)
                     }
-                    
-                    Spacer()
-                    
-                    Image(systemName: "pencil")
-                        .foregroundColor(SafePathColors.textSecondary)
                 }
-                .padding(12)
-                .background(Color.white)
-                .cornerRadius(16)
             }
+        }
+    }
+    
+    // Helper for category icons
+    private func iconForCategory(_ category: KitCategory) -> String {
+        switch category {
+        case .firstAid: return "cross.case.fill"
+        case .lighting: return "flashlight.on.fill"
+        case .water: return "drop.fill"
+        case .food: return "fork.knife"
+        case .communication: return "radio.fill"
+        case .navigation: return "map.fill"
+        case .clothing: return "tshirt.fill"
+        case .tools: return "wrench.and.screwdriver.fill"
+        case .hygiene: return "hands.sparkles.fill"
+        case .documents: return "doc.fill"
+        }
+    }
+    
+    // Helper for category colors
+    private func colorForCategory(_ category: KitCategory) -> Color {
+        switch category {
+        case .firstAid: return SafePathColors.safeGreen
+        case .water, .communication, .navigation: return SafePathColors.primaryBlue
+        case .lighting, .food: return SafePathColors.warningOrange
+        case .tools: return SafePathColors.dangerRed
+        default: return SafePathColors.offlineGray
         }
     }
 }

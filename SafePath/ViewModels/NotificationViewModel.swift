@@ -65,4 +65,16 @@ final class NotificationViewModel: ObservableObject {
     func clearError() {
         errorMessage = nil
     }
+    
+    /// Simulates receiving a disaster preparation guide notification.
+    func simulatePrepGuideNotification(for disasterType: String) {
+        let notification = FamilyNotification(
+            title: "\(disasterType) Warning",
+            body: "A \(disasterType) alert has been issued in your area. Tap here to view the preparation guide and checklist.",
+            type: .prepGuide,
+            priority: .high,
+            deepLinkAction: .openPrepGuide
+        )
+        receive(notification)
+    }
 }
