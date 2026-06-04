@@ -15,8 +15,12 @@ final class EmergencyStatusViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let repository = EmergencyStatusRepository()
+    private let repository: EmergencyStatusRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
+
+    init(repository: EmergencyStatusRepositoryProtocol = EmergencyStatusRepository()) {
+        self.repository = repository
+    }
 
     // MARK: - Status Actions
 

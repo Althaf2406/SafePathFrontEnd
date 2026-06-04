@@ -2,9 +2,13 @@ import Foundation
 
 /// Person 2: Repository for emergency status API calls.
 /// Connects to Express backend emergency endpoints via APIService.
-final class EmergencyStatusRepository {
+final class EmergencyStatusRepository: EmergencyStatusRepositoryProtocol {
 
-    private let api = APIService.shared
+    private let api: APIServiceProtocol
+
+    init(api: APIServiceProtocol = APIService.shared) {
+        self.api = api
+    }
 
     // MARK: - Status Endpoints
 

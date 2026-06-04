@@ -14,8 +14,12 @@ final class FamilySafetyViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let repository = FamilyRepository()
+    private let repository: FamilyRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
+
+    init(repository: FamilyRepositoryProtocol = FamilyRepository()) {
+        self.repository = repository
+    }
 
     // MARK: - Group Actions
 

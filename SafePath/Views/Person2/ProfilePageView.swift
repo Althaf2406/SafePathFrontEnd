@@ -16,15 +16,25 @@ struct ProfilePageView: View {
     @State private var goToEditProfile  = false
     @State private var goToSettings     = false
 
+    @EnvironmentObject var userVM: UserManagementViewModel
+
     // MARK: - UI States
     @State private var showLogoutConfirm = false
     @State private var showLogoutToast   = false
 
-    // Placeholder data — wire to UserManagementViewModel when backend is ready
-    private let userName     = "Muhammad Althaf"
-    private let userEmail    = "althaf.m@example.com"
-    private let userLocation = "Surabaya, East Java"
-    private let initials     = "MA"
+    // Computed properties mapped to UserManagementViewModel
+    private var userName: String { userVM.currentUser?.name ?? "Muhammad Althaf" }
+    private var userEmail: String { userVM.currentUser?.email ?? "althaf.m@example.com" }
+    private var userLocation: String {
+        if let lat = userVM.currentUser?.lastLatitude, let lon = userVM.currentUser?.lastLongitude {
+            return String(format: "%.4f, %.4f", lat, lon)
+        }
+        return "Surabaya, East Java"
+    }
+    private var initials: String {
+        let name = userVM.currentUser?.name ?? "MA"
+        return String(name.prefix(2)).uppercased()
+    }
 
     var body: some View {
         NavigationStack {
@@ -424,5 +434,6 @@ struct ProfilePageView: View {
 #Preview {
     NavigationStack {
         ProfilePageView()
+            .environmentObject(UserManagementViewModel())
     }
 }
