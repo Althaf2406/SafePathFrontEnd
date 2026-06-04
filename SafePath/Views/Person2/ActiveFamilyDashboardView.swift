@@ -49,6 +49,10 @@ struct ActiveFamilyDashboardView: View {
         Member(name: "Sis", status: .needHelp, battery: 45)
     ]
     
+    let familyName = "The Johnsons"
+    let connectedMembers = 4
+    let inviteCode = "JHN-2026"
+    
     var body: some View {
         VStack(spacing: 0) {
             // MARK: - Custom Navigation Bar
@@ -256,10 +260,9 @@ struct ActiveFamilyDashboardView: View {
         .confirmationDialog("Leave Family Group?", isPresented: $showLeaveConfirm, titleVisibility: .visible) {
             Button("Leave Group", role: .destructive) {
                 Task {
-                    if let token = userVM.currentUser?.authToken,
-                       let groupID = userVM.currentUser?.familyGroupIDs.first,
+                    if let groupID = userVM.currentUser?.familyGroupIDs.first,
                        let memberID = userVM.currentUser?.id {
-                        await familyVM.removeMember(authToken: token, groupID: groupID, memberID: memberID)
+                        await familyVM.removeMember(groupID: groupID, memberID: memberID)
                         // In real app, we would update user's group IDs and redirect
                         // For UI demo, we can just print or handle state
                     }

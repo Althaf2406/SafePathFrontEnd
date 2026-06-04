@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 import CoreLocation
-
+@testable import SafePath
 
 @Suite("Location Service Tests")
 struct LocationServiceTests {

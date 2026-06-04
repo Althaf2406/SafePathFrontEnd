@@ -73,12 +73,10 @@ struct SOSSentView: View {
         }
         .onAppear {
             Task {
-                // 1. Call real backend API if token exists
-                if let token = userVM.currentUser?.authToken {
-                    let lat = userVM.currentUser?.lastLatitude
-                    let lon = userVM.currentUser?.lastLongitude
-                    await emergencyVM.triggerSOS(authToken: token, latitude: lat, longitude: lon)
-                }
+                // 1. Call real backend API
+                let lat = userVM.currentUser?.lastLatitude
+                let lon = userVM.currentUser?.lastLongitude
+                await emergencyVM.triggerSOS(latitude: lat, longitude: lon)
                 
                 // 2. Simulate delay for the UI notification effect (or fallback if API fails)
                 try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds

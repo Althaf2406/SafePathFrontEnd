@@ -4,6 +4,7 @@ import Testing
 
 
 @Suite("EmergencyStatusRepository Tests")
+@MainActor
 struct EmergencyStatusRepositoryTests {
 
     @Test("Fungsi: triggerSOS() - Skenario Berhasil")
@@ -13,7 +14,7 @@ struct EmergencyStatusRepositoryTests {
         mockAPI.responseToReturn = mockStatus
         
         let repo = EmergencyStatusRepository(api: mockAPI)
-        let status = try await repo.triggerSOS(authToken: "token", latitude: nil, longitude: nil, message: "Help!")
+        let status = try await repo.triggerSOS(latitude: nil, longitude: nil, message: "Help!")
         
         #expect(status.isSOS == true)
     }
@@ -26,7 +27,7 @@ struct EmergencyStatusRepositoryTests {
         let repo = EmergencyStatusRepository(api: mockAPI)
         
         do {
-            _ = try await repo.updateStatus(authToken: "token", status: .safe, message: nil, latitude: nil, longitude: nil)
+            _ = try await repo.updateStatus(status: .safe, message: nil, latitude: nil, longitude: nil)
             Issue.record("Diharapkan error, tapi sukses")
         } catch {
             #expect(error != nil)

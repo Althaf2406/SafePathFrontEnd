@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PreparednessView: View {
     @EnvironmentObject var viewModel: PreparednessViewModel
+    @EnvironmentObject var userVM: UserManagementViewModel
 
     var body: some View {
         NavigationStack {
@@ -24,7 +25,9 @@ struct PreparednessView: View {
             .background(Color(UIColor.systemGroupedBackground))
             .navigationTitle("Preparedness")
             .task {
-                await viewModel.load()
+                let lat = userVM.currentUser?.lastLatitude ?? -7.2504
+                let lng = userVM.currentUser?.lastLongitude ?? 112.7688
+                await viewModel.load(lat: lat, lng: lng)
             }
         }
     }

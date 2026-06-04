@@ -3,6 +3,7 @@ import Testing
 import CoreLocation
 @testable import SafePath
 
+
 @Suite("EvacuationRoute ViewModel Tests")
 @MainActor
 struct EvacuationRouteViewModelTests {

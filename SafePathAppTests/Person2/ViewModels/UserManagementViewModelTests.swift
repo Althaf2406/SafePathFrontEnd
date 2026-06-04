@@ -8,7 +8,7 @@ import Testing
 struct UserManagementViewModelTests {
     
     init() {
-        UserDefaults.standard.removeObject(forKey: "safepath_current_user")
+        SessionManager.shared.clearSession()
     }
 
     @Test("Fungsi: register() - Skenario Berhasil")

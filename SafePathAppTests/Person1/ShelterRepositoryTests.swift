@@ -2,7 +2,6 @@ import Foundation
 import Testing
 @testable import SafePath
 
-
 @Suite("Shelter Repository Tests")
 struct ShelterRepositoryTests {
     
@@ -24,7 +23,7 @@ struct ShelterRepositoryTests {
             _ = try await repo.fetchAllShelters()
             Issue.record("Expected error to be thrown")
         } catch {
-            #expect(error != nil)
+            #expect(true)
         }
     }
     

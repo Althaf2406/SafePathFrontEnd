@@ -2,7 +2,9 @@ import Foundation
 import Testing
 import CoreLocation
 @testable import SafePath
+
 @Suite("Route Repository Tests")
+@MainActor
 struct RouteRepositoryTests {
     
     @Test("Fungsi: calculateRoute() - Skenario Berhasil")
@@ -23,7 +25,7 @@ struct RouteRepositoryTests {
             _ = try await repo.calculateRoute(from: TestDataFactory.mockUserLocation(), to: TestDataFactory.mockShelter())
             Issue.record("Expected error to be thrown")
         } catch {
-            #expect(error != nil)
+            #expect(true)
         }
     }
     
@@ -38,7 +40,7 @@ struct RouteRepositoryTests {
             _ = try await repo.calculateRoute(from: invalidLocation, to: TestDataFactory.mockShelter())
             Issue.record("Expected error due to invalid coordinate")
         } catch {
-            #expect(error != nil)
+            #expect(true)
         }
     }
 }

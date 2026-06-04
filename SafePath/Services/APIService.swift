@@ -36,6 +36,9 @@ final class APIService {
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if let token = SessionManager.shared.authToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
         
         logRequest(request)
         
@@ -80,10 +83,9 @@ extension APIService {
     /// Returns the decoded response of type `T`.
     func send<T: Decodable>(
         _ endpoint: APIEndpoint,
-        authToken: String? = nil,
         body: [String: Any]? = nil
     ) async throws -> T {
-        let request = try buildRequest(for: endpoint, authToken: authToken, body: body)
+        let request = try buildRequest(for: endpoint, body: body)
  
         logRequest(request)
  
@@ -115,10 +117,9 @@ extension APIService {
     /// Send a request that returns no meaningful response body (e.g. logout, DELETE).
     func sendVoid(
         _ endpoint: APIEndpoint,
-        authToken: String? = nil,
         body: [String: Any]? = nil
     ) async throws {
-        let request = try buildRequest(for: endpoint, authToken: authToken, body: body)
+        let request = try buildRequest(for: endpoint, body: body)
  
         logRequest(request)
  
@@ -145,7 +146,6 @@ extension APIService {
  
     private func buildRequest(
         for endpoint: APIEndpoint,
-        authToken: String?,
         body: [String: Any]?
     ) throws -> URLRequest {
         guard let url = endpoint.url else {
@@ -157,7 +157,7 @@ extension APIService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
  
-        if let token = authToken {
+        if let token = SessionManager.shared.authToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         if let body = body {

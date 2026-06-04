@@ -6,7 +6,7 @@ protocol PreparednessRepositoryProtocol {
     func createItem(_ item: ChecklistItem) async throws -> ChecklistItem
     func updateItem(_ item: ChecklistItem) async throws -> ChecklistItem
     func deleteItem(id: String) async throws
-    func fetchRiskProfiles() async throws -> [RiskProfile]
+    func fetchRiskProfiles(lat: Double, lng: Double) async throws -> [RiskProfile]
 }
 
 /// Person 3: Repository for preparedness data persistence.
@@ -62,7 +62,7 @@ final class PreparednessRepository: PreparednessRepositoryProtocol {
     // MARK: - Risk Profiles
 
     /// Fetch local risk profiles from backend.
-    func fetchRiskProfiles() async throws -> [RiskProfile] {
-        return try await api.fetchData(.riskProfiles)
+    func fetchRiskProfiles(lat: Double, lng: Double) async throws -> [RiskProfile] {
+        return try await api.fetchData(.riskProfiles(lat: lat, lng: lng))
     }
 }

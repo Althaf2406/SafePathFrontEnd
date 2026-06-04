@@ -17,18 +17,17 @@ final class MockUserRepository: UserRepositoryProtocol {
         return userToReturn
     }
 
-    func logout(authToken: String) async throws {
+    func logout() async throws {
         if shouldThrowError { throw URLError(.badServerResponse) }
         didCallLogout = true
     }
 
-    func fetchProfile(authToken: String) async throws -> User {
+    func fetchProfile() async throws -> User {
         if shouldThrowError { throw URLError(.badServerResponse) }
         return userToReturn
     }
 
     func updateProfile(
-        authToken: String,
         name: String?,
         phone: String?,
         profileImageURL: String?,

@@ -12,7 +12,7 @@ struct EmergencyStatusViewModelTests {
         let mockRepo = MockEmergencyStatusRepository()
         let vm = EmergencyStatusViewModel(repository: mockRepo)
         
-        await vm.updateStatus(authToken: "token", status: .safe, latitude: -7.0, longitude: 112.0)
+        await vm.updateStatus(status: .safe, latitude: -7.0, longitude: 112.0)
         
         #expect(vm.currentStatus != nil)
         #expect(vm.currentStatus?.status == .safe)
@@ -26,7 +26,7 @@ struct EmergencyStatusViewModelTests {
         mockRepo.shouldThrowError = true
         let vm = EmergencyStatusViewModel(repository: mockRepo)
         
-        await vm.updateStatus(authToken: "token", status: .safe)
+        await vm.updateStatus(status: .safe)
         
         #expect(vm.currentStatus == nil)
         #expect(vm.errorMessage != nil)
@@ -38,7 +38,7 @@ struct EmergencyStatusViewModelTests {
         let mockRepo = MockEmergencyStatusRepository()
         let vm = EmergencyStatusViewModel(repository: mockRepo)
         
-        await vm.triggerSOS(authToken: "token", latitude: -7.0, longitude: 112.0)
+        await vm.triggerSOS(latitude: -7.0, longitude: 112.0)
         
         #expect(vm.currentStatus?.isSOS == true)
         #expect(vm.isSOSActive == true)
@@ -53,7 +53,7 @@ struct EmergencyStatusViewModelTests {
         vm.currentStatus = TestDataFactory.mockEmergencyStatus(isSOS: true)
         vm.isSOSActive = true
         
-        await vm.resolveSOS(authToken: "token")
+        await vm.resolveSOS()
         
         #expect(vm.currentStatus?.isSOS == false)
         #expect(vm.isSOSActive == false)
@@ -65,7 +65,7 @@ struct EmergencyStatusViewModelTests {
         let mockRepo = MockEmergencyStatusRepository()
         let vm = EmergencyStatusViewModel(repository: mockRepo)
         
-        await vm.fetchFamilyStatuses(authToken: "token", groupID: "group1")
+        await vm.fetchFamilyStatuses(groupID: "group1")
         
         #expect(vm.familyStatuses.isEmpty == false)
         #expect(vm.errorMessage == nil)

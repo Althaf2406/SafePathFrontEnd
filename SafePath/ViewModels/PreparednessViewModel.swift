@@ -19,11 +19,11 @@ final class PreparednessViewModel: ObservableObject {
 
     // MARK: - Load
 
-    func load() async {
+    func load(lat: Double, lng: Double) async {
         isLoading = true
         defer { isLoading = false }
         await getAllItem()
-        await loadRiskProfiles()
+        await loadRiskProfiles(lat: lat, lng: lng)
     }
 
     func getAllItem() async {
@@ -36,9 +36,9 @@ final class PreparednessViewModel: ObservableObject {
         }
     }
 
-    func loadRiskProfiles() async {
+    func loadRiskProfiles(lat: Double, lng: Double) async {
         do {
-            let profiles = try await repository.fetchRiskProfiles()
+            let profiles = try await repository.fetchRiskProfiles(lat: lat, lng: lng)
             self.riskProfiles = profiles
         } catch {
             // Fall back to mock risk profiles

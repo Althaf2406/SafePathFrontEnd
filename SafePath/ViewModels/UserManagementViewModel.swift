@@ -22,7 +22,8 @@ final class UserManagementViewModel: ObservableObject {
 
     init(repository: UserRepositoryProtocol? = nil) {
         self.repository = repository ?? UserRepository()
-        restoreSession()
+        self.currentUser = SessionManager.shared.currentUser
+        self.isLoggedIn = SessionManager.shared.isLoggedIn
         // Mock removed to enforce API integration
     }
 
@@ -45,7 +46,7 @@ final class UserManagementViewModel: ObservableObject {
             let user = try await repository.register(name: name, email: email, password: password, phone: phone)
             self.currentUser = user
             self.isLoggedIn  = true
-            persistSession(user)
+            SessionManager.shared.saveUser(user)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -69,7 +70,7 @@ final class UserManagementViewModel: ObservableObject {
             let user = try await repository.login(email: email, password: password)
             self.currentUser = user
             self.isLoggedIn  = true
-            persistSession(user)
+            SessionManager.shared.saveUser(user)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -81,11 +82,11 @@ final class UserManagementViewModel: ObservableObject {
     func logout() async {
         isLoading = true
 
-        if let token = currentUser?.authToken {
-            try? await repository.logout(authToken: token)
-        }
+        try? await repository.logout()
 
-        clearSession()
+        SessionManager.shared.clearSession()
+        self.currentUser = nil
+        self.isLoggedIn = false
         isLoading = false
     }
 
@@ -93,14 +94,13 @@ final class UserManagementViewModel: ObservableObject {
 
     /// GET /user/profile — Fetches the latest profile from backend.
     func fetchProfile() async {
-        guard let token = currentUser?.authToken else { return }
         isLoading = true
         errorMessage = nil
 
         do {
-            let user = try await repository.fetchProfile(authToken: token)
+            let user = try await repository.fetchProfile()
             self.currentUser = user
-            persistSession(user)
+            SessionManager.shared.saveUser(user)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -110,15 +110,14 @@ final class UserManagementViewModel: ObservableObject {
 
     /// PUT /user/profile — Updates name, phone, profile image, or location.
     func updateProfile(name: String? = nil, phone: String? = nil, profileImageURL: String? = nil, latitude: Double? = nil, longitude: Double? = nil) async {
-        guard let token = currentUser?.authToken else { return }
         isLoading = true
         errorMessage = nil
 
         do {
-            let updatedUser = try await repository.updateProfile(authToken: token, name: name, phone: phone, profileImageURL: profileImageURL, latitude: latitude, longitude: longitude)
+            let updatedUser = try await repository.updateProfile(name: name, phone: phone, profileImageURL: profileImageURL, latitude: latitude, longitude: longitude)
             self.currentUser = updatedUser
             self.isLoading   = false
-            persistSession(updatedUser)
+            SessionManager.shared.saveUser(updatedUser)
         } catch {
             errorMessage = error.localizedDescription
             self.isLoading = false
@@ -132,28 +131,4 @@ final class UserManagementViewModel: ObservableObject {
         errorMessage = nil
     }
 
-    // MARK: - Session Persistence (UserDefaults)
-
-    private let sessionKey = "safepath_current_user"
-
-    private func persistSession(_ user: User) {
-        if let data = try? JSONEncoder().encode(user) {
-            UserDefaults.standard.set(data, forKey: sessionKey)
-        }
-    }
-
-    private func restoreSession() {
-        guard let data = UserDefaults.standard.data(forKey: sessionKey),
-              let user = try? JSONDecoder().decode(User.self, from: data),
-              user.isAuthenticated else { return }
-        self.currentUser = user
-        self.isLoggedIn  = true
-    }
-
-    private func clearSession() {
-        UserDefaults.standard.removeObject(forKey: sessionKey)
-        currentUser = nil
-        isLoggedIn  = false
-        errorMessage = nil
-    }
 }

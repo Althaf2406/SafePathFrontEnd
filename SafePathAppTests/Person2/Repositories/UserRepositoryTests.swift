@@ -4,6 +4,7 @@ import Testing
 
 
 @Suite("UserRepository Tests")
+@MainActor
 struct UserRepositoryTests {
 
     @Test("Fungsi: fetchProfile() - Skenario Berhasil")
@@ -13,7 +14,7 @@ struct UserRepositoryTests {
         mockAPI.responseToReturn = mockUser
         
         let repo = UserRepository(api: mockAPI)
-        let user = try await repo.fetchProfile(authToken: "token")
+        let user = try await repo.fetchProfile()
         
         #expect(user.name == "API User")
     }
@@ -26,7 +27,7 @@ struct UserRepositoryTests {
         let repo = UserRepository(api: mockAPI)
         
         do {
-            _ = try await repo.fetchProfile(authToken: "token")
+            _ = try await repo.fetchProfile()
             Issue.record("Diharapkan error, tapi sukses")
         } catch {
             #expect(error != nil)

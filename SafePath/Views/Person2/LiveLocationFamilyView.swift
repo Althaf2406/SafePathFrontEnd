@@ -101,10 +101,9 @@ struct LiveLocationFamilyView: View {
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
         .navigationBarHidden(true)
         .onAppear {
-            if let token = userVM.currentUser?.authToken,
-               let groupID = userVM.currentUser?.familyGroupIDs.first {
+            if let groupID = userVM.currentUser?.familyGroupIDs.first {
                 Task {
-                    await familyVM.fetchFamilyLocations(authToken: token, groupID: groupID)
+                    await familyVM.fetchFamilyLocations(groupID: groupID)
                     if let first = familyVM.members.first {
                         selectedMember = first
                         mapRegion.center = CLLocationCoordinate2D(latitude: first.lastLatitude ?? -7.2504, longitude: first.lastLongitude ?? 112.7688)
