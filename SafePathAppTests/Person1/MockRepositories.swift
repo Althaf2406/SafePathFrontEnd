@@ -1,4 +1,5 @@
 import Foundation
+@testable import SafePath
 import CoreLocation
 import Combine
 
