@@ -71,23 +71,19 @@ struct DisasterPreparationDetailView: View {
                         VStack(spacing: 0) {
                             ForEach(viewModel.checklistItems) { item in
                                 HStack {
-                                    Button(action: {
-                                        viewModel.toggleChecklistItem(item)
-                                    }) {
-                                        Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(item.isChecked ? .green : .gray)
-                                            .font(.title2)
-                                    }
+                                    Image(systemName: "circle.fill")
+                                        .foregroundColor(.blue)
+                                        .font(.system(size: 8))
+                                        .padding(.trailing, 8)
                                     
                                     VStack(alignment: .leading) {
                                         Text(item.name)
                                             .font(.body)
-                                            .strikethrough(item.isChecked)
-                                            .foregroundColor(item.isChecked ? .secondary : .primary)
+                                            .foregroundColor(.primary)
                                         
-                                        Text("Qty: \(item.quantity ?? 1) • \(item.priority.rawValue)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
+//                                        Text("Qty: \(item.quantity ?? 1) • \(item.priority.rawValue)")
+//                                            .font(.caption)
+//                                            .foregroundColor(.secondary)
                                     }
                                     Spacer()
                                 }
@@ -96,7 +92,7 @@ struct DisasterPreparationDetailView: View {
                                 
                                 if item.id != viewModel.checklistItems.last?.id {
                                     Divider()
-                                        .padding(.leading, 48)
+                                        .padding(.leading, 32)
                                 }
                             }
                         }

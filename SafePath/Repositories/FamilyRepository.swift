@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// Person 2: Repository for family group API calls.
 /// Connects to Express backend family endpoints via APIService.
@@ -83,6 +84,24 @@ final class FamilyRepository: FamilyRepositoryProtocol {
 
     /// GET /family/group/:groupId/locations
     func fetchFamilyLocations(authToken: String, groupID: String) async throws -> [FamilyMember] {
-        return try await api.send(.fetchFamilyLocations(groupID: groupID), authToken: authToken)
+        let context = SharedModelContainer.shared.context
+        do {
+            let members: [FamilyMember] = try await api.send(.fetchFamilyLocations(groupID: groupID), authToken: authToken)
+            
+            // Cache them
+            for member in members {
+                if let lat = member.lastLatitude, let lon = member.lastLongitude {
+                    context.insert(SDFamilyMember(id: member.id, name: member.name, latitude: lat, longitude: lon, lastUpdated: member.lastUpdated ?? Date(), status: member.status.rawValue))
+                }
+            }
+            try? context.save()
+            return members
+        } catch {
+            let descriptor = FetchDescriptor<SDFamilyMember>()
+            if let cached = try? context.fetch(descriptor), !cached.isEmpty {
+                return cached.map { $0.toFamilyMember() }
+            }
+            throw error
+        }
     }
 }

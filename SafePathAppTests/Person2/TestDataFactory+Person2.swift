@@ -1,4 +1,5 @@
 import Foundation
+@testable import SafePath
 import Testing
 
 extension TestDataFactory {
@@ -25,7 +26,7 @@ extension TestDataFactory {
     static func mockFamilyMember(
         id: String = "member-1",
         name: String = "Member Name",
-        role: String = "member",
+        role: FamilyMember.MemberRole = .member,
         status: FamilyMember.MemberStatus = .safe,
         isSafe: Bool = true,
         lastLatitude: Double? = nil,
@@ -36,12 +37,12 @@ extension TestDataFactory {
             id: id,
             name: name,
             phone: nil,
-            role: role,
-            status: status,
             isSafe: isSafe,
             lastLatitude: lastLatitude,
             lastLongitude: lastLongitude,
             lastUpdated: nil,
+            role: role,
+            status: status,
             avatarURL: nil,
             deviceToken: nil
         )
@@ -56,12 +57,12 @@ extension TestDataFactory {
         return FamilyGroup(
             id: id,
             name: name,
+            members: members,
+            createdAt: Date(),
             inviteCode: "ABCDEFGH",
             adminUserID: "admin-1",
             maxMembers: 10,
-            isActive: true,
-            createdAt: Date(),
-            members: members
+            isActive: true
         )
     }
 
@@ -79,12 +80,12 @@ extension TestDataFactory {
             message: nil,
             latitude: nil,
             longitude: nil,
+            updatedAt: Date(),
             isSOS: isSOS,
-            escalationLevel: 0,
+            escalationLevel: .none,
             responderID: nil,
             responderName: nil,
-            resolvedAt: nil,
-            updatedAt: Date()
+            resolvedAt: nil
         )
     }
 }

@@ -23,21 +23,7 @@ final class UserManagementViewModel: ObservableObject {
     init(repository: UserRepositoryProtocol? = nil) {
         self.repository = repository ?? UserRepository()
         restoreSession()
-        #if DEBUG
-        // Inject Dummy Data for UI Testing Person 2
-        if self.currentUser == nil {
-            self.currentUser = User(
-                id: "dummy-123",
-                name: "Dummy Tester",
-                email: "dummy@example.com",
-                lastLatitude: -7.2504,
-                lastLongitude: 112.7688,
-                authToken: "mock-token-123",
-                familyGroupIDs: ["DUMMY_GROUP_123"]
-            )
-            self.isLoggedIn = true
-        }
-        #endif
+        // Mock removed to enforce API integration
     }
 
     // MARK: - Auth Actions

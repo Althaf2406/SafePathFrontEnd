@@ -6,6 +6,7 @@ struct AppRouter: View {
     @EnvironmentObject var locationService: LocationService
     @EnvironmentObject var userVM: UserManagementViewModel
     @State private var selectedTab: Tab = .family
+    @State private var showProfile = false
     
     enum Tab: String {
         case home     = "Home"
@@ -16,8 +17,11 @@ struct AppRouter: View {
     }
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // ── Tab 1: Home (Disaster Alerts) ─────────────────────────────
+        VStack(spacing: 0) {
+            customTopBar
+            
+            TabView(selection: $selectedTab) {
+                // ── Tab 1: Home (Disaster Alerts) ─────────────────────────────
             NavigationStack {
                 DisasterAlertView()
             }
@@ -56,13 +60,50 @@ struct AppRouter: View {
                 .tag(Tab.family)
             
             // ── Tab 5: Prep (Person 3 Placeholder UI) ─────────────────────
-            ChecklistView()
+            PreparednessView()
                 .tabItem {
                     Label("Prep", systemImage: "checklist")
                 }
                 .tag(Tab.prep)
         }
+        }
         .tint(SafePathColors.primaryBlue)
+        .fullScreenCover(isPresented: $showProfile) {
+            ProfilePageView()
+        }
+    }
+    
+    private var customTopBar: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button(action: { selectedTab = .home }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "shield.lefthalf.filled")
+                            .foregroundColor(SafePathColors.primaryBlue)
+                            .font(.system(size: 24, weight: .bold))
+                        Text("SafePath")
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .foregroundColor(SafePathColors.primaryBlue)
+                    }
+                }
+                
+                Spacer()
+                
+                Button(action: { showProfile = true }) {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .frame(width: 34, height: 34)
+                        .foregroundColor(SafePathColors.textSecondary.opacity(0.4))
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            
+            Divider()
+        }
+        .background(Color.white)
     }
 }
 

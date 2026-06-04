@@ -25,21 +25,39 @@ final class RouteRepository: RouteRepositoryProtocol {
         request.requestsAlternateRoutes = true
         
         let directions = MKDirections(request: request)
-        let response = try await directions.calculate()
-        
-        guard let primaryRoute = response.routes.first else {
-            throw RouteError.noRouteFound
+        do {
+            let response = try await directions.calculate()
+            guard let primaryRoute = response.routes.first else {
+                throw RouteError.noRouteFound
+            }
+            
+            return EvacuationRoute(
+                id: UUID().uuidString,
+                shelterId: String(shelter.id),
+                shelterName: shelter.name,
+                distanceMeters: primaryRoute.distance,
+                expectedTravelTime: primaryRoute.expectedTravelTime,
+                safetyScore: 0.85, // Placeholder
+                mkRoute: primaryRoute,
+                customPolyline: nil
+            )
+        } catch {
+            // Fallback to straight line (offline mode)
+            var coordinates = [origin, shelter.coordinate]
+            let straightLine = MKPolyline(coordinates: &coordinates, count: 2)
+            let distance = originLoc.distance(from: destLoc)
+            
+            return EvacuationRoute(
+                id: UUID().uuidString,
+                shelterId: String(shelter.id),
+                shelterName: shelter.name,
+                distanceMeters: distance,
+                expectedTravelTime: distance / 1.4, // Average walking speed 1.4 m/s
+                safetyScore: 0.5,
+                mkRoute: nil,
+                customPolyline: straightLine
+            )
         }
-        
-        return EvacuationRoute(
-            id: UUID().uuidString,
-            shelterId: String(shelter.id),
-            shelterName: shelter.name,
-            distanceMeters: primaryRoute.distance,
-            expectedTravelTime: primaryRoute.expectedTravelTime,
-            safetyScore: 0.85, // Placeholder — future risk layer integration
-            mkRoute: primaryRoute
-        )
     }
     
     /// Calculate route and return alternatives too.
@@ -56,35 +74,55 @@ final class RouteRepository: RouteRepositoryProtocol {
         request.requestsAlternateRoutes = true
         
         let directions = MKDirections(request: request)
-        let response = try await directions.calculate()
-        
-        guard let primaryMK = response.routes.first else {
-            throw RouteError.noRouteFound
-        }
-        
-        let primary = EvacuationRoute(
-            id: UUID().uuidString,
-            shelterId: String(shelter.id),
-            shelterName: shelter.name,
-            distanceMeters: primaryMK.distance,
-            expectedTravelTime: primaryMK.expectedTravelTime,
-            safetyScore: 0.85,
-            mkRoute: primaryMK
-        )
-        
-        let alternatives = response.routes.dropFirst().map { route in
-            EvacuationRoute(
+        do {
+            let response = try await directions.calculate()
+            guard let primaryMK = response.routes.first else {
+                throw RouteError.noRouteFound
+            }
+            
+            let primary = EvacuationRoute(
                 id: UUID().uuidString,
                 shelterId: String(shelter.id),
                 shelterName: shelter.name,
-                distanceMeters: route.distance,
-                expectedTravelTime: route.expectedTravelTime,
-                safetyScore: 0.75,
-                mkRoute: route
+                distanceMeters: primaryMK.distance,
+                expectedTravelTime: primaryMK.expectedTravelTime,
+                safetyScore: 0.85,
+                mkRoute: primaryMK,
+                customPolyline: nil
             )
+            
+            let alternatives = response.routes.dropFirst().map { route in
+                EvacuationRoute(
+                    id: UUID().uuidString,
+                    shelterId: String(shelter.id),
+                    shelterName: shelter.name,
+                    distanceMeters: route.distance,
+                    expectedTravelTime: route.expectedTravelTime,
+                    safetyScore: 0.75,
+                    mkRoute: route,
+                    customPolyline: nil
+                )
+            }
+            
+            return (primary, Array(alternatives))
+        } catch {
+            // Fallback to straight line (offline mode)
+            var coordinates = [origin, shelter.coordinate]
+            let straightLine = MKPolyline(coordinates: &coordinates, count: 2)
+            let distance = originLoc.distance(from: destLoc)
+            
+            let offlinePrimary = EvacuationRoute(
+                id: UUID().uuidString,
+                shelterId: String(shelter.id),
+                shelterName: shelter.name,
+                distanceMeters: distance,
+                expectedTravelTime: distance / 1.4,
+                safetyScore: 0.5,
+                mkRoute: nil,
+                customPolyline: straightLine
+            )
+            return (offlinePrimary, [])
         }
-        
-        return (primary, Array(alternatives))
     }
 }
 

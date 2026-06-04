@@ -13,8 +13,8 @@ final class PreparednessViewModel: ObservableObject {
 
     private let repository: PreparednessRepositoryProtocol
 
-    init(repository: PreparednessRepositoryProtocol = PreparednessRepository()) {
-        self.repository = repository
+    init(repository: PreparednessRepositoryProtocol? = nil) {
+        self.repository = repository ?? PreparednessRepository()
     }
 
     // MARK: - Load

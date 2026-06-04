@@ -12,8 +12,8 @@ final class FirstAidGuideViewModel: ObservableObject {
     private let repository: FirstAidRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    init(repository: FirstAidRepositoryProtocol = FirstAidRepository()) {
-        self.repository = repository
+    init(repository: FirstAidRepositoryProtocol? = nil) {
+        self.repository = repository ?? FirstAidRepository()
         loadGuides()
     }
     

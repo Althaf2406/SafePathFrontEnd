@@ -22,40 +22,50 @@ struct TestDataFactory {
             id: id,
             name: name,
             address: address,
-            coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lng),
+            latitude: lat,
+            longitude: lng,
             capacity: capacity,
-            isActive: isActive,
-            contactNumber: "123",
+            availableCapacity: capacity,
+            contact: "123",
             facilities: facilities,
-            buildingLevel: buildingLevel,
+            shelterType: .building,
             disasterTypeSupported: disasterTypeSupported,
-            distanceKm: distanceKm
+            isOpenArea: false,
+            buildingLevel: buildingLevel,
+            isActive: isActive,
+            distanceKm: distanceKm,
+            recommendationScore: 0
         )
     }
     
     static func mockDisasterAlert(
         id: String = "alert1",
-        title: String = "Test Alert",
-        description: String = "This is a test alert",
-        severity: DisasterAlert.Severity = .high,
         type: String = "earthquake",
-        magnitude: Double? = 5.0,
-        instruction: String = "Evacuate",
+        severity: AlertSeverity = .high,
+        magnitude: Double = 5.0,
+        latitude: Double = -7.25,
+        longitude: Double = 112.76,
         locationName: String = "Test City",
-        timestamp: Date = Date()
+        instruction: String = "Evacuate",
+        timestamp: String = "2024-12-01T08:30:00.000Z"
     ) -> DisasterAlert {
         return DisasterAlert(
             id: id,
-            title: title,
-            description: description,
-            severity: severity,
             type: type,
+            severity: severity,
             magnitude: magnitude,
-            instruction: instruction,
-            coordinate: CLLocationCoordinate2D(latitude: -7.25, longitude: 112.76),
+            latitude: latitude,
+            longitude: longitude,
             locationName: locationName,
-            affectedRadiusKm: 10.0,
-            timestamp: timestamp
+            instruction: instruction,
+            timestamp: timestamp,
+            source: "BMKG",
+            sourceUrl: "https://data.bmkg.go.id",
+            tsunamiPotential: false,
+            depth: "10 km",
+            feltDescription: nil,
+            distanceKm: 10.0,
+            isNearby: true
         )
     }
     

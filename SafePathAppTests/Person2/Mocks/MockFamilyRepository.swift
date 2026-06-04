@@ -1,4 +1,5 @@
 import Foundation
+@testable import SafePath
 
 final class MockFamilyRepository: FamilyRepositoryProtocol {
     var shouldThrowError = false

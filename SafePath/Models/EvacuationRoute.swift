@@ -11,10 +11,11 @@ struct EvacuationRoute: Identifiable {
     let expectedTravelTime: TimeInterval
     let safetyScore: Double  // 0.0–1.0 placeholder; future risk layer integration
     let mkRoute: MKRoute?
+    let customPolyline: MKPolyline? // Used for offline straight line
     
     /// Polyline for map overlay display.
     var polyline: MKPolyline? {
-        mkRoute?.polyline
+        customPolyline ?? mkRoute?.polyline
     }
     
     var distanceKm: Double {
@@ -41,7 +42,8 @@ extension EvacuationRoute {
         distanceMeters: 1800,
         expectedTravelTime: 420,
         safetyScore: 0.85,
-        mkRoute: nil
+        mkRoute: nil,
+        customPolyline: nil
     )
 }
 #endif

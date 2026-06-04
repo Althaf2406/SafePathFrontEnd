@@ -16,25 +16,7 @@
       "skippedTests" : {
         "suites" : [
           {
-            "name" : "EmergencyStatusRepositoryTests"
-          },
-          {
-            "name" : "EmergencyStatusViewModelTests"
-          },
-          {
-            "name" : "FamilyRepositoryTests"
-          },
-          {
-            "name" : "FamilySafetyViewModelTests"
-          },
-          {
             "name" : "SafePathAppTests"
-          },
-          {
-            "name" : "UserManagementViewModelTests"
-          },
-          {
-            "name" : "UserRepositoryTests"
           }
         ]
       },

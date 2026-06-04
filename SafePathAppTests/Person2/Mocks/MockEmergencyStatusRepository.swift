@@ -1,6 +1,7 @@
 import Foundation
+@testable import SafePath
 
-final class MockEmergencyStatusRepository: EmergencyStatusRepositoryProtocol {
+final class MockEmergencyStatusRepository: SafePath.EmergencyStatusRepositoryProtocol {
     var shouldThrowError = false
     var statusToReturn: EmergencyStatus = TestDataFactory.mockEmergencyStatus()
     var statusesToReturn: [EmergencyStatus] = [TestDataFactory.mockEmergencyStatus()]

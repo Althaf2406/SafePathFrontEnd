@@ -10,8 +10,6 @@ import SwiftUI
 struct FamilyDashboardView: View {
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: - Custom Navigation Bar
-            customTopBar
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 28) {
@@ -88,43 +86,6 @@ struct FamilyDashboardView: View {
     }
     
     // MARK: - Subviews
-    
-    private var customTopBar: some View {
-        VStack(spacing: 0) {
-            HStack {
-                HStack(spacing: 8) {
-                    Image(systemName: "shield.lefthalf.filled")
-                        .foregroundColor(SafePathColors.primaryBlue)
-                        .font(.system(size: 24, weight: .bold))
-                    Text("SafePath")
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundColor(SafePathColors.primaryBlue)
-                }
-                
-                Spacer()
-                
-                HStack(spacing: 16) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(SafePathColors.textPrimary)
-                    
-                    NavigationLink(destination: ProfilePageView()) {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .frame(width: 34, height: 34)
-                            .foregroundColor(SafePathColors.textSecondary.opacity(0.4))
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
-                    }
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            
-            Divider()
-        }
-        .background(Color.white)
-    }
     
     private var heroSection: some View {
         ZStack {
