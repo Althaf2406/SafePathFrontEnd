@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct ActiveFamilyDashboardView: View {
+    @EnvironmentObject var userVM: UserManagementViewModel
+    @StateObject private var familyVM = FamilySafetyViewModel()
+    
+    @State private var showLeaveConfirm = false
     
     // Mock Data for UI
-    let familyName = "Jae's Family"
-    let connectedMembers = 4
-    let inviteCode = "JAE-9482-SAF"
     
     struct Member: Identifiable {
         let id = UUID()
@@ -224,6 +225,26 @@ struct ActiveFamilyDashboardView: View {
                                 .shadow(color: Color.black.opacity(0.04), radius: 8, y: 4)
                             }
                         }
+                        
+                        // NEW: Leave Family Button
+                        Button(action: { showLeaveConfirm = true }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    .font(.system(size: 16, weight: .semibold))
+                                Text("Leave Family Group")
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                            }
+                            .foregroundColor(SafePathColors.dangerRed)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color.white)
+                            .cornerRadius(16)
+                            .shadow(color: Color.black.opacity(0.04), radius: 8, y: 4)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(SafePathColors.dangerRed.opacity(0.3), lineWidth: 1)
+                            )
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)
@@ -232,6 +253,22 @@ struct ActiveFamilyDashboardView: View {
         }
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
         .navigationBarHidden(true)
+        .confirmationDialog("Leave Family Group?", isPresented: $showLeaveConfirm, titleVisibility: .visible) {
+            Button("Leave Group", role: .destructive) {
+                Task {
+                    if let token = userVM.currentUser?.authToken,
+                       let groupID = userVM.currentUser?.familyGroupIDs.first,
+                       let memberID = userVM.currentUser?.id {
+                        await familyVM.removeMember(authToken: token, groupID: groupID, memberID: memberID)
+                        // In real app, we would update user's group IDs and redirect
+                        // For UI demo, we can just print or handle state
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("You will lose access to family location and alerts.")
+        }
     }
     
     // MARK: - Top Bar
