@@ -7,11 +7,16 @@ final class DisasterPreparationViewModel: ObservableObject {
     @Published var guides: [DisasterPreparationGuide] = []
     @Published var checklistItems: [ChecklistItem] = []
     
-    private let prepRepository = DisasterPreparationRepository()
-    private let checklistRepository = ChecklistRepository()
+    private let prepRepository: DisasterPreparationRepositoryProtocol
+    private let checklistRepository: ChecklistRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    init() {
+    init(
+        prepRepository: DisasterPreparationRepositoryProtocol = DisasterPreparationRepository(),
+        checklistRepository: ChecklistRepositoryProtocol = ChecklistRepository()
+    ) {
+        self.prepRepository = prepRepository
+        self.checklistRepository = checklistRepository
         loadGuides()
     }
     

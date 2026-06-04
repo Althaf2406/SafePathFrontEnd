@@ -11,9 +11,9 @@ final class PreparednessViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    private let repository: PreparednessRepository
+    private let repository: PreparednessRepositoryProtocol
 
-    init(repository: PreparednessRepository = PreparednessRepository()) {
+    init(repository: PreparednessRepositoryProtocol = PreparednessRepository()) {
         self.repository = repository
     }
 

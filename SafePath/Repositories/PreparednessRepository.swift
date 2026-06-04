@@ -1,8 +1,16 @@
 import Foundation
 import Combine
 
+protocol PreparednessRepositoryProtocol {
+    func getAllItem() async throws -> [ChecklistItem]
+    func createItem(_ item: ChecklistItem) async throws -> ChecklistItem
+    func updateItem(_ item: ChecklistItem) async throws -> ChecklistItem
+    func deleteItem(id: String) async throws
+    func fetchRiskProfiles() async throws -> [RiskProfile]
+}
+
 /// Person 3: Repository for preparedness data persistence.
-final class PreparednessRepository {
+final class PreparednessRepository: PreparednessRepositoryProtocol {
 
     private let api: APIService
 

@@ -1,8 +1,12 @@
 import Foundation
 import Combine
 
+protocol FirstAidRepositoryProtocol {
+    func fetchGuides() -> AnyPublisher<[FirstAidGuide], Error>
+}
+
 /// Person 3: Repository for first aid guide content.
-final class FirstAidRepository {
+final class FirstAidRepository: FirstAidRepositoryProtocol {
     
     /// Simulates fetching first aid guides from backend or local bundle.
     func fetchGuides() -> AnyPublisher<[FirstAidGuide], Error> {

@@ -9,10 +9,11 @@ final class FirstAidGuideViewModel: ObservableObject {
     @Published var selectedGuide: FirstAidGuide?
     @Published var searchQuery: String = ""
     
-    private let repository = FirstAidRepository()
+    private let repository: FirstAidRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    init() {
+    init(repository: FirstAidRepositoryProtocol = FirstAidRepository()) {
+        self.repository = repository
         loadGuides()
     }
     

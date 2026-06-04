@@ -13,13 +13,14 @@ final class CustomizeChecklistViewModel: ObservableObject {
     
     @Published var customItems: [ChecklistItem] = []
     
-    private let repository = ChecklistRepository()
+    private let repository: ChecklistRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
     
     let categories = KitCategory.allCases
     let disasterTypes = ["All", "Flood", "Earthquake", "Tsunami", "Volcano", "Wildfire"]
     
-    init() {
+    init(repository: ChecklistRepositoryProtocol = ChecklistRepository()) {
+        self.repository = repository
         loadCustomItems()
     }
     

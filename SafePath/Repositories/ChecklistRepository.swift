@@ -1,8 +1,15 @@
 import Foundation
 import Combine
 
+protocol ChecklistRepositoryProtocol {
+    func fetchCustomItems() -> AnyPublisher<[ChecklistItem], Error>
+    func fetchItems(forDisasterType disasterType: String) -> AnyPublisher<[ChecklistItem], Error>
+    func saveCustomItem(_ item: ChecklistItem) -> AnyPublisher<Void, Error>
+    func deleteCustomItem(id: String) -> AnyPublisher<Void, Error>
+}
+
 /// Person 3: Repository for checklist data persistence.
-final class ChecklistRepository {
+final class ChecklistRepository: ChecklistRepositoryProtocol {
     
     // Simulating local storage with an in-memory array for now.
     private var customItems: [ChecklistItem] = [

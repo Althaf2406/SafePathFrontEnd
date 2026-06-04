@@ -1,8 +1,12 @@
 import Foundation
 import Combine
 
+protocol DisasterPreparationRepositoryProtocol {
+    func fetchGuides() -> AnyPublisher<[DisasterPreparationGuide], Error>
+}
+
 /// Repository for disaster preparation guides.
-final class DisasterPreparationRepository {
+final class DisasterPreparationRepository: DisasterPreparationRepositoryProtocol {
     
     func fetchGuides() -> AnyPublisher<[DisasterPreparationGuide], Error> {
         let guides = [
