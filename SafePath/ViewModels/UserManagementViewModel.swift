@@ -20,8 +20,8 @@ final class UserManagementViewModel: ObservableObject {
 
     // MARK: - Init — restore persisted session
 
-    init(repository: UserRepositoryProtocol = UserRepository()) {
-        self.repository = repository
+    init(repository: UserRepositoryProtocol? = nil) {
+        self.repository = repository ?? UserRepository()
         restoreSession()
         #if DEBUG
         // Inject Dummy Data for UI Testing Person 2

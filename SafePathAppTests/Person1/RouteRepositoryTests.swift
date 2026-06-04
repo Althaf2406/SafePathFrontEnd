@@ -1,7 +1,6 @@
 import Foundation
 import Testing
 import CoreLocation
-@testable import SafePath
 
 @Suite("Route Repository Tests")
 struct RouteRepositoryTests {

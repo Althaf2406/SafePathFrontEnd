@@ -1,5 +1,4 @@
 import Foundation
-@testable import SafePath
 
 final class MockEmergencyStatusRepository: EmergencyStatusRepositoryProtocol {
     var shouldThrowError = false

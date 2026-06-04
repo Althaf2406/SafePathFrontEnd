@@ -1,5 +1,4 @@
 import Foundation
-@testable import SafePath
 
 final class MockUserRepository: UserRepositoryProtocol {
     var shouldThrowError = false

@@ -1,7 +1,6 @@
 import Foundation
 import Testing
 
-@testable import SafePath
 
 @Suite("EmergencyStatus ViewModel Tests")
 @MainActor

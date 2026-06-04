@@ -1,7 +1,6 @@
 import Foundation
 import CoreLocation
 import Combine
-@testable import SafePath
 
 final class MockDisasterAlertRepository: DisasterAlertRepositoryProtocol {
     var shouldThrowError = false

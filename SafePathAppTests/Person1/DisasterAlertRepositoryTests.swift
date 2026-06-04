@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import SafePath
+
 
 @Suite("DisasterAlert Repository Tests")
 struct DisasterAlertRepositoryTests {

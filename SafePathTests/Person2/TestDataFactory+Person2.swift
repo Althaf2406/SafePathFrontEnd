@@ -1,7 +1,7 @@
 import Foundation
-@testable import SafePath
+import Testing
 
-struct TestDataFactory {
+extension TestDataFactory {
     static func mockUser(
         id: String = "test-user-1",
         name: String = "Test User",

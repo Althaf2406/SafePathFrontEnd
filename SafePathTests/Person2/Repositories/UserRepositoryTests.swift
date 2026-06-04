@@ -1,7 +1,6 @@
 import Foundation
 import Testing
 
-@testable import SafePath
 
 @Suite("UserRepository Tests")
 struct UserRepositoryTests {

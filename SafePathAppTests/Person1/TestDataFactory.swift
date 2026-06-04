@@ -1,7 +1,7 @@
 import Foundation
 import CoreLocation
 import MapKit
-@testable import SafePath
+
 
 struct TestDataFactory {
     static func mockShelter(
