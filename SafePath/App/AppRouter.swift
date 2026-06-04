@@ -45,7 +45,7 @@ struct AppRouter: View {
             // ── Tab 4: Family (Person 2 Placeholder UI) ───────────────────
             NavigationStack {
                 if let user = userVM.currentUser, !user.familyGroupIDs.isEmpty {
-                    ActiveFamilyDashboardView()
+                    EmergencyStatusView()
                 } else {
                     FamilyDashboardView()
                 }

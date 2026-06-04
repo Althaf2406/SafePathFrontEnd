@@ -1,8 +1,16 @@
 import Foundation
 import Combine
 
+protocol ShelterRepositoryProtocol {
+    func fetchAllShelters() async throws -> [Shelter]
+    func fetchShelter(id: Int) async throws -> Shelter
+    func fetchNearbyShelters(lat: Double, lng: Double) async throws -> [Shelter]
+    func fetchNearbyShelters(lat: Double, lng: Double, radiusKm: Double) async throws -> [Shelter]
+    func fetchRecommendedShelters(lat: Double, lng: Double, disasterType: String) async throws -> [Shelter]
+}
+
 @MainActor
-final class ShelterRepository {
+final class ShelterRepository: ShelterRepositoryProtocol {
     
     private let api: APIService
     

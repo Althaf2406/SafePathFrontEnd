@@ -1,8 +1,14 @@
 import Foundation
 import Combine
 
+protocol DisasterAlertRepositoryProtocol {
+    func fetchAllAlerts() async throws -> [DisasterAlert]
+    func fetchNearbyAlerts(lat: Double, lng: Double) async throws -> [DisasterAlert]
+    func fetchNearbyAlerts(lat: Double, lng: Double, radiusKm: Double) async throws -> [DisasterAlert]
+}
+
 @MainActor
-final class DisasterAlertRepository {
+final class DisasterAlertRepository: DisasterAlertRepositoryProtocol {
     
     private let api: APIService
     
