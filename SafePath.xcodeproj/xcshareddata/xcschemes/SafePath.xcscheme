@@ -33,7 +33,34 @@
             reference = "container:TestPlan.xctestplan"
             default = "YES">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:TestPlan.xctestplan">
+         </TestPlanReference>
       </TestPlans>
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B82518FC2FD19D4800C16BEC"
+               BuildableName = "SafePathTests.xctest"
+               BlueprintName = "SafePathTests"
+               ReferencedContainer = "container:SafePath.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3F684B2E2FD1737B00A40153"
+               BuildableName = "SafePathAppTests.xctest"
+               BlueprintName = "SafePathAppTests"
+               ReferencedContainer = "container:SafePath.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

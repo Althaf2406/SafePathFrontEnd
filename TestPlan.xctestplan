@@ -12,7 +12,38 @@
     "testTimeoutsEnabled" : true
   },
   "testTargets" : [
-
+    {
+      "skippedTests" : {
+        "suites" : [
+          {
+            "name" : "EmergencyStatusRepositoryTests"
+          },
+          {
+            "name" : "EmergencyStatusViewModelTests"
+          },
+          {
+            "name" : "FamilyRepositoryTests"
+          },
+          {
+            "name" : "FamilySafetyViewModelTests"
+          },
+          {
+            "name" : "SafePathAppTests"
+          },
+          {
+            "name" : "UserManagementViewModelTests"
+          },
+          {
+            "name" : "UserRepositoryTests"
+          }
+        ]
+      },
+      "target" : {
+        "containerPath" : "container:SafePath.xcodeproj",
+        "identifier" : "3F684B2E2FD1737B00A40153",
+        "name" : "SafePathAppTests"
+      }
+    }
   ],
-  "version" : 1
+  "version" : 2
 }
