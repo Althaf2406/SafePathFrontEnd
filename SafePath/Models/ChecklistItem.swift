@@ -23,16 +23,16 @@ enum KitCategory: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .firstAid: return "First Aid"
-        case .lighting: return "Lighting"
-        case .water: return "Water"
-        case .food: return "Food"
+        case .firstAid:      return "First Aid"
+        case .lighting:      return "Lighting"
+        case .water:         return "Water"
+        case .food:          return "Food"
         case .communication: return "Communication"
-        case .navigation: return "Navigation"
-        case .clothing: return "Clothing"
-        case .tools: return "Tools"
-        case .hygiene: return "Hygiene"
-        case .documents: return "Documents"
+        case .navigation:    return "Navigation"
+        case .clothing:      return "Clothing"
+        case .tools:         return "Tools"
+        case .hygiene:       return "Hygiene"
+        case .documents:     return "Documents"
         }
     }
 }

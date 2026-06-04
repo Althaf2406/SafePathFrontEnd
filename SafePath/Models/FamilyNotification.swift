@@ -25,6 +25,7 @@ struct FamilyNotification: Codable, Identifiable {
         case routeShared  = "route_shared"
         case familyInvite = "family_invite"
         case memberJoined = "member_joined"
+        case prepGuide    = "prep_guide"
 
         var systemImageName: String {
             switch self {
@@ -34,6 +35,7 @@ struct FamilyNotification: Codable, Identifiable {
             case .routeShared:  return "map.fill"
             case .familyInvite: return "person.badge.plus"
             case .memberJoined: return "person.fill.checkmark"
+            case .prepGuide:    return "book.fill"
             }
         }
     }
@@ -55,6 +57,7 @@ struct FamilyNotification: Codable, Identifiable {
         case openFamilyGroup   = "open_family_group"
         case openEmergencyStatus = "open_emergency_status"
         case openChecklist     = "open_checklist"
+        case openPrepGuide     = "open_prep_guide"
     }
 
     enum CodingKeys: String, CodingKey {

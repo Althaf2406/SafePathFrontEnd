@@ -6,8 +6,11 @@ struct FirstAidGuide: Codable, Identifiable {
     let id: String
     var title: String
     var category: String  // "cpr", "bleeding", "burns", "fractures", "choking"
-    var steps: [String]
+    var shortDescription: String
+    var steps: [String] // Keeping for simple overview
     var iconName: String?
     
-    // TODO: Person 3 — Add images, video URLs, difficulty level, estimated time.
+    // Additional properties for detailed view
+    var requiredKit: [FirstAidKitItem] = []
+    var detailedSteps: [FirstAidStep] = []
 }
