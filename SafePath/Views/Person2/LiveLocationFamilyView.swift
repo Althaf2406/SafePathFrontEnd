@@ -275,7 +275,7 @@ struct LiveLocationFamilyView: View {
                 }
             }
             .padding(.horizontal, 24)
-            .padding(.bottom, 24)
+            .padding(.bottom, 80)
         }
         .background(Color.white)
         .clipShape(

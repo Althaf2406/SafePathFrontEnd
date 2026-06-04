@@ -89,11 +89,13 @@ struct FamilyNotificationsView: View {
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(SafePathColors.textPrimary)
                         
-                        (Text(message)
-                            .foregroundColor(SafePathColors.textPrimary) +
-                         Text(status)
-                            .fontWeight(.bold)
-                            .foregroundColor(color))
+                        HStack(spacing: 0) {
+                            Text(message)
+                                .foregroundColor(SafePathColors.textPrimary)
+                            Text(status)
+                                .fontWeight(.bold)
+                                .foregroundColor(color)
+                        }
                         .font(.system(size: 14))
                     }
                     Spacer()
@@ -120,4 +122,8 @@ struct FamilyNotificationsView: View {
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.02), radius: 5, y: 2)
     }
+}
+
+#Preview{
+    FamilyNotificationsView()
 }

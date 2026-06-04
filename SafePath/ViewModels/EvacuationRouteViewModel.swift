@@ -12,7 +12,7 @@ final class EvacuationRouteViewModel: ObservableObject {
     @Published var isCalculating = false
     @Published var routeError: String?
     
-    private let routeRepository: RouteRepository
+    private let routeRepository: RouteRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Integration hooks for Person 2
@@ -22,7 +22,7 @@ final class EvacuationRouteViewModel: ObservableObject {
     // MARK: - Integration hooks for Person 3
     var onSaveRouteOffline: ((EvacuationRoute) -> Void)?
     
-    init(routeRepository: RouteRepository) {
+    init(routeRepository: RouteRepositoryProtocol) {
         self.routeRepository = routeRepository
     }
     

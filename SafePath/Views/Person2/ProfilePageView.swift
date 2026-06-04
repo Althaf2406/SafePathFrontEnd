@@ -8,177 +8,276 @@
 import SwiftUI
 import Combine
 
-/// Person 2: Profile page matching the screenshot design.
+/// Person 2: Profile page — premium redesign matching Figma page 34.
 struct ProfilePageView: View {
     @Environment(\.dismiss) var dismiss
 
+    // MARK: - Navigation States
+    @State private var goToEditProfile  = false
+    @State private var goToSettings     = false
+
+    @EnvironmentObject var userVM: UserManagementViewModel
+
+    // MARK: - UI States
     @State private var showLogoutConfirm = false
     @State private var showLogoutToast   = false
 
-    // Placeholder user data — replace with ViewModel binding
-    private let userName     = "Muhammad Althaf"
-    private let userEmail    = "althaf.m@example.com"
-    private let userLocation = "Surabaya, East Java"
-
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-
-                // MARK: Avatar + Identity
-                avatarSection
-                    .padding(.top, 24)
-                    .padding(.bottom, 20)
-
-                // MARK: Edit Profile & Settings
-                accountMenuCard
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 20)
-
-                // MARK: Safety Connections
-                safetyConnectionsSection
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 20)
-
-                // MARK: Device Status
-                deviceStatusSection
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 32)
-
-                // MARK: Logout Button
-                logoutButton
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 40)
-            }
+    // Computed properties mapped to UserManagementViewModel
+    private var userName: String { userVM.currentUser?.name ?? "Muhammad Althaf" }
+    private var userEmail: String { userVM.currentUser?.email ?? "althaf.m@example.com" }
+    private var userLocation: String {
+        if let lat = userVM.currentUser?.lastLatitude, let lon = userVM.currentUser?.lastLongitude {
+            return String(format: "%.4f, %.4f", lat, lon)
         }
-        .background(SafePathColors.backgroundLight.ignoresSafeArea())
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack(spacing: 6) {
-                    Image(systemName: "mappin.circle.fill")
-                        .foregroundColor(SafePathColors.primaryBlue)
-                        .font(.system(size: 18, weight: .bold))
-                    Text("SafePath")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundColor(SafePathColors.primaryBlue)
-                }
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundColor(SafePathColors.textSecondary.opacity(0.5))
-            }
-        }
-        .confirmationDialog("Are you sure you want to log out?", isPresented: $showLogoutConfirm, titleVisibility: .visible) {
-            Button("Logout", role: .destructive) {
-                withAnimation { showLogoutToast = true }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    withAnimation { showLogoutToast = false }
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-        .overlay(
-            Group {
-                if showLogoutToast { toastOverlay }
-            }
-        )
+        return "Surabaya, East Java"
+    }
+    private var initials: String {
+        let name = userVM.currentUser?.name ?? "MA"
+        return String(name.prefix(2)).uppercased()
     }
 
-    // MARK: - Avatar Section
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
 
-    private var avatarSection: some View {
-        VStack(spacing: 10) {
-            ZStack(alignment: .bottomTrailing) {
-                // Avatar placeholder
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 90))
-                    .foregroundColor(SafePathColors.textSecondary.opacity(0.25))
-                    .frame(width: 100, height: 100)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 3))
-                    .shadow(color: Color.black.opacity(0.1), radius: 8, y: 4)
+                    // MARK: - Hero Banner + Avatar
+                    heroBannerSection
+                        .padding(.bottom, 24)
 
-                // Edit badge
-                Button(action: {}) {
-                    Image(systemName: "pencil")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 28, height: 28)
-                        .background(SafePathColors.primaryBlue)
-                        .clipShape(Circle())
-                        .shadow(radius: 2)
+                    // MARK: - Quick Stats Row
+                    quickStatsRow
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 24)
+
+                    // MARK: - Account Menu Card
+                    menuSection
+
+                    // MARK: - Safety Connections
+                    safetyConnectionsSection
+                        .padding(.top, 24)
+
+                    // MARK: - Device Status
+                    deviceStatusSection
+                        .padding(.top, 24)
+
+                    // MARK: - Logout Button
+                    logoutButton
+                        .padding(.horizontal, 16)
+                        .padding(.top, 28)
+                        .padding(.bottom, 40)
                 }
             }
-
-            Text(userName)
-                .font(.system(size: 26, weight: .bold, design: .rounded))
-                .foregroundColor(SafePathColors.textPrimary)
-
-            Text(userEmail)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(SafePathColors.textSecondary)
-
-            HStack(spacing: 4) {
-                Image(systemName: "location.circle")
-                    .font(.system(size: 13))
-                    .foregroundColor(SafePathColors.textSecondary)
-                Text(userLocation)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(SafePathColors.textSecondary)
+            .background(SafePathColors.backgroundLight.ignoresSafeArea())
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(SafePathColors.primaryBlue)
+                            .font(.system(size: 18, weight: .semibold))
+                    }
+                }
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "shield.lefthalf.filled")
+                            .foregroundColor(SafePathColors.primaryBlue)
+                            .font(.system(size: 16, weight: .bold))
+                        Text("SafePath")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundColor(SafePathColors.primaryBlue)
+                    }
+                }
             }
+            // MARK: - Navigation Destinations
+            .navigationDestination(isPresented: $goToEditProfile) {
+                EditProfileView()
+            }
+            .navigationDestination(isPresented: $goToSettings) {
+                SettingView()
+            }
+            .confirmationDialog("Are you sure you want to log out?", isPresented: $showLogoutConfirm, titleVisibility: .visible) {
+                Button("Logout", role: .destructive) {
+                    withAnimation { showLogoutToast = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation { showLogoutToast = false }
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .overlay(
+                Group { if showLogoutToast { toastOverlay } }
+            )
         }
+    }
+
+    // MARK: - Hero Banner + Avatar
+
+    private var heroBannerSection: some View {
+        ZStack(alignment: .bottomLeading) {
+            // Gradient Banner
+            LinearGradient(
+                colors: [SafePathColors.primaryBlue, SafePathColors.accentBlue.opacity(0.85)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .frame(height: 200)
+
+            // Decorative Circles
+            Circle()
+                .fill(Color.white.opacity(0.05))
+                .frame(width: 180, height: 180)
+                .offset(x: -40, y: 60)
+            Circle()
+                .fill(Color.white.opacity(0.07))
+                .frame(width: 120, height: 120)
+                .offset(x: UIScreen.main.bounds.width - 80, y: 20)
+
+            // Avatar + Info
+            HStack(alignment: .bottom, spacing: 16) {
+                // Avatar Circle with Initials
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 88, height: 88)
+                        .shadow(color: .black.opacity(0.15), radius: 10, y: 4)
+                    Text(initials)
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .foregroundColor(SafePathColors.primaryBlue)
+
+                    // Online badge
+                    Circle()
+                        .fill(SafePathColors.safeGreen)
+                        .frame(width: 18, height: 18)
+                        .overlay(Circle().stroke(Color.white, lineWidth: 2.5))
+                        .offset(x: 30, y: 30)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(userName)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text(userEmail)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.75))
+                    HStack(spacing: 4) {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 10))
+                        Text(userLocation)
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(.white.opacity(0.65))
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 0))
+    }
+
+    // MARK: - Quick Stats Row
+
+    private var quickStatsRow: some View {
+        HStack(spacing: 0) {
+            statCell(value: "4", label: "Family Members", icon: "person.2.fill", color: SafePathColors.primaryBlue)
+            Divider().frame(height: 40)
+            statCell(value: "Safe", label: "My Status", icon: "checkmark.shield.fill", color: SafePathColors.safeGreen)
+            Divider().frame(height: 40)
+            statCell(value: "85%", label: "Battery", icon: "battery.75", color: SafePathColors.warningOrange)
+        }
+        .padding(.vertical, 16)
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
+    }
+
+    private func statCell(value: String, label: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundColor(color)
+            Text(value)
+                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .foregroundColor(SafePathColors.textPrimary)
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(SafePathColors.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Account Menu Card
 
-    private var accountMenuCard: some View {
-        VStack(spacing: 0) {
-            menuRow(icon: "person.fill", label: "Edit Profile", action: {})
-            Divider().padding(.leading, 52)
-            menuRow(icon: "gearshape.fill", label: "Settings", action: {})
+    private var menuSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionLabel("ACCOUNT")
+
+            VStack(spacing: 0) {
+                // Edit Profile — uses @State navigation to avoid toolbar conflict
+                Button(action: { goToEditProfile = true }) {
+                    menuRowContent(
+                        icon: "person.fill",
+                        iconBg: SafePathColors.primaryBlue.opacity(0.1),
+                        iconColor: SafePathColors.primaryBlue,
+                        label: "Edit Profile"
+                    )
+                }
+
+                Divider().padding(.leading, 60)
+
+                // Settings — uses @State navigation
+                Button(action: { goToSettings = true }) {
+                    menuRowContent(
+                        icon: "gearshape.fill",
+                        iconBg: Color.gray.opacity(0.1),
+                        iconColor: SafePathColors.textSecondary,
+                        label: "Settings"
+                    )
+                }
+            }
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.04), radius: 6, y: 3)
         }
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+        .padding(.horizontal, 16)
     }
 
-    private func menuRow(icon: String, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(SafePathColors.primaryBlue)
-                    .frame(width: 24)
-                Text(label)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(SafePathColors.textPrimary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(SafePathColors.textSecondary.opacity(0.5))
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+    private func menuRowContent(icon: String, iconBg: Color, iconColor: Color, label: String) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: 32, height: 32)
+                .background(iconBg)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            Text(label)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(SafePathColors.textPrimary)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(SafePathColors.textSecondary.opacity(0.4))
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 15)
     }
 
     // MARK: - Safety Connections Section
 
     private var safetyConnectionsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             sectionLabel("SAFETY CONNECTIONS")
 
             VStack(spacing: 0) {
-                // Emergency Contact Row
+                // Emergency Contact
                 HStack(spacing: 14) {
                     Image(systemName: "cross.case.fill")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundColor(SafePathColors.dangerRed)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 32, height: 32)
                         .background(SafePathColors.dangerRed.opacity(0.1))
-                        .clipShape(Circle())
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Emergency Contact")
@@ -188,27 +287,29 @@ struct ProfilePageView: View {
                             .font(.system(size: 13))
                             .foregroundColor(SafePathColors.textSecondary)
                     }
-
                     Spacer()
-
                     Button("Manage") {}
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundColor(SafePathColors.primaryBlue)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(SafePathColors.primaryBlue.opacity(0.08))
+                        .cornerRadius(8)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
 
-                Divider().padding(.leading, 70)
+                Divider().padding(.leading, 62)
 
-                // Family Group Row
+                // Family Group
                 Button(action: {}) {
                     HStack(spacing: 14) {
-                        Image(systemName: "clock.arrow.2.circlepath")
-                            .font(.system(size: 16, weight: .medium))
+                        Image(systemName: "figure.2.and.child.holdinghands")
+                            .font(.system(size: 15, weight: .medium))
                             .foregroundColor(SafePathColors.primaryBlue)
-                            .frame(width: 40, height: 40)
+                            .frame(width: 32, height: 32)
                             .background(SafePathColors.primaryBlue.opacity(0.1))
-                            .clipShape(Circle())
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Family Group")
@@ -218,12 +319,10 @@ struct ProfilePageView: View {
                                 .font(.system(size: 13))
                                 .foregroundColor(SafePathColors.textSecondary)
                         }
-
                         Spacer()
-
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(SafePathColors.textSecondary.opacity(0.5))
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(SafePathColors.textSecondary.opacity(0.4))
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
@@ -231,45 +330,52 @@ struct ProfilePageView: View {
             }
             .background(Color.white)
             .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+            .shadow(color: .black.opacity(0.04), radius: 6, y: 3)
         }
+        .padding(.horizontal, 16)
     }
 
     // MARK: - Device Status Section
 
     private var deviceStatusSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             sectionLabel("DEVICE STATUS")
 
             VStack(spacing: 0) {
-                deviceRow(icon: "iphone",        label: "iPhone", isFirst: true)
-                Divider().padding(.leading, 52)
-                deviceRow(icon: "ipad",          label: "iPad")
-                Divider().padding(.leading, 52)
-                deviceRow(icon: "applewatch",    label: "Watch")
+                deviceRow(icon: "iphone",     label: "iPhone",  status: "Active")
+                Divider().padding(.leading, 62)
+                deviceRow(icon: "ipad",       label: "iPad",    status: "Active")
+                Divider().padding(.leading, 62)
+                deviceRow(icon: "applewatch", label: "Watch",   status: "Active")
             }
             .background(Color.white)
             .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
-        }
-    }
-
-    private func deviceRow(icon: String, label: String, isFirst: Bool = false) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 18, weight: .light))
-                .foregroundColor(SafePathColors.textPrimary)
-                .frame(width: 24)
-            Text(label)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(SafePathColors.textPrimary)
-            Spacer()
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 22))
-                .foregroundColor(SafePathColors.safeGreen)
+            .shadow(color: .black.opacity(0.04), radius: 6, y: 3)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 15)
+    }
+
+    private func deviceRow(icon: String, label: String, status: String) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .light))
+                .foregroundColor(SafePathColors.textPrimary)
+                .frame(width: 32)
+            Text(label)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(SafePathColors.textPrimary)
+            Spacer()
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(SafePathColors.safeGreen)
+                    .frame(width: 6, height: 6)
+                Text(status)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(SafePathColors.safeGreen)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
     }
 
     // MARK: - Logout Button
@@ -289,23 +395,21 @@ struct ProfilePageView: View {
             .cornerRadius(14)
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(SafePathColors.dangerRed.opacity(0.6), lineWidth: 1.5)
+                    .stroke(SafePathColors.dangerRed.opacity(0.5), lineWidth: 1.5)
             )
-            .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.03), radius: 4, y: 2)
         }
     }
 
-    // MARK: - Section Label
+    // MARK: - Helpers
 
     private func sectionLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 12, weight: .bold))
+            .font(.system(size: 11, weight: .bold))
             .foregroundColor(SafePathColors.textSecondary)
             .tracking(0.8)
-            .padding(.leading, 4)
+            .padding(.leading, 20)
     }
-
-    // MARK: - Toast Overlay
 
     private var toastOverlay: some View {
         VStack {
@@ -321,7 +425,7 @@ struct ProfilePageView: View {
             .padding(.vertical, 12)
             .background(Color(red: 0.1, green: 0.15, blue: 0.2))
             .cornerRadius(30)
-            .shadow(color: Color.black.opacity(0.2), radius: 10, y: 5)
+            .shadow(color: .black.opacity(0.2), radius: 10, y: 5)
             .padding(.bottom, 40)
         }
     }
@@ -330,8 +434,6 @@ struct ProfilePageView: View {
 #Preview {
     NavigationStack {
         ProfilePageView()
+            .environmentObject(UserManagementViewModel())
     }
 }
-
-
-//tes

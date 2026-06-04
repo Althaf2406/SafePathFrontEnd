@@ -8,6 +8,8 @@ struct User: Codable, Identifiable {
     var phone: String?
     var profileImageURL: String?
     var createdAt: Date?
+    var lastLatitude: Double?
+    var lastLongitude: Double?
 
     // Person 2 — Authentication & family references
     var authToken: String?
@@ -21,6 +23,8 @@ struct User: Codable, Identifiable {
         case phone
         case profileImageURL  = "profile_image_url"
         case createdAt        = "created_at"
+        case lastLatitude     = "last_latitude"
+        case lastLongitude    = "last_longitude"
         case authToken        = "auth_token"
         case refreshToken     = "refresh_token"
         case familyGroupIDs   = "family_group_ids"
@@ -47,6 +51,8 @@ struct User: Codable, Identifiable {
         phone: String? = nil,
         profileImageURL: String? = nil,
         createdAt: Date? = Date(),
+        lastLatitude: Double? = nil,
+        lastLongitude: Double? = nil,
         authToken: String? = nil,
         refreshToken: String? = nil,
         familyGroupIDs: [String] = []
@@ -57,6 +63,8 @@ struct User: Codable, Identifiable {
         self.phone           = phone
         self.profileImageURL = profileImageURL
         self.createdAt       = createdAt
+        self.lastLatitude    = lastLatitude
+        self.lastLongitude   = lastLongitude
         self.authToken       = authToken
         self.refreshToken    = refreshToken
         self.familyGroupIDs  = familyGroupIDs

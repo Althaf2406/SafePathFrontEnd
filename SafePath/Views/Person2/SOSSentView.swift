@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct SOSSentView: View {
+    @EnvironmentObject var userVM: UserManagementViewModel
+    @EnvironmentObject var emergencyVM: EmergencyStatusViewModel
     @State private var isNotified = false
     @Environment(\.dismiss) var dismiss
     
@@ -25,7 +27,7 @@ struct SOSSentView: View {
                 VStack(spacing: 8) {
                     Text(isNotified ? "Status Updated" : "SOS Sent Successfully")
                         .font(.title.bold())
-                    Text(isNotified ? "Your family has been notified." : "Help is being notified. Your location is being shared in real-time.")
+                    Text(isNotified ? "Your family has been notified of your emergency." : "Help is being notified. Your location is being shared in real-time.")
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
@@ -39,7 +41,7 @@ struct SOSSentView: View {
                     if isNotified {
                         // Table-like Success View
                         VStack(spacing: 1) {
-                            successRow(label: "Status", value: "I am Safe", isBadge: true)
+                            successRow(label: "Status", value: "Need Help", isBadge: true)
                             successRow(label: "Location", value: "Surabaya, East Java")
                             successRow(label: "Time", value: "Just now")
                         }
@@ -58,7 +60,7 @@ struct SOSSentView: View {
                 
                 // Final Action Button
                 Button(action: { if isNotified { dismiss() } }) {
-                    Text(isNotified ? "Back to Home" : "Call Emergency Contact")
+                    Text(isNotified ? "Back to Family" : "Call Emergency Contact")
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -70,8 +72,16 @@ struct SOSSentView: View {
             }
         }
         .onAppear {
-            // Simulasi proses notifying selama 3 detik
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            Task {
+                // 1. Call real backend API if token exists
+                if let token = userVM.currentUser?.authToken {
+                    let lat = userVM.currentUser?.lastLatitude
+                    let lon = userVM.currentUser?.lastLongitude
+                    await emergencyVM.triggerSOS(authToken: token, latitude: lat, longitude: lon)
+                }
+                
+                // 2. Simulate delay for the UI notification effect (or fallback if API fails)
+                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
                 withAnimation(.spring()) {
                     isNotified = true
                 }
@@ -106,7 +116,7 @@ struct SOSSentView: View {
             if isBadge {
                 Text(value).bold()
                     .padding(.horizontal, 10).padding(.vertical, 4)
-                    .background(SafePathColors.safeGreen).foregroundColor(.white).cornerRadius(8)
+                    .background(SafePathColors.dangerRed).foregroundColor(.white).cornerRadius(8)
             } else {
                 Text(value).bold()
             }

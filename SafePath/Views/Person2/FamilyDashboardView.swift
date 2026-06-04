@@ -70,6 +70,8 @@ struct FamilyDashboardView: View {
                                     .stroke(SafePathColors.primaryBlue.opacity(0.2), lineWidth: 1)
                             )
                         }
+                        
+                        // Removed testing routes
                     }
                     .padding(.horizontal, 24)
                     
@@ -106,12 +108,14 @@ struct FamilyDashboardView: View {
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(SafePathColors.textPrimary)
                     
-                    Image(systemName: "person.crop.circle.fill")
-                        .resizable()
-                        .frame(width: 34, height: 34)
-                        .foregroundColor(SafePathColors.textSecondary.opacity(0.4))
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
+                    NavigationLink(destination: ProfilePageView()) {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .frame(width: 34, height: 34)
+                            .foregroundColor(SafePathColors.textSecondary.opacity(0.4))
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
+                    }
                 }
             }
             .padding(.horizontal, 20)

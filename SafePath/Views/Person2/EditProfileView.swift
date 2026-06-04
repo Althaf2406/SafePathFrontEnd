@@ -2,14 +2,17 @@ import SwiftUI
 import Combine
 
 /// Person 2: Edit Profile view matching the visual style in Screenshot 4.
-struct ProfileView: View {
+struct EditProfileView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var userVM: UserManagementViewModel
     
-    @State private var fullName: String = "Citizen User"
-    @State private var email: String = "citizen@safepath.io"
-    @State private var phone: String = "+1 (555) 012-3456"
+    @State private var fullName: String = ""
+    @State private var email: String = ""
+    @State private var phone: String = ""
     @State private var emergencyContact: String = "Sarah Doe (Spouse)"
     @State private var homeAddress: String = "123 Safety Way, Secure Valley, SV 94000"
+    @State private var latitude: String = ""
+    @State private var longitude: String = ""
     
     @State private var showSavedToast = false
     
@@ -25,6 +28,9 @@ struct ProfileView: View {
                 // Basic Info Card
                 basicInfoCard
                 
+                // Location Info Card
+                locationInfoCard
+                
                 // Emergency Context Card
                 emergencyContextCard
                 
@@ -39,6 +45,19 @@ struct ProfileView: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
+        }
+        .onAppear {
+            if let user = userVM.currentUser {
+                fullName = user.name
+                email = user.email
+                phone = user.phone ?? ""
+                if let lat = user.lastLatitude {
+                    latitude = String(lat)
+                }
+                if let lon = user.lastLongitude {
+                    longitude = String(lon)
+                }
+            }
         }
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
@@ -181,6 +200,57 @@ struct ProfileView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
     }
     
+    // MARK: - Location Info Card
+    private var locationInfoCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Latitude
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Latitude")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(SafePathColors.textPrimary)
+                
+                HStack(spacing: 8) {
+                    Image(systemName: "mappin")
+                        .foregroundColor(SafePathColors.textSecondary)
+                    TextField("Latitude", text: $latitude)
+                        .keyboardType(.decimalPad)
+                }
+                .padding()
+                .background(SafePathColors.backgroundLight.opacity(0.5))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(SafePathColors.lightBlueCard, lineWidth: 1)
+                )
+            }
+            
+            // Longitude
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Longitude")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(SafePathColors.textPrimary)
+                
+                HStack(spacing: 8) {
+                    Image(systemName: "mappin")
+                        .foregroundColor(SafePathColors.textSecondary)
+                    TextField("Longitude", text: $longitude)
+                        .keyboardType(.decimalPad)
+                }
+                .padding()
+                .background(SafePathColors.backgroundLight.opacity(0.5))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(SafePathColors.lightBlueCard, lineWidth: 1)
+                )
+            }
+        }
+        .padding(16)
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+    }
+    
     // MARK: - Emergency Context Card
     private var emergencyContextCard: some View {
         HStack(spacing: 0) {
@@ -251,12 +321,17 @@ struct ProfileView: View {
     private var actionSection: some View {
         VStack(spacing: 12) {
             Button(action: {
-                withAnimation {
-                    showSavedToast = true
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                Task {
+                    let lat = Double(latitude)
+                    let lon = Double(longitude)
+                    await userVM.updateProfile(name: fullName, phone: phone, latitude: lat, longitude: lon)
                     withAnimation {
-                        showSavedToast = false
+                        showSavedToast = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                        withAnimation {
+                            showSavedToast = false
+                        }
                     }
                 }
             }) {
@@ -300,5 +375,6 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView()
+    EditProfileView()
+        .environmentObject(UserManagementViewModel())
 }

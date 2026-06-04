@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EmergencyStatusView: View {
-    @EnvironmentObject var userVM: UserManagementViewModel // Menggunakan ViewModel asli kamu
+    @EnvironmentObject var userVM: UserManagementViewModel// Menggunakan ViewModel asli kamu
     @State private var navigateToNotifications = false
     
     var body: some View {
@@ -15,6 +15,30 @@ struct EmergencyStatusView: View {
                     // MARK: - Family Identity Header
                     familyHeader
                         .padding(.top, 10)
+                        
+                    // MARK: - Giant SOS Trigger
+                    NavigationLink(destination: SOSSentView()) {
+                        HStack {
+                            Spacer()
+                            VStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 44))
+                                Text("EMERGENCY SOS")
+                                    .font(.system(size: 22, weight: .black, design: .rounded))
+                                    .tracking(1.5)
+                            }
+                            .foregroundColor(.white)
+                            Spacer()
+                        }
+                        .padding(.vertical, 28)
+                        .background(
+                            LinearGradient(colors: [SafePathColors.dangerRed, Color.red.opacity(0.8)], startPoint: .top, endPoint: .bottom)
+                        )
+                        .cornerRadius(24)
+                        .shadow(color: SafePathColors.dangerRed.opacity(0.4), radius: 12, y: 8)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
                     
                     // MARK: - Member Status List
                     VStack(alignment: .leading, spacing: 16) {
@@ -33,32 +57,48 @@ struct EmergencyStatusView: View {
                     }
                     .padding(.horizontal, 20)
                     
-                    // MARK: - Action Buttons
-                    VStack(spacing: 14) {
-                        Button(action: {}) {
-                            HStack {
+                    // MARK: - Navigation Action Boxes
+                    HStack(spacing: 16) {
+                        NavigationLink(destination: LiveLocationFamilyView()) {
+                            VStack(alignment: .leading, spacing: 12) {
                                 Image(systemName: "map.fill")
-                                Text("Family Map")
+                                    .font(.system(size: 28))
+                                    .foregroundColor(.white)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Live Map")
+                                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                    Text("Track Family")
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(.white.opacity(0.8))
+                                }
                             }
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
+                            .padding(16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .background(SafePathColors.primaryBlue)
-                            .cornerRadius(12)
+                            .cornerRadius(20)
+                            .shadow(color: SafePathColors.primaryBlue.opacity(0.3), radius: 8, y: 4)
                         }
                         
-                        Button(action: {}) {
-                            HStack {
-                                Image(systemName: "person.badge.plus.fill")
-                                Text("Add Family Member")
+                        NavigationLink(destination: FamilyNotificationsView()) {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Image(systemName: "bell.badge.fill")
+                                    .font(.system(size: 28))
+                                    .foregroundColor(SafePathColors.primaryBlue)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Alerts")
+                                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                                        .foregroundColor(SafePathColors.textPrimary)
+                                    Text("History")
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(SafePathColors.textSecondary)
+                                }
                             }
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(SafePathColors.primaryBlue)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(SafePathColors.primaryBlue.opacity(0.1))
-                            .cornerRadius(12)
+                            .padding(16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white)
+                            .cornerRadius(20)
+                            .shadow(color: Color.black.opacity(0.04), radius: 8, y: 4)
                         }
                     }
                     .padding(.horizontal, 20)
@@ -197,4 +237,8 @@ struct EmergencyStatusView: View {
                 .stroke(isAlert ? SafePathColors.dangerRed.opacity(0.2) : Color.clear, lineWidth: 1)
         )
     }
+}
+
+#Preview{
+    EmergencyStatusView()
 }
