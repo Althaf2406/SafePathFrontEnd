@@ -2,9 +2,13 @@ import Foundation
 
 /// Person 2: Repository for family group API calls.
 /// Connects to Express backend family endpoints via APIService.
-final class FamilyRepository {
+final class FamilyRepository: FamilyRepositoryProtocol {
 
-    private let api = APIService.shared
+    private let api: APIServiceProtocol
+
+    init(api: APIServiceProtocol = APIService.shared) {
+        self.api = api
+    }
 
     // MARK: - Group Endpoints
 

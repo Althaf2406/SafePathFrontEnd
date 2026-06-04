@@ -15,12 +15,13 @@ final class UserManagementViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let repository = UserRepository()
+    private let repository: UserRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init — restore persisted session
 
-    init() {
+    init(repository: UserRepositoryProtocol = UserRepository()) {
+        self.repository = repository
         restoreSession()
         #if DEBUG
         // Inject Dummy Data for UI Testing Person 2

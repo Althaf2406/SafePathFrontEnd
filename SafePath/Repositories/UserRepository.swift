@@ -2,9 +2,13 @@ import Foundation
 
 /// Person 2: Repository for user API calls.
 /// Connects to Express backend auth & profile endpoints via APIService.
-final class UserRepository {
+final class UserRepository: UserRepositoryProtocol {
 
-    private let api = APIService.shared
+    private let api: APIServiceProtocol
+
+    init(api: APIServiceProtocol = APIService.shared) {
+        self.api = api
+    }
 
     // MARK: - Auth Endpoints
 
