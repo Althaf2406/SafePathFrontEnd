@@ -16,7 +16,7 @@ final class ShelterViewModel: ObservableObject {
     @Published var activeFilter: ShelterFilter = .nearest
     @Published var activeDisasterType: String = ""
     
-    private let repository: ShelterRepository
+    private let repository: ShelterRepositoryProtocol
     
     // MARK: - Integration hooks for Person 2
     var onShareWithFamily: ((Shelter) -> Void)?
@@ -24,7 +24,7 @@ final class ShelterViewModel: ObservableObject {
     // MARK: - Integration hooks for Person 3
     var onSaveShelterOffline: ((Shelter) -> Void)?
     
-    init(repository: ShelterRepository) {
+    init(repository: ShelterRepositoryProtocol) {
         self.repository = repository
     }
     
