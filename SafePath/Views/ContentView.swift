@@ -2,14 +2,19 @@ import SwiftUI
 import Combine
 
 struct ContentView: View {
+    @StateObject private var userVM = UserManagementViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, SafePath!")
+        Group {
+            if userVM.isLoggedIn {
+                ActiveFamilyDashboardView()
+            } else {
+                NavigationStack {
+                    LoginView()
+                }
+            }
         }
-        .padding()
+        .environmentObject(userVM)
     }
 }
 

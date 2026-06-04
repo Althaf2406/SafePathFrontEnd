@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var userVM: UserManagementViewModel
 
     // MARK: - Toggle States
     @State private var notificationsOn = true
@@ -176,7 +177,11 @@ struct SettingView: View {
                 }
             }
             .confirmationDialog("Sign out of SafePath?", isPresented: $showSignOutConfirm, titleVisibility: .visible) {
-                Button("Sign Out", role: .destructive) {}
+                Button("Sign Out", role: .destructive) {
+                    Task {
+                        await userVM.logout()
+                    }
+                }
                 Button("Cancel", role: .cancel) {}
             }
             .overlay(
