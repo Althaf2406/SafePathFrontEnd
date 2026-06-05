@@ -42,7 +42,7 @@ struct DisasterAlertViewModelTests {
         }
     }
     
-    @Test("Fungsi: fetchAllAlerts() - Skenario Gagal")
+    @Test("Fungsi: fetchAllAlerts() - Skenario Gagal (Fallback ke Mock Data)")
     func testFetchAlertsFailure() async {
         let mockRepo = MockDisasterAlertRepository()
         mockRepo.shouldThrowError = true
@@ -50,11 +50,12 @@ struct DisasterAlertViewModelTests {
         let vm = DisasterAlertViewModel(repository: mockRepo)
         await vm.fetchAllAlerts()
         
-        #expect(vm.allAlerts.isEmpty)
-        if case .error(let msg) = vm.state {
-            #expect(!msg.isEmpty)
+        // Karena ada mekanisme fallback ke data mock, list tidak boleh kosong.
+        #expect(!vm.allAlerts.isEmpty)
+        if case .loaded(let alerts) = vm.state {
+            #expect(!alerts.isEmpty)
         } else {
-            Issue.record("State was not .error")
+            Issue.record("State was not .loaded dengan fallback data")
         }
     }
     

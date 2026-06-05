@@ -42,7 +42,7 @@ struct ShelterViewModelTests {
         }
     }
     
-    @Test("Fungsi: fetchAllShelters() - Skenario Gagal")
+    @Test("Fungsi: fetchAllShelters() - Skenario Gagal (Fallback ke Mock Data)")
     func testFetchSheltersFailure() async {
         let mockRepo = MockShelterRepository()
         mockRepo.shouldThrowError = true
@@ -50,11 +50,12 @@ struct ShelterViewModelTests {
         let vm = ShelterViewModel(repository: mockRepo)
         await vm.fetchAllShelters()
         
-        #expect(vm.shelters.isEmpty)
-        if case .error(let msg) = vm.state {
-            #expect(!msg.isEmpty)
+        // Karena ada mekanisme fallback ke data mock, list tidak boleh kosong.
+        #expect(!vm.shelters.isEmpty)
+        if case .loaded(let shelters) = vm.state {
+            #expect(!shelters.isEmpty)
         } else {
-            Issue.record("State was not .error")
+            Issue.record("State was not .loaded dengan fallback data")
         }
     }
     
