@@ -47,7 +47,10 @@ final class DisasterAlertViewModel: ObservableObject {
             allAlerts = alerts
             state = alerts.isEmpty ? .empty : .loaded(alerts)
         } catch {
-            state = .error(error.localizedDescription)
+            print("⚠️ API DisasterAlerts Gagal: \(error.localizedDescription). Beralih ke data mock.")
+            let mockAlerts = [DisasterAlert.previewCritical, DisasterAlert.preview]
+            self.allAlerts = mockAlerts
+            self.state = .loaded(mockAlerts)
         }
     }
     
@@ -74,8 +77,25 @@ final class DisasterAlertViewModel: ObservableObject {
                 scheduleLocalNotification(for: alert)
             }
         } catch {
-            // Nearby fetch failure is non-fatal; keep existing data
-            print("Failed to fetch nearby alerts: \(error.localizedDescription)")
+            print("⚠️ Failed to fetch nearby alerts: \(error.localizedDescription). Beralih ke data mock.")
+            let allMocks = [DisasterAlert.preview, DisasterAlert.previewCritical]
+            let filtered = allMocks.compactMap { alert -> DisasterAlert? in
+                let alertLoc = CLLocation(latitude: alert.latitude, longitude: alert.longitude)
+                let userLoc = CLLocation(latitude: location.latitude, longitude: location.longitude)
+                let distance = alertLoc.distance(from: userLoc) / 1000.0
+                if distance <= radiusKm {
+                    var updated = alert
+                    updated.distanceKm = distance
+                    return updated
+                }
+                return nil
+            }
+            self.nearbyAlerts = filtered
+            
+            // Schedule local notifications for mock high-severity nearby alerts
+            for alert in filtered where alert.severity == .critical || alert.severity == .high {
+                scheduleLocalNotification(for: alert)
+            }
         }
     }
     

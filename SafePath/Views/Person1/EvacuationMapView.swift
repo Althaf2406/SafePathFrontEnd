@@ -14,6 +14,7 @@ struct EvacuationMapView: UIViewRepresentable {
     let alternativeRoutes: [MKRoute]
     let isEmergencyMode: Bool
     let centerUserTrigger: Bool
+    let isNavigating: Bool
     
     var onShelterTapped: ((Shelter) -> Void)?
     
@@ -29,6 +30,17 @@ struct EvacuationMapView: UIViewRepresentable {
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
         context.coordinator.parent = self
+        
+        // Atur mode pelacakan arah dan kompas (Heading) berdasarkan status navigasi
+        if isNavigating {
+            if mapView.userTrackingMode != .followWithHeading {
+                mapView.setUserTrackingMode(.followWithHeading, animated: true)
+            }
+        } else {
+            if mapView.userTrackingMode == .followWithHeading {
+                mapView.setUserTrackingMode(.none, animated: true)
+            }
+        }
         
         // Remove old overlays and annotations (except user location)
         mapView.removeOverlays(mapView.overlays)
@@ -103,7 +115,16 @@ struct EvacuationMapView: UIViewRepresentable {
     // MARK: - Region
     
     private func adjustRegion(_ mapView: MKMapView) {
-        if let route = primaryRoute {
+        if isNavigating, let userCoord = userCoordinate {
+            let region = MKCoordinateRegion(
+                center: userCoord,
+                span: MKCoordinateSpan(
+                    latitudeDelta: 0.005,
+                    longitudeDelta: 0.005
+                )
+            )
+            mapView.setRegion(region, animated: true)
+        } else if let route = primaryRoute {
             let rect = route.polyline.boundingMapRect
             let insets = UIEdgeInsets(top: 80, left: 40, bottom: 200, right: 40)
             mapView.setVisibleMapRect(rect, edgePadding: insets, animated: true)

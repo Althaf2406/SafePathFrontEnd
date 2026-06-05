@@ -6,6 +6,16 @@ struct DisasterAlertView: View {
     @StateObject private var viewModel = DisasterAlertViewModel()
     @EnvironmentObject var locationService: LocationService
     
+    @State private var showNearbyOnly = true
+    
+    private var displayedAlerts: [DisasterAlert] {
+        if showNearbyOnly && locationService.currentLocation != nil {
+            return viewModel.nearbyAlerts
+        } else {
+            return viewModel.allAlerts
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -14,8 +24,8 @@ struct DisasterAlertView: View {
                 switch viewModel.state {
                 case .idle, .loading:
                     loadingView
-                case .loaded(let alerts):
-                    alertListContent(alerts)
+                case .loaded:
+                    alertListContent(displayedAlerts)
                 case .empty:
                     emptyStateView
                 case .error(let message):
@@ -25,7 +35,14 @@ struct DisasterAlertView: View {
             .navigationTitle("Disaster Alerts")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { Task { await viewModel.fetchAllAlerts() } }) {
+                    Button(action: {
+                        Task {
+                            await viewModel.fetchAllAlerts()
+                            if let loc = locationService.currentLocation {
+                                await viewModel.fetchNearbyAlerts(location: loc)
+                            }
+                        }
+                    }) {
                         Image(systemName: "arrow.clockwise")
                     }
                 }
@@ -45,19 +62,49 @@ struct DisasterAlertView: View {
     private func alertListContent(_ alerts: [DisasterAlert]) -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
+                // Segmented picker to toggle nearby vs all
+                Picker("Filter", selection: $showNearbyOnly) {
+                    Text("Nearby").tag(true)
+                    Text("All Regions").tag(false)
+                }
+                .pickerStyle(.segmented)
+                .padding(.bottom, 6)
+                
                 // Attribution
                 bmkgAttributionBanner
                 
                 // Nearby high-severity banner
-                if !viewModel.highSeverityAlerts.isEmpty {
-                    nearbySeverityBanner
+                let activeHighSeverity = alerts.filter { $0.severity == .critical || $0.severity == .high }
+                if !activeHighSeverity.isEmpty {
+                    nearbySeverityBanner(count: activeHighSeverity.count)
                 }
                 
-                ForEach(alerts) { alert in
-                    NavigationLink(destination: DisasterAlertDetailView(alert: alert, viewModel: viewModel)) {
-                        AlertCard(alert: alert)
+                if alerts.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "checkmark.shield.fill")
+                            .font(.system(size: 48))
+                            .foregroundColor(SafePathColors.safeGreen)
+                            .padding(.top, 40)
+                        Text("No Active Alerts Nearby")
+                            .font(SafePathFonts.headline)
+                            .foregroundColor(SafePathColors.textPrimary)
+                        Text("Toggle \"All Regions\" to view alerts in other areas.")
+                            .font(SafePathFonts.caption)
+                            .foregroundColor(SafePathColors.textSecondary)
+                            .multilineTextAlignment(.center)
                     }
-                    .buttonStyle(.plain)
+                    .padding(24)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(color: Color.black.opacity(0.02), radius: 4)
+                } else {
+                    ForEach(alerts) { alert in
+                        NavigationLink(destination: DisasterAlertDetailView(alert: alert, viewModel: viewModel)) {
+                            AlertCard(alert: alert)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -84,7 +131,7 @@ struct DisasterAlertView: View {
         .cornerRadius(10)
     }
     
-    private var nearbySeverityBanner: some View {
+    private func nearbySeverityBanner(count: Int) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(.white)
@@ -92,7 +139,7 @@ struct DisasterAlertView: View {
                 Text("Active Emergency Alert")
                     .font(SafePathFonts.headline)
                     .foregroundColor(.white)
-                Text("\(viewModel.highSeverityAlerts.count) high-severity alerts detected nearby")
+                Text("\(count) high-severity alerts detected")
                     .font(SafePathFonts.caption)
                     .foregroundColor(.white.opacity(0.9))
             }

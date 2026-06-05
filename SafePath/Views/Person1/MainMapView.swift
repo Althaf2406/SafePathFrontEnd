@@ -9,6 +9,8 @@ struct MainMapView: View {
     @StateObject private var shelterVM = ShelterViewModel()
     @StateObject private var alertVM = DisasterAlertViewModel()
     @StateObject private var routeVM = EvacuationRouteViewModel()
+    @StateObject private var familyVM = FamilySafetyViewModel()
+    @StateObject private var emergencyVM = EmergencyStatusViewModel()
     
     @State private var isEmergencyMode = false
     @State private var showBottomSheet = true
@@ -16,6 +18,9 @@ struct MainMapView: View {
     @State private var showShelterDetail = false
     @State private var navigateToShelterDetail: Shelter?
     @State private var centerUserTrigger = false
+    @State private var showShareSuccess = false
+    @State private var showSOSSuccess = false
+    @State private var isNavigating = false
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -29,30 +34,40 @@ struct MainMapView: View {
                 alternativeRoutes: routeVM.alternativeRoutes.compactMap(\.mkRoute),
                 isEmergencyMode: isEmergencyMode,
                 centerUserTrigger: centerUserTrigger,
+                isNavigating: isNavigating,
                 onShelterTapped: { shelter in
-                    shelterVM.selectShelter(shelter)
-                    showBottomSheet = true
+                    if !isNavigating {
+                        shelterVM.selectShelter(shelter)
+                        showBottomSheet = true
+                    }
                 }
             )
             .ignoresSafeArea()
             
             // Top overlay controls
             VStack(spacing: 0) {
-                topBar
-                
-                // Emergency alert banner
-                if isEmergencyMode, let alert = alertVM.nearbyAlerts.first {
-                    emergencyBanner(alert)
+                if isNavigating {
+                    navigationTopBanner
+                } else {
+                    topBar
+                    
+                    // Emergency alert banner
+                    if isEmergencyMode, let alert = alertVM.nearbyAlerts.first {
+                        emergencyBanner(alert)
+                    }
                 }
                 
                 Spacer()
             }
             
-            // Bottom sheet
+            // Bottom sheet or Navigation HUD
             VStack {
                 Spacer()
                 
-                if showBottomSheet {
+                if isNavigating {
+                    navigationBottomHUD
+                        .transition(.move(edge: .bottom))
+                } else if showBottomSheet {
                     MapBottomSheetView(
                         selectedShelter: shelterVM.selectedShelter,
                         currentRoute: routeVM.currentRoute,
@@ -63,8 +78,9 @@ struct MainMapView: View {
                             }
                         },
                         onStartRoute: {
-                            if let shelter = shelterVM.selectedShelter, let loc = locationService.currentLocation {
-                                Task { await routeVM.calculateRoute(from: loc, to: shelter) }
+                            withAnimation(.easeInOut) {
+                                isNavigating = true
+                                showBottomSheet = false
                             }
                         },
                         onChangeShelter: {
@@ -94,41 +110,44 @@ struct MainMapView: View {
                     .transition(.move(edge: .bottom))
                 }
             }
+            .ignoresSafeArea(edges: .bottom)
             
             // Floating buttons (right side)
-            VStack {
-                Spacer()
-                    .frame(height: 160)
-                
-                VStack(spacing: 10) {
-                    // Find nearest shelter
-                    floatingButton(icon: "building.2.fill", label: "Nearest") {
-                        if let nearest = shelterVM.findNearestAvailable(preferMedical: isEmergencyMode) {
-                            shelterVM.selectShelter(nearest)
-                            if let loc = locationService.currentLocation {
-                                Task { await routeVM.calculateRoute(from: loc, to: nearest) }
+            if !isNavigating {
+                VStack {
+                    Spacer()
+                        .frame(height: 160)
+                    
+                    VStack(spacing: 10) {
+                        // Find nearest shelter
+                        floatingButton(icon: "building.2.fill", label: "Nearest") {
+                            if let nearest = shelterVM.findNearestAvailable(preferMedical: isEmergencyMode) {
+                                shelterVM.selectShelter(nearest)
+                                if let loc = locationService.currentLocation {
+                                    Task { await routeVM.calculateRoute(from: loc, to: nearest) }
+                                }
+                            }
+                        }
+                        
+                        // My location
+                        floatingButton(icon: "location.fill", label: "Location") {
+                            locationService.startUpdating()
+                            centerUserTrigger.toggle()
+                        }
+                        
+                        // Toggle bottom sheet
+                        floatingButton(icon: showBottomSheet ? "chevron.down" : "chevron.up", label: "Sheet") {
+                            withAnimation(.spring()) {
+                                showBottomSheet.toggle()
                             }
                         }
                     }
                     
-                    // My location
-                    floatingButton(icon: "location.fill", label: "Location") {
-                        locationService.startUpdating()
-                        centerUserTrigger.toggle()
-                    }
-                    
-                    // Toggle bottom sheet
-                    floatingButton(icon: showBottomSheet ? "chevron.down" : "chevron.up", label: "Sheet") {
-                        withAnimation(.spring()) {
-                            showBottomSheet.toggle()
-                        }
-                    }
+                    Spacer()
                 }
-                
-                Spacer()
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.trailing, 16)
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .padding(.trailing, 16)
             
             // Route calculating overlay
             if routeVM.isCalculating {
@@ -156,6 +175,34 @@ struct MainMapView: View {
             locationService.requestPermission()
             alertVM.requestNotificationPermission()
             
+            // Inisialisasi callback rute untuk integrasi keluarga (Person 2)
+            routeVM.onShareRoute = { route in
+                print("📢 Route shared: \(route.shelterName)")
+                if let loc = locationService.currentLocation {
+                    Task {
+                        await familyVM.shareLocation(latitude: loc.latitude, longitude: loc.longitude)
+                        showShareSuccess = true
+                    }
+                } else {
+                    showShareSuccess = true
+                }
+            }
+            
+            routeVM.onSOS = {
+                print("🚨 SOS button pressed on Map!")
+                if let loc = locationService.currentLocation {
+                    Task {
+                        await emergencyVM.triggerSOS(latitude: loc.latitude, longitude: loc.longitude)
+                        showSOSSuccess = true
+                    }
+                } else {
+                    Task {
+                        await emergencyVM.triggerSOS()
+                        showSOSSuccess = true
+                    }
+                }
+            }
+            
             // Fetch initial data
             await shelterVM.fetchAllShelters()
             await alertVM.fetchAllAlerts()
@@ -165,7 +212,8 @@ struct MainMapView: View {
                 await alertVM.fetchNearbyAlerts(location: loc)
                 
                 // Auto-enable emergency mode if critical alerts nearby
-                if !alertVM.criticalAlerts.isEmpty {
+                let nearbyCritical = alertVM.nearbyAlerts.filter { $0.severity == .critical }
+                if !nearbyCritical.isEmpty {
                     withAnimation { isEmergencyMode = true }
                     
                     // Auto-find nearest shelter
@@ -177,10 +225,32 @@ struct MainMapView: View {
             }
         }
         .onChange(of: locationService.currentLocation?.latitude) { oldValue, newValue in
-            // Recalculate route when location changes
-            if let loc = locationService.currentLocation, let shelter = shelterVM.selectedShelter {
-                Task { await routeVM.recalculateIfNeeded(newLocation: loc, shelter: shelter) }
+            if let loc = locationService.currentLocation {
+                Task {
+                    await shelterVM.fetchNearbyShelters(location: loc)
+                    await alertVM.fetchNearbyAlerts(location: loc)
+                    
+                    // Auto-enable or disable emergency mode based on nearby critical alerts
+                    let nearbyCritical = alertVM.nearbyAlerts.filter { $0.severity == .critical }
+                    withAnimation {
+                        isEmergencyMode = !nearbyCritical.isEmpty
+                    }
+                }
+                
+                if let shelter = shelterVM.selectedShelter {
+                    Task { await routeVM.recalculateIfNeeded(newLocation: loc, shelter: shelter) }
+                }
             }
+        }
+        .alert("Route Shared", isPresented: $showShareSuccess) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Informasi rute evakuasi Anda ke shelter telah berhasil dibagikan dengan grup keluarga Anda.")
+        }
+        .alert("SOS Emergency Sent", isPresented: $showSOSSuccess) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Sinyal darurat SOS telah diaktifkan dan dikirim ke seluruh anggota keluarga Anda.")
         }
     }
     
@@ -310,6 +380,159 @@ struct MainMapView: View {
         .padding(24)
         .background(Color.black.opacity(0.6))
         .cornerRadius(16)
+    }
+    
+    // MARK: - Navigation Views (Google Maps Style)
+    
+    private var navigationTopBanner: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .center, spacing: 16) {
+                // Turn-by-turn arrow
+                Image(systemName: "arrow.up")
+                    .font(.system(size: 30, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 48, height: 48)
+                    .background(Color.white.opacity(0.15))
+                    .cornerRadius(12)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    if let shelter = shelterVM.selectedShelter {
+                        Text("Menuju \(shelter.name)")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.white)
+                            .lineLimit(1)
+                    } else {
+                        Text("Ke arah barat")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    Text("Kemudian ikuti rute evakuasi aman")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                
+                Spacer()
+                
+                // Compass / Location North Icon
+                Image(systemName: "location.north.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(.white)
+                    .padding(10)
+                    .background(Color.white.opacity(0.2))
+                    .clipShape(Circle())
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+        }
+        .background(Color(red: 0.0, green: 0.35, blue: 0.3)) // Dark teal green
+        .cornerRadius(16)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
+    }
+    
+    private var navigationBottomHUD: some View {
+        HStack {
+            // Exit Button
+            Button(action: {
+                withAnimation(.easeInOut) {
+                    isNavigating = false
+                    showBottomSheet = true
+                }
+            }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(SafePathColors.textPrimary)
+                    .padding(12)
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(color: Color.black.opacity(0.12), radius: 4, y: 2)
+            }
+            
+            Spacer()
+            
+            // Route ETA & Distance
+            if let route = routeVM.currentRoute {
+                VStack(spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text(route.etaDisplay)
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(SafePathColors.safeGreen)
+                        Image(systemName: "leaf.fill")
+                            .font(.system(size: 13))
+                            .foregroundColor(SafePathColors.safeGreen)
+                    }
+                    
+                    HStack(spacing: 5) {
+                        Text(route.distanceDisplay)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(SafePathColors.textSecondary)
+                        Text("•")
+                            .foregroundColor(SafePathColors.textSecondary)
+                        Text(getArrivalTime(etaString: route.etaDisplay))
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(SafePathColors.textSecondary)
+                    }
+                }
+            } else {
+                Text("Navigating...")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(SafePathColors.textPrimary)
+            }
+            
+            Spacer()
+            
+            // Recenter Button
+            Button(action: {
+                centerUserTrigger.toggle()
+            }) {
+                Image(systemName: "location.fill")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(SafePathColors.accentBlue)
+                    .clipShape(Circle())
+                    .shadow(color: SafePathColors.accentBlue.opacity(0.3), radius: 4, y: 2)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, y: -3)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 90) // Mencegah HUD navigasi tertutup oleh tab bar melayang
+    }
+    
+    // Helper to calculate arrival time
+    private func getArrivalTime(etaString: String) -> String {
+        let cleanString = etaString.lowercased()
+        var totalMinutes = 0
+        
+        if cleanString.contains("hr") {
+            let components = cleanString.components(separatedBy: "hr")
+            if let hr = Int(components[0].trimmingCharacters(in: .whitespacesAndNewlines)) {
+                totalMinutes += hr * 60
+            }
+            if components.count > 1 && components[1].contains("min") {
+                let minPart = components[1].components(separatedBy: "min")[0]
+                if let min = Int(minPart.trimmingCharacters(in: .whitespacesAndNewlines)) {
+                    totalMinutes += min
+                }
+            }
+        } else if cleanString.contains("min") {
+            let cleanStringComponents = cleanString.components(separatedBy: "min")
+            if !cleanStringComponents.isEmpty, let min = Int(cleanStringComponents[0].trimmingCharacters(in: .whitespacesAndNewlines)) {
+                totalMinutes += min
+            }
+        } else {
+            totalMinutes = 15
+        }
+        
+        let arrivalDate = Date().addingTimeInterval(TimeInterval(totalMinutes * 60))
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH.mm"
+        return formatter.string(from: arrivalDate)
     }
 }
 

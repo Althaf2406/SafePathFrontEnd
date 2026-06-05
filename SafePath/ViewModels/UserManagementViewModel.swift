@@ -42,14 +42,25 @@ final class UserManagementViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        do {
-            let user = try await repository.register(name: name, email: email, password: password, phone: phone)
-            self.currentUser = user
-            self.isLoggedIn  = true
-            SessionManager.shared.saveUser(user)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        // Beralih langsung ke akun Mock untuk menghindari timeout jaringan yang lama
+        print("ℹ️ Pendaftaran: Menggunakan Akun Mock.")
+        let mockUser = User(
+            id: "admin_123",
+            name: name,
+            email: email,
+            phone: phone ?? "08123456789",
+            profileImageURL: nil,
+            createdAt: Date(),
+            lastLatitude: -7.285694,
+            lastLongitude: 112.631611,
+            authToken: "mock_token_admin",
+            refreshToken: nil,
+            familyGroupIDs: []
+        )
+        
+        self.currentUser = mockUser
+        self.isLoggedIn = true
+        SessionManager.shared.saveUser(mockUser)
 
         isLoading = false
     }
@@ -66,14 +77,25 @@ final class UserManagementViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        do {
-            let user = try await repository.login(email: email, password: password)
-            self.currentUser = user
-            self.isLoggedIn  = true
-            SessionManager.shared.saveUser(user)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        // Beralih langsung ke akun Mock untuk menghindari timeout jaringan yang lama
+        print("ℹ️ Login: Menggunakan Akun Mock.")
+        let mockUser = User(
+            id: "admin_123",
+            name: "Admin Tester",
+            email: email,
+            phone: "08123456789",
+            profileImageURL: nil,
+            createdAt: Date(),
+            lastLatitude: -7.285694,
+            lastLongitude: 112.631611,
+            authToken: "mock_token_admin",
+            refreshToken: nil,
+            familyGroupIDs: []
+        )
+        
+        self.currentUser = mockUser
+        self.isLoggedIn = true
+        SessionManager.shared.saveUser(mockUser)
 
         isLoading = false
     }

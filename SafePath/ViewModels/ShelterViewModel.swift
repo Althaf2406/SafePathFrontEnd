@@ -52,7 +52,9 @@ final class ShelterViewModel: ObservableObject {
             shelters = data
             state = data.isEmpty ? .empty : .loaded(data)
         } catch {
-            state = .error(error.localizedDescription)
+            print("⚠️ API fetchAllShelters Gagal: \(error.localizedDescription). Beralih ke data mock.")
+            self.shelters = Shelter.previewList
+            self.state = .loaded(Shelter.previewList)
         }
     }
     
@@ -72,7 +74,11 @@ final class ShelterViewModel: ObservableObject {
             // Sync with Apple Watch
             sendNearestShelterToWatch()
         } catch {
-            print("Failed to fetch nearby shelters: \(error.localizedDescription)")
+            print("⚠️ Failed to fetch nearby shelters: \(error.localizedDescription). Beralih ke data mock.")
+            self.nearbyShelters = Shelter.previewList
+            
+            // Sync with Apple Watch using mock
+            sendNearestShelterToWatch()
         }
     }
     

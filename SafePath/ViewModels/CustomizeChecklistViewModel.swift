@@ -19,8 +19,8 @@ final class CustomizeChecklistViewModel: ObservableObject {
     let categories = KitCategory.allCases
     let disasterTypes = ["All", "Flood", "Earthquake", "Tsunami", "Volcano", "Wildfire"]
     
-    init(repository: ChecklistRepositoryProtocol = ChecklistRepository()) {
-        self.repository = repository
+    init(repository: ChecklistRepositoryProtocol? = nil) {
+        self.repository = repository ?? ChecklistRepository()
         loadCustomItems()
     }
     

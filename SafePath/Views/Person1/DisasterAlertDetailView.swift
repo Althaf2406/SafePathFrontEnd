@@ -7,16 +7,19 @@ struct DisasterAlertDetailView: View {
     let alert: DisasterAlert
     @ObservedObject var viewModel: DisasterAlertViewModel
     
-    @State private var mapRegion: MKCoordinateRegion
+    @EnvironmentObject var locationService: LocationService
+    
+    @State private var mapPosition: MapCameraPosition
     @State private var showShareSheet = false
     
     init(alert: DisasterAlert, viewModel: DisasterAlertViewModel) {
         self.alert = alert
         self.viewModel = viewModel
-        _mapRegion = State(initialValue: MKCoordinateRegion(
+        let region = MKCoordinateRegion(
             center: alert.coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-        ))
+        )
+        _mapPosition = State(initialValue: .region(region))
     }
     
     var body: some View {
@@ -39,6 +42,9 @@ struct DisasterAlertDetailView: View {
             .padding(.bottom, 32)
         }
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
+        .onAppear {
+            mapPosition = .automatic
+        }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -134,9 +140,14 @@ struct DisasterAlertDetailView: View {
     }
     
     // MARK: - Map Preview
+    private var disasterRadius: Double {
+        alert.severity == .critical ? 50000 : 25000
+    }
+    
     private var mapPreview: some View {
         ZStack(alignment: .bottomLeading) {
-            Map(initialPosition: .region(mapRegion)) {
+            Map(position: $mapPosition) {
+                // 1. Epicenter Annotation
                 Annotation("", coordinate: alert.coordinate) {
                     ZStack {
                         Circle()
@@ -152,10 +163,29 @@ struct DisasterAlertDetailView: View {
                             .frame(width: 12, height: 12)
                     }
                 }
+                
+                // 2. Disaster Danger Zone (Radius Circle)
+                MapCircle(center: alert.coordinate, radius: disasterRadius)
+                    .foregroundStyle(SafePathColors.dangerRed.opacity(0.15))
+                    .stroke(SafePathColors.dangerRed.opacity(0.5), lineWidth: 2)
+                
+                // 3. User Location Dot Annotation
+                if let userCoord = locationService.currentLocation {
+                    Annotation("Your Location", coordinate: userCoord) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.blue.opacity(0.2))
+                                .frame(width: 24, height: 24)
+                            Circle()
+                                .stroke(Color.white, lineWidth: 2)
+                                .fill(Color.blue)
+                                .frame(width: 14, height: 14)
+                        }
+                    }
+                }
             }
-            .frame(height: 180)
+            .frame(height: 200)
             .cornerRadius(16)
-            .allowsHitTesting(false)
             
             // Location Pill Overlay
             HStack(spacing: 4) {
@@ -319,6 +349,7 @@ struct DisasterAlertDetailView_Previews: PreviewProvider {
                 alert: .preview,
                 viewModel: DisasterAlertViewModel()
             )
+            .environmentObject(LocationService())
         }
     }
 }

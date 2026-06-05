@@ -35,6 +35,7 @@ struct MapBottomSheetView: View {
                 noSelectionSheet
             }
         }
+        .padding(.bottom, 80) // Mencegah konten tertutup oleh tab bar melayang
         .background(SafePathColors.cardBackground)
         .cornerRadius(20, corners: [.topLeft, .topRight])
         .shadow(color: .black.opacity(0.1), radius: 10, y: -3)
