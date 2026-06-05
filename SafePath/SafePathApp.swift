@@ -7,6 +7,7 @@ struct SafePathApp: App {
     @StateObject private var locationService = LocationService()
     @StateObject private var userVM = UserManagementViewModel()
     @StateObject var preparednessViewModel = PreparednessViewModel()
+    @StateObject private var emergencyVM = EmergencyStatusViewModel()
 
     var body: some Scene {
         WindowGroup {
@@ -14,6 +15,7 @@ struct SafePathApp: App {
                 .environmentObject(locationService)
                 .environmentObject(userVM)
                 .environmentObject(preparednessViewModel)
+                .environmentObject(emergencyVM)
                 .onAppear {
                     locationService.requestPermission()
                 }
