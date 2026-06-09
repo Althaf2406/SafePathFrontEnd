@@ -31,7 +31,7 @@ struct FamilyRepositoryTests {
             _ = try await repo.createGroup(name: "Test")
             Issue.record("Diharapkan error, tapi sukses")
         } catch {
-            #expect(error != nil)
+            #expect(true)
         }
     }
 }

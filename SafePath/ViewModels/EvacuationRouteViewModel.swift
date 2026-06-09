@@ -75,6 +75,26 @@ final class EvacuationRouteViewModel: ObservableObject {
         routeError = nil
     }
     
+    // MARK: - Route Selection
+    
+    /// Switch to an alternative route without recalculating from MapKit.
+    func selectRoute(at index: Int) {
+        guard index >= 0 && index < alternativeRoutes.count else { return }
+        guard let current = currentRoute else { return }
+        
+        let selectedAlternative = alternativeRoutes[index]
+        
+        // Swap current and selected alternative
+        var newAlternatives = alternativeRoutes
+        newAlternatives[index] = current
+        
+        currentRoute = selectedAlternative
+        alternativeRoutes = newAlternatives
+        
+        // Sync with Apple Watch
+        sendRouteSummaryToWatch()
+    }
+    
     // MARK: - Route Display Helpers
     
     var routeETA: String {

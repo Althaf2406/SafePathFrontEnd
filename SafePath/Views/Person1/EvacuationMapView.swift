@@ -14,6 +14,8 @@ struct EvacuationMapView: UIViewRepresentable {
     let alternativeRoutes: [MKRoute]
     let isEmergencyMode: Bool
     let centerUserTrigger: Bool
+    let zoomTrigger: Int
+    let isZoomIn: Bool
     let isNavigating: Bool
     
     var onShelterTapped: ((Shelter) -> Void)?
@@ -32,12 +34,12 @@ struct EvacuationMapView: UIViewRepresentable {
         context.coordinator.parent = self
         
         // Atur mode pelacakan arah dan kompas (Heading) berdasarkan status navigasi
-        if isNavigating {
-            if mapView.userTrackingMode != .followWithHeading {
+        // Hanya dijalankan saat status isNavigating berubah agar tidak mengganggu zoom/pan pengguna
+        if isNavigating != context.coordinator.lastIsNavigating {
+            context.coordinator.lastIsNavigating = isNavigating
+            if isNavigating {
                 mapView.setUserTrackingMode(.followWithHeading, animated: true)
-            }
-        } else {
-            if mapView.userTrackingMode == .followWithHeading {
+            } else {
                 mapView.setUserTrackingMode(.none, animated: true)
             }
         }
@@ -86,7 +88,10 @@ struct EvacuationMapView: UIViewRepresentable {
         // Handle centering trigger when Location button is tapped
         if centerUserTrigger != context.coordinator.lastCenterUserTrigger {
             context.coordinator.lastCenterUserTrigger = centerUserTrigger
-            if let userCoord = userCoordinate {
+            
+            if isNavigating {
+                mapView.setUserTrackingMode(.followWithHeading, animated: true)
+            } else if let userCoord = userCoordinate {
                 let region = MKCoordinateRegion(
                     center: userCoord,
                     span: MKCoordinateSpan(
@@ -105,6 +110,23 @@ struct EvacuationMapView: UIViewRepresentable {
                 )
                 mapView.setRegion(region, animated: true)
             }
+        }
+        
+        // Handle zoom triggers
+        if zoomTrigger != context.coordinator.lastZoomTrigger {
+            context.coordinator.lastZoomTrigger = zoomTrigger
+            var region = mapView.region
+            let multiplier = isZoomIn ? 0.5 : 2.0
+            var newLatDelta = region.span.latitudeDelta * multiplier
+            var newLonDelta = region.span.longitudeDelta * multiplier
+            
+            // Limit zoom
+            newLatDelta = min(max(newLatDelta, 0.001), 180.0)
+            newLonDelta = min(max(newLonDelta, 0.001), 180.0)
+            
+            region.span.latitudeDelta = newLatDelta
+            region.span.longitudeDelta = newLonDelta
+            mapView.setRegion(region, animated: true)
         }
     }
     
@@ -145,6 +167,8 @@ struct EvacuationMapView: UIViewRepresentable {
     final class Coordinator: NSObject, MKMapViewDelegate {
         var parent: EvacuationMapView
         var lastCenterUserTrigger: Bool?
+        var lastZoomTrigger: Int = 0
+        var lastIsNavigating: Bool?
         
         init(parent: EvacuationMapView) {
             self.parent = parent

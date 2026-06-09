@@ -3,6 +3,7 @@ import Testing
 @testable import SafePath
 
 @Suite("Shelter Repository Tests")
+@MainActor
 struct ShelterRepositoryTests {
     
     @Test("Fungsi: fetchAllShelters() - Skenario Berhasil")

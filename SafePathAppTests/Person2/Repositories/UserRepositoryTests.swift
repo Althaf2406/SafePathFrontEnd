@@ -30,7 +30,7 @@ struct UserRepositoryTests {
             _ = try await repo.fetchProfile()
             Issue.record("Diharapkan error, tapi sukses")
         } catch {
-            #expect(error != nil)
+            #expect(true)
         }
     }
 }

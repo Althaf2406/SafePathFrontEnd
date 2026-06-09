@@ -2,7 +2,8 @@ import Foundation
 import Testing
 @testable import SafePath
 
-@Suite("DisasterAlert Repository Tests")
+@Suite("Disaster Alert Repository Tests")
+@MainActor
 struct DisasterAlertRepositoryTests {
     // Note: Implementing true repository tests requires an APIServiceProtocol
     // which involves refactoring APIService.
@@ -26,7 +27,7 @@ struct DisasterAlertRepositoryTests {
             _ = try await repo.fetchAllAlerts()
             Issue.record("Expected error to be thrown")
         } catch {
-            #expect(error != nil)
+            #expect(true)
         }
     }
     

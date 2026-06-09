@@ -5,12 +5,14 @@ import Combine
 struct MapBottomSheetView: View {
     let selectedShelter: Shelter?
     let currentRoute: EvacuationRoute?
+    var alternativeRoutes: [EvacuationRoute] = []
     let isEmergencyMode: Bool
     
     var onSelectShelter: (() -> Void)?
     var onStartRoute: (() -> Void)?
     var onChangeShelter: (() -> Void)?
     var onViewShelterDetail: ((Shelter) -> Void)?
+    var onSelectAlternativeRoute: ((Int) -> Void)?
     
     // Person 2 placeholder hooks
     var onShareRouteWithFamily: (() -> Void)?
@@ -158,8 +160,60 @@ struct MapBottomSheetView: View {
                     }
                 }
             }
+            
+            // Alternative Routes Section
+            if !alternativeRoutes.isEmpty {
+                alternativeRoutesSection()
+            }
         }
         .padding(16)
+    }
+    
+    // MARK: - Alternative Routes
+    
+    private func alternativeRoutesSection() -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Alternative Routes")
+                .font(SafePathFonts.caption)
+                .foregroundColor(SafePathColors.textSecondary)
+                .padding(.top, 8)
+            
+            ForEach(Array(alternativeRoutes.enumerated()), id: \.offset) { index, route in
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Route \(index + 2)")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(SafePathColors.textPrimary)
+                        
+                        HStack(spacing: 8) {
+                            Label(route.distanceDisplay, systemImage: "location.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(SafePathColors.textSecondary)
+                            
+                            Label(route.etaDisplay, systemImage: "clock.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(SafePathColors.textSecondary)
+                        }
+                    }
+                    Spacer()
+                    
+                    Button(action: {
+                        onSelectAlternativeRoute?(index)
+                    }) {
+                        Text("Use This Route")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(SafePathColors.accentBlue)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding(12)
+                .background(SafePathColors.backgroundLight)
+                .cornerRadius(10)
+            }
+        }
     }
     
     // MARK: - Normal Shelter Sheet

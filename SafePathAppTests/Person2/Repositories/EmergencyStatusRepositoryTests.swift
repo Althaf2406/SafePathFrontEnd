@@ -30,7 +30,7 @@ struct EmergencyStatusRepositoryTests {
             _ = try await repo.updateStatus(status: .safe, message: nil, latitude: nil, longitude: nil)
             Issue.record("Diharapkan error, tapi sukses")
         } catch {
-            #expect(error != nil)
+            #expect(true)
         }
     }
 }

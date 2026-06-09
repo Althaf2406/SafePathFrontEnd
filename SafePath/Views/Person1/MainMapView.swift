@@ -21,6 +21,9 @@ struct MainMapView: View {
     @State private var showShareSuccess = false
     @State private var showSOSSuccess = false
     @State private var isNavigating = false
+    @State private var showRouteSelectionDialog = false
+    @State private var zoomTrigger = 0
+    @State private var isZoomIn = true
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -34,6 +37,8 @@ struct MainMapView: View {
                 alternativeRoutes: routeVM.alternativeRoutes.compactMap(\.mkRoute),
                 isEmergencyMode: isEmergencyMode,
                 centerUserTrigger: centerUserTrigger,
+                zoomTrigger: zoomTrigger,
+                isZoomIn: isZoomIn,
                 isNavigating: isNavigating,
                 onShelterTapped: { shelter in
                     if !isNavigating {
@@ -71,6 +76,7 @@ struct MainMapView: View {
                     MapBottomSheetView(
                         selectedShelter: shelterVM.selectedShelter,
                         currentRoute: routeVM.currentRoute,
+                        alternativeRoutes: routeVM.alternativeRoutes,
                         isEmergencyMode: isEmergencyMode,
                         onSelectShelter: {
                             if let shelter = shelterVM.selectedShelter, let loc = locationService.currentLocation {
@@ -89,6 +95,9 @@ struct MainMapView: View {
                         onViewShelterDetail: { shelter in
                             navigateToShelterDetail = shelter
                             showShelterDetail = true
+                        },
+                        onSelectAlternativeRoute: { index in
+                            routeVM.selectRoute(at: index)
                         },
                         onShareRouteWithFamily: {
                             // Person 2 placeholder
@@ -148,6 +157,43 @@ struct MainMapView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.trailing, 16)
             }
+            
+            // Zoom Controls
+            VStack {
+                Spacer()
+                
+                VStack(spacing: 0) {
+                    Button(action: {
+                        isZoomIn = true
+                        zoomTrigger += 1
+                    }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(SafePathColors.textPrimary)
+                            .frame(width: 44, height: 44)
+                            .background(.ultraThinMaterial)
+                    }
+                    
+                    Divider().frame(width: 44)
+                    
+                    Button(action: {
+                        isZoomIn = false
+                        zoomTrigger += 1
+                    }) {
+                        Image(systemName: "minus")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(SafePathColors.textPrimary)
+                            .frame(width: 44, height: 44)
+                            .background(.ultraThinMaterial)
+                    }
+                }
+                .cornerRadius(12)
+                .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+                
+                Spacer().frame(height: isNavigating ? 180 : 320)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding(.trailing, 16)
             
             // Route calculating overlay
             if routeVM.isCalculating {
@@ -251,6 +297,16 @@ struct MainMapView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("Sinyal darurat SOS telah diaktifkan dan dikirim ke seluruh anggota keluarga Anda.")
+        }
+        .confirmationDialog("Pilih Rute Alternatif", isPresented: $showRouteSelectionDialog, titleVisibility: .visible) {
+            ForEach(Array(routeVM.alternativeRoutes.enumerated()), id: \.offset) { index, route in
+                Button("Rute \(index + 2) (\(route.etaDisplay), \(route.distanceDisplay))") {
+                    routeVM.selectRoute(at: index)
+                }
+            }
+            Button("Batal", role: .cancel) {}
+        } message: {
+            Text("Pilih rute evakuasi lain jika jalur saat ini terhambat.")
         }
     }
     
@@ -482,17 +538,33 @@ struct MainMapView: View {
             
             Spacer()
             
-            // Recenter Button
-            Button(action: {
-                centerUserTrigger.toggle()
-            }) {
-                Image(systemName: "location.fill")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white)
-                    .padding(12)
-                    .background(SafePathColors.accentBlue)
-                    .clipShape(Circle())
-                    .shadow(color: SafePathColors.accentBlue.opacity(0.3), radius: 4, y: 2)
+            // Controls
+            HStack(spacing: 12) {
+                if !routeVM.alternativeRoutes.isEmpty {
+                    Button(action: {
+                        showRouteSelectionDialog = true
+                    }) {
+                        Image(systemName: "arrow.triangle.swap")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .background(SafePathColors.primaryBlue)
+                            .clipShape(Circle())
+                            .shadow(color: SafePathColors.primaryBlue.opacity(0.3), radius: 4, y: 2)
+                    }
+                }
+                
+                Button(action: {
+                    centerUserTrigger.toggle()
+                }) {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(12)
+                        .background(SafePathColors.accentBlue)
+                        .clipShape(Circle())
+                        .shadow(color: SafePathColors.accentBlue.opacity(0.3), radius: 4, y: 2)
+                }
             }
         }
         .padding(.horizontal, 20)

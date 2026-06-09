@@ -81,4 +81,67 @@ struct EvacuationRouteViewModelTests {
         #expect(vm.alternativeRoutes.isEmpty)
         #expect(vm.routeError == nil)
     }
+    
+    // MARK: - Alternative Route Selection Tests
+    
+    @Test("Fungsi: selectRoute() - Berhasil tukar rute")
+    func testSelectAlternativeRouteSuccess() async {
+        let mockRepo = MockRouteRepository()
+        let primaryRoute = TestDataFactory.mockEvacuationRoute()
+        var altRoute1 = TestDataFactory.mockEvacuationRoute()
+        var altRoute2 = TestDataFactory.mockEvacuationRoute()
+        
+        // Ensure they have different distances to distinguish them
+        mockRepo.primaryRouteToReturn = primaryRoute
+        mockRepo.alternativesToReturn = [altRoute1, altRoute2]
+        
+        let vm = EvacuationRouteViewModel(routeRepository: mockRepo)
+        await vm.calculateRoute(from: TestDataFactory.mockUserLocation(), to: TestDataFactory.mockShelter())
+        
+        #expect(vm.currentRoute?.id == primaryRoute.id)
+        #expect(vm.alternativeRoutes.count == 2)
+        
+        vm.selectRoute(at: 1)
+        
+        #expect(vm.currentRoute?.id == altRoute2.id)
+        #expect(vm.alternativeRoutes.count == 2)
+        #expect(vm.alternativeRoutes[1].id == primaryRoute.id)
+        #expect(vm.routeError == nil)
+    }
+    
+    @Test("Fungsi: selectRoute() - Memperbarui ETA")
+    func testSelectAlternativeRouteUpdatesETA() async {
+        let mockRepo = MockRouteRepository()
+        let primaryRoute = EvacuationRoute(id: "1", shelterId: "1", shelterName: "Shelter 1", distanceMeters: 1000, expectedTravelTime: 600, safetyScore: 0.8, mkRoute: nil, customPolyline: nil)
+        let altRoute = EvacuationRoute(id: "2", shelterId: "1", shelterName: "Shelter 1", distanceMeters: 2000, expectedTravelTime: 1200, safetyScore: 0.7, mkRoute: nil, customPolyline: nil)
+        
+        mockRepo.primaryRouteToReturn = primaryRoute
+        mockRepo.alternativesToReturn = [altRoute]
+        
+        let vm = EvacuationRouteViewModel(routeRepository: mockRepo)
+        await vm.calculateRoute(from: TestDataFactory.mockUserLocation(), to: TestDataFactory.mockShelter())
+        
+        #expect(vm.routeETA == "10 min")
+        
+        vm.selectRoute(at: 0)
+        
+        #expect(vm.routeETA == "20 min")
+    }
+    
+    @Test("Fungsi: selectRoute() - Index Tidak Valid")
+    func testSelectInvalidAlternativeRouteIndex() async {
+        let mockRepo = MockRouteRepository()
+        let primaryRoute = TestDataFactory.mockEvacuationRoute()
+        
+        mockRepo.primaryRouteToReturn = primaryRoute
+        mockRepo.alternativesToReturn = []
+        
+        let vm = EvacuationRouteViewModel(routeRepository: mockRepo)
+        await vm.calculateRoute(from: TestDataFactory.mockUserLocation(), to: TestDataFactory.mockShelter())
+        
+        vm.selectRoute(at: 0)
+        
+        #expect(vm.currentRoute?.id == primaryRoute.id)
+        #expect(vm.routeError == nil)
+    }
 }
