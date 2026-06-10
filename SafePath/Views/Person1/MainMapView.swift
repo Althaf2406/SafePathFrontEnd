@@ -5,6 +5,7 @@ import MapKit
 /// Main map screen with Normal (Shelter Map) and Emergency (Evacuation Map) modes.
 struct MainMapView: View {
     @EnvironmentObject var locationService: LocationService
+    @EnvironmentObject var userVM: UserManagementViewModel
     
     @StateObject private var shelterVM = ShelterViewModel()
     @StateObject private var alertVM = DisasterAlertViewModel()
@@ -227,10 +228,28 @@ struct MainMapView: View {
                 if let loc = locationService.currentLocation {
                     Task {
                         await familyVM.shareLocation(latitude: loc.latitude, longitude: loc.longitude)
+                        if let currentUserId = userVM.currentUser?.id {
+                            await familyVM.updateMemberStatus(memberID: currentUserId, status: .evacuating)
+                        }
+                        await emergencyVM.updateStatus(
+                            status: .evacuating,
+                            message: "Started evacuation route to \(route.shelterName)",
+                            latitude: loc.latitude,
+                            longitude: loc.longitude
+                        )
                         showShareSuccess = true
                     }
                 } else {
-                    showShareSuccess = true
+                    Task {
+                        if let currentUserId = userVM.currentUser?.id {
+                            await familyVM.updateMemberStatus(memberID: currentUserId, status: .evacuating)
+                        }
+                        await emergencyVM.updateStatus(
+                            status: .evacuating,
+                            message: "Started evacuation route to \(route.shelterName)"
+                        )
+                        showShareSuccess = true
+                    }
                 }
             }
             
@@ -615,6 +634,7 @@ struct MainMapView_Previews: PreviewProvider {
     static var previews: some View {
         MainMapView()
             .environmentObject(LocationService())
+            .environmentObject(UserManagementViewModel())
     }
 }
 #endif

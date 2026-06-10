@@ -19,6 +19,15 @@ final class FamilyRepository: FamilyRepositoryProtocol {
         return try await api.send(.createFamilyGroup, body: body)
     }
 
+    /// POST /family/join
+    func joinGroup(inviteCode: String) async throws -> FamilyGroup {
+        return try await api.send(.joinFamilyGroup, body: ["invite_code": inviteCode])
+    }
+
+    func leaveGroup(groupID: String) async throws {
+        try await api.sendVoid(.leaveGroup(groupID: groupID))
+    }
+
     /// GET /family/group/:groupId
     func fetchGroup(groupID: String) async throws -> FamilyGroup {
         return try await api.send(.fetchFamilyGroup(groupID: groupID))

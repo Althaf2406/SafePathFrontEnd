@@ -20,6 +20,9 @@ final class CustomizeChecklistViewModel: ObservableObject {
     @Published var showOfflineBanner: Bool = false
     @Published var isSaving: Bool = false
     @Published var errorMessage: String? = nil
+    
+    // Editing State
+    @Published var editingItemId: String? = nil
 
     // Live item list — mirrors PreparednessViewModel.emergencyKit
     @Published var customItems: [ChecklistItem] = []
@@ -54,8 +57,8 @@ final class CustomizeChecklistViewModel: ObservableObject {
         guard preparednessVM == nil else { return } // only wire once
         self.preparednessVM = vm
 
-        // Mirror the item list from the shared VM
-        vm.$emergencyKit
+        // Mirror custom items from the shared VM
+        vm.$customKit
             .receive(on: RunLoop.main)
             .sink { [weak self] items in
                 self?.customItems = items
@@ -63,7 +66,7 @@ final class CustomizeChecklistViewModel: ObservableObject {
             .store(in: &cancellables)
 
         // Seed immediately
-        customItems = vm.emergencyKit
+        customItems = vm.customKit
         pendingCount = queue.pendingCount()
     }
 
@@ -84,18 +87,21 @@ final class CustomizeChecklistViewModel: ObservableObject {
         showOfflineBanner = isOffline
     }
 
-    // MARK: - Save Item (Add)
-
-    /// Add a new item. Works offline — the item is immediately visible in the
-    /// shared list and the create operation is queued for backend sync.
+    /// Add or Update an item based on `editingItemId`. Works offline.
     func saveItem() {
         guard !itemName.isEmpty, let vm = preparednessVM else { return }
         isSaving = true
 
+        let targetId = editingItemId ?? UUID().uuidString
+        let isEditing = editingItemId != nil
+
+        // If editing, preserve the isChecked state
+        let currentIsChecked = customItems.first(where: { $0.id == targetId })?.isChecked ?? false
+
         let newItem = ChecklistItem(
-            id: UUID().uuidString,
+            id: targetId,
             name: itemName,
-            isChecked: false,
+            isChecked: currentIsChecked,
             category: selectedCategory,
             quantity: quantity,
             priority: priority,
@@ -103,13 +109,33 @@ final class CustomizeChecklistViewModel: ObservableObject {
         )
 
         Task {
-            await vm.addItem(newItem)
+            if isEditing {
+                // Find existing item in customKit and update it.
+                // PreparednessViewModel.toggleItem only toggles, so we need a dedicated update method.
+                // Actually, preparednessViewModel doesn't have an `editItem` method yet, let's just update the item directly 
+                // in the array and call the repository or we need to add `editItem` to `PreparednessViewModel`.
+                await vm.editItem(newItem)
+            } else {
+                await vm.addItem(newItem)
+            }
             await MainActor.run {
                 self.isSaving = false
                 self.resetForm()
                 self.pendingCount = self.queue.pendingCount()
             }
         }
+    }
+    
+    // MARK: - Edit Item
+    
+    func startEditing(_ item: ChecklistItem) {
+        editingItemId = item.id
+        itemName = item.name
+        selectedCategory = item.category
+        quantity = item.quantity ?? 1
+        priority = item.priority
+        disasterType = item.disasterType ?? "All"
+        errorMessage = nil
     }
 
     // MARK: - Toggle Item
@@ -137,9 +163,8 @@ final class CustomizeChecklistViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Reset Form
-
     func resetForm() {
+        editingItemId = nil
         itemName = ""
         quantity = 1
         selectedCategory = .lighting

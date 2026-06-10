@@ -27,6 +27,7 @@ struct PreparednessView: View {
             .task {
                 let lat = userVM.currentUser?.lastLatitude ?? -7.2504
                 let lng = userVM.currentUser?.lastLongitude ?? 112.7688
+                viewModel.loadMandatoryItems(userId: userVM.currentUser?.id)
                 await viewModel.load(lat: lat, lng: lng)
             }
         }

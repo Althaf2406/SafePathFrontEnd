@@ -4,8 +4,11 @@ import Combine
 /// Person 3: Emergency Checklist view — connected to PreparednessViewModel.
 struct ChecklistView: View {
     @EnvironmentObject var viewModel: PreparednessViewModel
+    @EnvironmentObject var userVM: UserManagementViewModel
     @State private var selectedCategory: KitCategory? = nil // nil = "All"
     @State private var isNavigatingToCustomize = false
+
+    private var mandatoryIDs: Set<String> { Set(PreparednessViewModel.mandatoryItems.map { $0.id }) }
 
     var filteredItems: [ChecklistItem] {
         guard let cat = selectedCategory else { return viewModel.emergencyKit }
@@ -67,8 +70,10 @@ struct ChecklistView: View {
                 CustomizeChecklistView()
             }
             .task {
-                if viewModel.emergencyKit.isEmpty {
-                    await viewModel.getAllItem()
+                let userId = userVM.currentUser?.id
+                viewModel.loadMandatoryItems(userId: userId)
+                if viewModel.customKit.isEmpty {
+                    await viewModel.loadCustomItems()
                 }
             }
         }
@@ -209,7 +214,12 @@ struct ChecklistView: View {
                         VStack(spacing: 0) {
                             HStack(spacing: 12) {
                                 Button(action: {
-                                    Task { await viewModel.toggleItem(item) }
+                                    let userId = userVM.currentUser?.id ?? ""
+                                    if mandatoryIDs.contains(item.id) {
+                                        viewModel.toggleMandatoryItem(item, userId: userId)
+                                    } else {
+                                        Task { await viewModel.toggleItem(item) }
+                                    }
                                 }) {
                                     Image(systemName: item.isChecked ? "checkmark.square.fill" : "square")
                                         .font(.title2)
@@ -230,14 +240,25 @@ struct ChecklistView: View {
 
                                 Spacer()
 
-                                // Priority Badge
-                                Text(item.priority.rawValue)
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(priorityColor(item.priority))
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 4)
-                                    .background(priorityColor(item.priority).opacity(0.1))
-                                    .cornerRadius(8)
+                                // Mandatory / Priority Badge
+                                VStack(spacing: 4) {
+                                    if mandatoryIDs.contains(item.id) {
+                                        Text("Required")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 3)
+                                            .background(SafePathColors.primaryBlue)
+                                            .cornerRadius(6)
+                                    }
+                                    Text(item.priority.rawValue)
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(priorityColor(item.priority))
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 4)
+                                        .background(priorityColor(item.priority).opacity(0.1))
+                                        .cornerRadius(8)
+                                }
                             }
                             .padding(.vertical, 16)
                             .padding(.horizontal, 16)

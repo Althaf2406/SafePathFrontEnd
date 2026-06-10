@@ -46,12 +46,23 @@ struct AppRouter: View {
             }
             .tag(Tab.shelter)
             
-            // ── Tab 4: Family (Person 2 Placeholder UI) ───────────────────
-            NavigationStack {
-                if let user = userVM.currentUser, !user.familyGroupIDs.isEmpty {
-                    EmergencyStatusView()
+            Group {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    if let user = userVM.currentUser, !user.familyGroupIDs.isEmpty {
+                        FamilyDashboardiPadView()
+                    } else {
+                        NavigationStack {
+                            FamilyDashboardView()
+                        }
+                    }
                 } else {
-                    FamilyDashboardView()
+                    NavigationStack {
+                        if let user = userVM.currentUser, !user.familyGroupIDs.isEmpty {
+                            ActiveFamilyDashboardView()
+                        } else {
+                            FamilyDashboardView()
+                        }
+                    }
                 }
             }
                 .tabItem {
@@ -69,7 +80,11 @@ struct AppRouter: View {
         }
         .tint(SafePathColors.primaryBlue)
         .fullScreenCover(isPresented: $showProfile) {
-            ProfilePageView()
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                ProfilePageiPadView()
+            } else {
+                ProfilePageView()
+            }
         }
     }
     

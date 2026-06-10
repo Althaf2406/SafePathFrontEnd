@@ -35,6 +35,7 @@ final class ShelterViewModel: ObservableObject {
     // MARK: - Filter Enum
     
     enum ShelterFilter: String, CaseIterable {
+        case all         = "All"
         case nearest     = "Nearest"
         case recommended = "Recommended"
         case available   = "Available"
@@ -106,7 +107,18 @@ final class ShelterViewModel: ObservableObject {
     // MARK: - Filtering
     
     var filteredShelters: [Shelter] {
-        var result = nearbyShelters.isEmpty ? shelters : nearbyShelters
+        var result: [Shelter]
+        
+        // Base array selection based on filter
+        switch activeFilter {
+        case .nearest:
+            result = nearbyShelters.isEmpty ? shelters : nearbyShelters
+        case .recommended:
+            result = recommendedShelters.isEmpty ? (nearbyShelters.isEmpty ? shelters : nearbyShelters) : recommendedShelters
+        default:
+            // For All, Available, Medical, High Ground, Pet Friendly, we search across ALL shelters.
+            result = shelters
+        }
         
         // Search text filter
         if !searchText.isEmpty {
@@ -116,16 +128,10 @@ final class ShelterViewModel: ObservableObject {
             }
         }
         
-        // Active filter
+        // Active filter specific
         switch activeFilter {
-        case .nearest:
+        case .nearest, .recommended:
             result.sort { ($0.distanceKm ?? 999) < ($1.distanceKm ?? 999) }
-        case .recommended:
-            if !recommendedShelters.isEmpty {
-                result = recommendedShelters
-            } else {
-                result.sort { ($0.distanceKm ?? 999) < ($1.distanceKm ?? 999) }
-            }
         case .available:
             result = result.filter { $0.isActive }
         case .medical:
@@ -138,6 +144,8 @@ final class ShelterViewModel: ObservableObject {
             result = result.filter { s in
                 s.facilities.contains { f in f.localizedCaseInsensitiveContains("pet") || f.localizedCaseInsensitiveContains("hewan") }
             }
+        case .all:
+            break
         }
         
         return result

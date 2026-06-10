@@ -18,8 +18,9 @@ struct CustomizeChecklistView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
 
                 // Offline banner
                 if viewModel.isOffline {
@@ -43,10 +44,18 @@ struct CustomizeChecklistView: View {
             .padding(.horizontal, 16)
             .padding(.top, 16)
             .padding(.bottom, 32)
-        }
-        .background(SafePathColors.backgroundLight.ignoresSafeArea())
-        .onAppear {
-            viewModel.syncWith(preparednessVM)
+            }
+            .background(SafePathColors.backgroundLight.ignoresSafeArea())
+            .onAppear {
+                viewModel.syncWith(preparednessVM)
+            }
+            .onChange(of: viewModel.editingItemId) { newValue in
+                if newValue != nil {
+                    withAnimation {
+                        proxy.scrollTo("formTop", anchor: .top)
+                    }
+                }
+            }
         }
     }
 
@@ -96,7 +105,7 @@ struct CustomizeChecklistView: View {
     // MARK: - Header View
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Customize Checklist")
+            Text(viewModel.editingItemId != nil ? "Edit Checklist Item" : "Customize Checklist")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundColor(SafePathColors.primaryBlue)
 
@@ -110,6 +119,9 @@ struct CustomizeChecklistView: View {
     // MARK: - Form Card
     private var formCard: some View {
         VStack(alignment: .leading, spacing: 16) {
+            
+            // Anchor for scrolling
+            Color.clear.frame(height: 1).id("formTop")
 
             // Item Name
             VStack(alignment: .leading, spacing: 6) {
@@ -246,7 +258,7 @@ struct CustomizeChecklistView: View {
             }
             .padding(.bottom, 8)
 
-            // Save Item Button
+            // Save / Update Item Button
             Button(action: { viewModel.saveItem() }) {
                 HStack(spacing: 8) {
                     if viewModel.isSaving {
@@ -256,7 +268,9 @@ struct CustomizeChecklistView: View {
                     } else {
                         Image(systemName: viewModel.isOffline ? "arrow.down.to.line.alt" : "square.and.arrow.down.fill")
                     }
-                    Text(viewModel.isOffline ? "Simpan Lokal (Offline)" : "Save Item")
+                    Text(viewModel.editingItemId != nil 
+                         ? (viewModel.isOffline ? "Update Lokal (Offline)" : "Update Item") 
+                         : (viewModel.isOffline ? "Simpan Lokal (Offline)" : "Save Item"))
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                 }
                 .foregroundColor(.white)
@@ -267,23 +281,23 @@ struct CustomizeChecklistView: View {
             }
             .disabled(viewModel.isSaving || viewModel.itemName.isEmpty)
 
-            // Clear Form Button
-            Button(action: { viewModel.resetForm() }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "trash.fill")
-                    Text("Clear Form")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                }
-                .foregroundColor(SafePathColors.dangerRed)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Color.white)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(SafePathColors.dangerRed, lineWidth: 1.5)
-                )
-                .cornerRadius(12)
-            }
+            // Clear / Cancel Form Button
+//            Button(action: { viewModel.resetForm() }) {
+//                HStack(spacing: 8) {
+//                    Image(systemName: viewModel.editingItemId != nil ? "xmark" : "trash.fill")
+//                    Text(viewModel.editingItemId != nil ? "Cancel Edit" : "Clear Form")
+//                        .font(.system(size: 16, weight: .bold, design: .rounded))
+//                }
+//                .foregroundColor(SafePathColors.dangerRed)
+//                .frame(maxWidth: .infinity)
+//                .padding(.vertical, 14)
+//                .background(Color.white)
+//                .overlay(
+//                    RoundedRectangle(cornerRadius: 12)
+//                        .stroke(SafePathColors.dangerRed, lineWidth: 1.5)
+//                )
+//                .cornerRadius(12)
+//            }
         }
         .padding(16)
         .background(Color.white)
@@ -334,6 +348,17 @@ struct CustomizeChecklistView: View {
 
                             Spacer()
 
+                            // Edit Button
+                            Button(action: {
+                                viewModel.startEditing(item)
+                                // Not strictly scrolling to top, but users can see the form
+                            }) {
+                                Image(systemName: "pencil")
+                                    .foregroundColor(SafePathColors.primaryBlue)
+                                    .padding(.trailing, 4)
+                            }
+
+                            // Delete Button
                             Button(action: { viewModel.deleteItem(id: item.id) }) {
                                 Image(systemName: "trash")
                                     .foregroundColor(SafePathColors.dangerRed)

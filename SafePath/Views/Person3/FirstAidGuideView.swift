@@ -7,7 +7,7 @@ struct FirstAidGuideView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     
@@ -37,7 +37,7 @@ struct FirstAidGuideView: View {
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(SafePathColors.textSecondary)
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 32 : 16)
                     
                     // Search Bar
                     HStack {
@@ -52,7 +52,7 @@ struct FirstAidGuideView: View {
                         RoundedRectangle(cornerRadius: 24)
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 32 : 16)
                     
                     // Guide List
                     LazyVStack(spacing: 16) {
@@ -63,7 +63,7 @@ struct FirstAidGuideView: View {
                             .buttonStyle(PlainButtonStyle())
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 32 : 16)
                     .padding(.bottom, 24)
                 }
                 .padding(.top, 16)

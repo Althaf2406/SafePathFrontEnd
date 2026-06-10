@@ -2,6 +2,8 @@ import Foundation
 
 protocol FamilyRepositoryProtocol {
     func createGroup(name: String) async throws -> FamilyGroup
+    func joinGroup(inviteCode: String) async throws -> FamilyGroup
+    func leaveGroup(groupID: String) async throws
     func fetchGroup(groupID: String) async throws -> FamilyGroup
     func fetchAllGroups() async throws -> [FamilyGroup]
     

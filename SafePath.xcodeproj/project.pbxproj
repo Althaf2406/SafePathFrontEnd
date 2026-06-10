@@ -46,6 +46,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B8B40D0E2FD9D7D600E14DA2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 526630E62FA39A560003F97E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8C346322FD96E1B00D2F5AE;
+			remoteInfo = "SafePathWatchApp Watch App";
+		};
 		B8C3462C2FD96C8700D2F5AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 526630E62FA39A560003F97E /* Project object */;
@@ -351,6 +358,7 @@
 			);
 			dependencies = (
 				B8C3462D2FD96C8700D2F5AE /* PBXTargetDependency */,
+				B8B40D0F2FD9D7D600E14DA2 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				526630F02FA39A560003F97E /* SafePath */,
@@ -602,6 +610,11 @@
 			target = 526630ED2FA39A560003F97E /* SafePath */;
 			targetProxy = F0D87FF4D4E5856B9210D1A1 /* PBXContainerItemProxy */;
 		};
+		B8B40D0F2FD9D7D600E14DA2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8C346322FD96E1B00D2F5AE /* SafePathWatchApp Watch App */;
+			targetProxy = B8B40D0E2FD9D7D600E14DA2 /* PBXContainerItemProxy */;
+		};
 		B8C3462D2FD96C8700D2F5AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			targetProxy = B8C3462C2FD96C8700D2F5AE /* PBXContainerItemProxy */;
@@ -795,7 +808,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Lab_Week 10_Muhammad Althaf Hilmi_0706012410065";
+				INFOPLIST_KEY_CFBundleDisplayName = SafePath;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -828,7 +841,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Lab_Week 10_Muhammad Althaf Hilmi_0706012410065";
+				INFOPLIST_KEY_CFBundleDisplayName = SafePath;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

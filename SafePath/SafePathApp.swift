@@ -8,7 +8,7 @@ struct SafePathApp: App {
     @StateObject private var locationService = LocationService()
     @StateObject private var userVM = UserManagementViewModel()
     @StateObject var preparednessViewModel = PreparednessViewModel()
-    @StateObject private var emergencyVM = EmergencyStatusViewModel()
+    @StateObject private var emergencyVM = EmergencyStatusViewModel(isPrimaryObserver: true)
 
     init() {
         // Activate WCSession on the iOS side on launch

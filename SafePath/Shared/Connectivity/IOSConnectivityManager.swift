@@ -73,4 +73,47 @@ class IOSConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         session.activate()
     }
     #endif
+    
+    // MARK: - Receive from Watch
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        DispatchQueue.main.async {
+            self.handleMessageFromWatch(message)
+        }
+    }
+    
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
+        DispatchQueue.main.async {
+            self.handleMessageFromWatch(userInfo)
+        }
+    }
+    
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+        DispatchQueue.main.async {
+            self.handleMessageFromWatch(applicationContext)
+        }
+    }
+    
+    private var lastActionTime = Date.distantPast
+    
+    private func handleMessageFromWatch(_ message: [String: Any]) {
+        if Date().timeIntervalSince(lastActionTime) < 10.0 { return }
+        lastActionTime = Date()
+        
+        print("📱 [IOSConnectivity] Diterima pesan dari Apple Watch: \(message)")
+        guard let action = message["action"] as? String else {
+            print("📱 [IOSConnectivity] Pesan tidak memiliki action yang valid.")
+            return
+        }
+        
+        if action == "triggerSOS" {
+            print("📱 [IOSConnectivity] Memicu SOS via NotificationCenter...")
+            NotificationCenter.default.post(name: Notification.Name("WatchDidTriggerSOS"), object: nil)
+        } else if action == "updateStatus",
+                  let data = message["data"] as? [String: Any],
+                  let status = data["status"] as? String {
+            print("📱 [IOSConnectivity] Memicu Update Status (\(status)) via NotificationCenter...")
+            NotificationCenter.default.post(name: Notification.Name("WatchDidUpdateStatus"), object: status)
+        }
+    }
 }

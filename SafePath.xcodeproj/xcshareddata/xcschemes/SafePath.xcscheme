@@ -21,6 +21,34 @@
                ReferencedContainer = "container:SafePath.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3F684B2E2FD1737B00A40153"
+               BuildableName = "SafePathAppTests.xctest"
+               BlueprintName = "SafePathAppTests"
+               ReferencedContainer = "container:SafePath.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B8C346322FD96E1B00D2F5AE"
+               BuildableName = "SafePathWatchApp Watch App.app"
+               BlueprintName = "SafePathWatchApp Watch App"
+               ReferencedContainer = "container:SafePath.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

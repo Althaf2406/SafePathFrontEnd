@@ -70,6 +70,26 @@ final class UserManagementViewModel: ObservableObject {
             self.currentUser = user
             self.isLoggedIn = true
             SessionManager.shared.saveUser(user)
+
+            // Refresh full profile so family_group_ids is always up-to-date
+            if let freshUser = try? await repository.fetchProfile() {
+                // Preserve auth token from login response (fetchProfile doesn't return one)
+                var merged = freshUser
+                merged = User(
+                    id: freshUser.id, name: freshUser.name, email: freshUser.email,
+                    phone: freshUser.phone, profileImageURL: freshUser.profileImageURL,
+                    bloodType: freshUser.bloodType, medicalConditions: freshUser.medicalConditions,
+                    emergencyContactName: freshUser.emergencyContactName,
+                    emergencyContactPhone: freshUser.emergencyContactPhone,
+                    createdAt: freshUser.createdAt, lastLatitude: freshUser.lastLatitude,
+                    lastLongitude: freshUser.lastLongitude, locationUpdatedAt: freshUser.locationUpdatedAt,
+                    authToken: user.authToken, refreshToken: user.refreshToken,
+                    deviceToken: freshUser.deviceToken, familyGroupIDs: freshUser.familyGroupIDs,
+                    preferences: freshUser.preferences
+                )
+                self.currentUser = merged
+                SessionManager.shared.saveUser(merged)
+            }
         } catch {
             errorMessage = error.localizedDescription
             self.isLoggedIn = false

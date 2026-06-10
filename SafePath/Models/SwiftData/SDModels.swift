@@ -147,3 +147,21 @@ class SDDisasterPreparationGuide {
         )
     }
 }
+// MARK: - SDEmergencyKitItem (checked state for hardcoded items, per user)
+@Model
+class SDEmergencyKitItem {
+    /// Composite key: "<userID>_<itemID>"
+    @Attribute(.unique) var compositeKey: String
+    var itemId: String
+    var userId: String
+    var isChecked: Bool
+    var updatedAt: Date
+
+    init(itemId: String, userId: String, isChecked: Bool) {
+        self.compositeKey = "\(userId)_\(itemId)"
+        self.itemId = itemId
+        self.userId = userId
+        self.isChecked = isChecked
+        self.updatedAt = Date()
+    }
+}

@@ -15,19 +15,41 @@ class iOSConnectivityManager: NSObject, WCSessionDelegate, ObservableObject {
     }
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        print("⌚️ [WatchConnectivity] Activation completed with state: \(activationState.rawValue), error: \(String(describing: error))")
     }
     
+    #if os(iOS)
+    func sessionDidBecomeInactive(_ session: WCSession) {}
+    func sessionDidDeactivate(_ session: WCSession) {
+        session.activate()
+    }
+    #endif
+    
     func sendActionToiOS(action: String, data: [String: Any]? = nil) {
+        var payload: [String: Any] = ["action": action]
+        if let data = data {
+            payload["data"] = data
+        }
+        
+        // 1. Update Application Context (sangat reliable di Simulator)
+        do {
+            try session.updateApplicationContext(payload)
+            print("⌚️ [WatchConnectivity] Berhasil set updateApplicationContext.")
+        } catch {
+            print("⌚️ [WatchConnectivity] Gagal set applicationContext: \(error.localizedDescription)")
+        }
+        
+        // 2. Transfer User Info (antrean background)
+        print("⌚️ [WatchConnectivity] Antri kirim pesan via transferUserInfo: \(payload)")
+        session.transferUserInfo(payload)
+        
         if session.isReachable {
-            var payload: [String: Any] = ["action": action]
-            if let data = data {
-                payload["data"] = data
-            }
+            print("⌚️ [WatchConnectivity] Session isReachable! Mengirim pesan langsung via sendMessage...")
             session.sendMessage(payload, replyHandler: nil) { error in
-                print("Error sending message: \(error.localizedDescription)")
+                print("⌚️ [WatchConnectivity] Error sending message: \(error.localizedDescription)")
             }
         } else {
-            print("Session is not reachable!")
+            print("⌚️ [WatchConnectivity] Session is not reachable! Message hanya dikirim via transferUserInfo.")
         }
     }
     

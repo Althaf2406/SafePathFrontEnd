@@ -17,8 +17,8 @@ final class APIService {
     
     private init() {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 1
-        config.timeoutIntervalForResource = 5
+        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForResource = 60
         session = URLSession(configuration: config)
         
         decoder = JSONDecoder()

@@ -36,6 +36,37 @@ final class FamilySafetyViewModel: ObservableObject {
         isLoading = false
     }
 
+    /// POST /family/join — Joins an existing group via invite code.
+    @MainActor
+    func joinGroup(inviteCode: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            let group = try await repository.joinGroup(inviteCode: inviteCode)
+            self.familyGroup = group
+            self.members = group.members
+            self.isLoading = false
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+        }
+    }
+
+    @MainActor
+    func leaveGroup(groupID: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try await repository.leaveGroup(groupID: groupID)
+            self.familyGroup = nil
+            self.members = []
+            self.isLoading = false
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+        }
+    }
+
     /// GET /family/group/:id — Fetches group details and refreshes members list.
     func fetchGroup(groupID: String) async {
         isLoading = true
