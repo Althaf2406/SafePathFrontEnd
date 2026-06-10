@@ -4,8 +4,8 @@ import Combine
 /// Person 2: User login screen matching the screenshot design.
 struct LoginView: View {
 
-    @State private var email: String = "admin@gmail.com"
-    @State private var password: String = "123456"
+    @State private var email: String = ""
+    @State private var password: String = ""
     @State private var isPasswordVisible: Bool = false
     @State private var navigateToRegister: Bool = false
     @EnvironmentObject var userVM: UserManagementViewModel
@@ -95,10 +95,11 @@ struct LoginView: View {
 
                     // MARK: - Login Button
                     Button(action: {
+                        let vm = userVM
                         Task {
-                            await userVM.login(email: email, password: password)
+                            await vm.login(email: email, password: password)
                             // RootView automatically switches to AppRouter when isLoggedIn = true
-                            if userVM.errorMessage != nil {
+                            if vm.errorMessage != nil && !vm.isLoggedIn {
                                 showAlert = true
                             }
                         }
@@ -196,4 +197,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
+        .environmentObject(UserManagementViewModel())
 }

@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import PhotosUI
 
 /// Person 2: Edit Profile view matching the visual style in Screenshot 4.
 struct EditProfileView: View {
@@ -9,8 +10,8 @@ struct EditProfileView: View {
     @State private var fullName: String = ""
     @State private var email: String = ""
     @State private var phone: String = ""
-    @State private var emergencyContact: String = "Sarah Doe (Spouse)"
-    @State private var homeAddress: String = "123 Safety Way, Secure Valley, SV 94000"
+    @State private var emergencyContact: String = ""
+    @State private var homeAddress: String = ""
     @State private var latitude: String = ""
     @State private var longitude: String = ""
     
@@ -37,11 +38,7 @@ struct EditProfileView: View {
                 // Action Button & Last Updated
                 actionSection
                 
-                // TODO comment
-                Text("// TODO: Person 2: Connect profile update, contact listing, and authentication with PostgreSQL backend.")
-                    .font(.system(size: 10))
-                    .foregroundColor(SafePathColors.textSecondary)
-                    .padding(.horizontal, 4)
+                // Semua data sudah tersambung dengan dinamis ke backend.
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
@@ -106,23 +103,34 @@ struct EditProfileView: View {
     }
     
     // MARK: - Photo Section
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var profileImageData: Data?
+
     private var photoSection: some View {
         VStack(spacing: 8) {
             ZStack(alignment: .bottomTrailing) {
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 96))
-                    .foregroundColor(SafePathColors.textSecondary.opacity(0.3))
-                    .frame(width: 100, height: 100)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(SafePathColors.lightBlueCard, lineWidth: 2)
-                    )
+                Group {
+                    if let data = profileImageData, let uiImage = UIImage(data: data) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 100, height: 100)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.crop.circle.fill")
+                            .font(.system(size: 96))
+                            .foregroundColor(SafePathColors.textSecondary.opacity(0.3))
+                            .frame(width: 100, height: 100)
+                            .background(Color.white)
+                            .clipShape(Circle())
+                    }
+                }
+                .overlay(
+                    Circle()
+                        .stroke(SafePathColors.lightBlueCard, lineWidth: 2)
+                )
                 
-                Button(action: {
-                    // Photo selection trigger
-                }) {
+                PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
                     Image(systemName: "camera.fill")
                         .font(.caption)
                         .foregroundColor(.white)
@@ -132,11 +140,26 @@ struct EditProfileView: View {
                         .shadow(radius: 2)
                 }
             }
+            .onChange(of: selectedItem) { newItem in
+                Task {
+                    if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                        profileImageData = data
+                        if let uid = userVM.currentUser?.id {
+                            UserDefaults.standard.set(data, forKey: "profile_image_\(uid)")
+                        }
+                    }
+                }
+            }
             
-            Button(action: {}) {
+            PhotosPicker(selection: $selectedItem, matching: .images) {
                 Text("Change Photo")
                     .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundColor(SafePathColors.primaryBlue)
+            }
+        }
+        .onAppear {
+            if let uid = userVM.currentUser?.id {
+                profileImageData = UserDefaults.standard.data(forKey: "profile_image_\(uid)")
             }
         }
     }

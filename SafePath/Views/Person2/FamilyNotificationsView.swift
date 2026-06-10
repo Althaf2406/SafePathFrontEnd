@@ -2,6 +2,8 @@ import SwiftUI
 
 struct FamilyNotificationsView: View {
     @Environment(\.dismiss) var dismiss // Untuk tombol back
+    @EnvironmentObject var userVM: UserManagementViewModel
+    @StateObject private var familyVM = FamilySafetyViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -25,13 +27,26 @@ struct FamilyNotificationsView: View {
                     
                     // MARK: - Notification List
                     VStack(spacing: 16) {
-                        notificationRow(name: "Muhammad Althaf", message: "Marked status as ", status: "Safe.", subMessage: "Home", time: "JUST NOW", color: SafePathColors.safeGreen, icon: "house.fill")
-                        
-                        notificationRow(name: "Dzaky", message: "Needs help ", status: "immediately.", subMessage: "Near Shelter Balai Kota", time: "5M AGO", color: SafePathColors.dangerRed, icon: "mappin.and.ellipse", isCritical: true)
-                        
-                        notificationRow(name: "Louie", message: "Location ", status: "unavailable.", subMessage: "Last seen near Downtown", time: "15M AGO", color: .gray, icon: "location.slash.fill")
-                        
-                        notificationRow(name: "Nevandio", message: "Arrived safely at ", status: "destination.", subMessage: "Shelter Universitas Ciputra", time: "22M AGO", color: SafePathColors.primaryBlue, icon: "building.2.fill")
+                        if familyVM.members.isEmpty {
+                            Text("No recent notifications.")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(SafePathColors.textSecondary)
+                                .padding(.top, 20)
+                        } else {
+                            ForEach(familyVM.members) { member in
+                                let isSafe = member.status == .safe
+                                notificationRow(
+                                    name: member.name,
+                                    message: isSafe ? "Marked status as " : "Needs help ",
+                                    status: isSafe ? "Safe." : "immediately.",
+                                    subMessage: isSafe ? "Last location available" : "Emergency triggered",
+                                    time: "Recent",
+                                    color: isSafe ? SafePathColors.safeGreen : SafePathColors.dangerRed,
+                                    icon: isSafe ? "checkmark.circle.fill" : "mappin.and.ellipse",
+                                    isCritical: !isSafe
+                                )
+                            }
+                        }
                     }
                     .padding(.horizontal, 20)
                 }
@@ -40,6 +55,13 @@ struct FamilyNotificationsView: View {
         }
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            if let groupID = userVM.currentUser?.familyGroupIDs.first {
+                Task {
+                    await familyVM.fetchGroup(groupID: groupID)
+                }
+            }
+        }
     }
     
     // MARK: - Subviews
@@ -126,4 +148,7 @@ struct FamilyNotificationsView: View {
 
 #Preview{
     FamilyNotificationsView()
+        .environmentObject(UserManagementViewModel())
 }
+
+

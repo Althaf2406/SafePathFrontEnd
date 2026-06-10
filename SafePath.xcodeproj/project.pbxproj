@@ -52,13 +52,6 @@
 			remoteGlobalIDString = 3F150C882FD01BCB0029E15F;
 			remoteInfo = "SafePathWatch Watch App";
 		};
-		B82519012FD19D4800C16BEC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 526630E62FA39A560003F97E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 526630ED2FA39A560003F97E;
-			remoteInfo = SafePath;
-		};
 		F0D87FF4D4E5856B9210D1A1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 526630E62FA39A560003F97E /* Project object */;
@@ -135,8 +128,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3F150C8D2FD01BCB0029E15F /* SafePathWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "SafePathWatch Watch App";
 			sourceTree = "<group>";
 		};
@@ -185,7 +176,6 @@
 				3B75B134FF1E3423D4026ABA /* FamilyRepositoryTests.swift */,
 				D679B00813AA28CFDFB76235 /* EmergencyStatusRepositoryTests.swift */,
 			);
-			name = Repositories;
 			path = Repositories;
 			sourceTree = "<group>";
 		};
@@ -203,7 +193,6 @@
 				2D762DCC8D026BABD3C42DB9 /* EvacuationRouteViewModelTests.swift */,
 				962E7BDDC4D0C13722FFA1B9 /* LocationServiceTests.swift */,
 			);
-			name = Person1;
 			path = Person1;
 			sourceTree = "<group>";
 		};
@@ -215,7 +204,6 @@
 				6F926F6579787D941EA1D15A /* MockFamilyRepository.swift */,
 				BEAA62EEE2F72DE7CA447DBB /* MockEmergencyStatusRepository.swift */,
 			);
-			name = Mocks;
 			path = Mocks;
 			sourceTree = "<group>";
 		};
@@ -227,7 +215,6 @@
 				DC70E3443123473C9E142361 /* SafePathAppTests.swift */,
 				026108542E2E41BE331D4D57 /* Person1 */,
 			);
-			name = SafePathAppTests;
 			path = SafePathAppTests;
 			sourceTree = "<group>";
 		};
@@ -261,7 +248,6 @@
 				ECD451920A60752700576E0B /* UserManagementViewModelTests.swift */,
 				909693707CABAA78FDEE7E58 /* EmergencyStatusViewModelTests.swift */,
 			);
-			name = ViewModels;
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
@@ -277,7 +263,6 @@
 				9E11D6F60CA3466969B8208B /* DisasterPreparationViewModelTests.swift */,
 				398DD9C699F3AEF2CF43E87A /* MockFirstAidRepository.swift */,
 			);
-			name = Person3;
 			path = Person3;
 			sourceTree = "<group>";
 		};
@@ -289,7 +274,6 @@
 				00C38829A69EC7D957AEBE07 /* Repositories */,
 				2DEBF1A126027A588E2C15D2 /* TestDataFactory+Person2.swift */,
 			);
-			name = Person2;
 			path = Person2;
 			sourceTree = "<group>";
 		};
@@ -397,10 +381,6 @@
 					};
 					526630ED2FA39A560003F97E = {
 						CreatedOnToolsVersion = 26.2;
-					};
-					B82518FC2FD19D4800C16BEC = {
-						CreatedOnToolsVersion = 26.5;
-						TestTargetID = 526630ED2FA39A560003F97E;
 					};
 				};
 			};
@@ -569,7 +549,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				INFOPLIST_KEY_CFBundleDisplayName = SafePathWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKWatchOnly = YES;
@@ -602,7 +581,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				INFOPLIST_KEY_CFBundleDisplayName = SafePathWatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKWatchOnly = YES;
@@ -633,7 +611,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SafePathAppTests;
@@ -656,7 +633,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SafePathAppTests;
@@ -802,7 +778,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				INFOPLIST_KEY_CFBundleDisplayName = "Lab_Week 10_Muhammad Althaf Hilmi_0706012410065";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -814,7 +789,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Mualli.SafePath;
+				PRODUCT_BUNDLE_IDENTIFIER = Mualli.SafePath.Person2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -833,9 +808,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8C9N6GH5L3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
 				INFOPLIST_KEY_CFBundleDisplayName = "Lab_Week 10_Muhammad Althaf Hilmi_0706012410065";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -847,7 +822,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Mualli.SafePath;
+				PRODUCT_BUNDLE_IDENTIFIER = Mualli.SafePath.Person2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -856,50 +831,6 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		B82519032FD19D4800C16BEC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = test.SafePathTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SafePath.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SafePath";
-			};
-			name = Debug;
-		};
-		B82519042FD19D4800C16BEC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "SafePath requires your location to provide accurate disaster alerts and show nearby shelters.";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = test.SafePathTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SafePath.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SafePath";
 			};
 			name = Release;
 		};

@@ -151,51 +151,8 @@ struct LiveLocationFamilyView: View {
         }
     }
     
-    private var mapPinsLayer: some View {
-        ZStack {
-            VStack(spacing: 6) {
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .frame(width: 44, height: 44)
-                    .foregroundColor(SafePathColors.textSecondary)
-                    .background(Color.gray.opacity(0.3))
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(SafePathColors.safeGreen, lineWidth: 3))
-                    .shadow(radius: 4)
-                
-                Text("Sarah (Safe)")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(SafePathColors.safeGreen)
-                    .cornerRadius(12)
-            }
-            .offset(x: -80, y: -100)
-            
-            ZStack(alignment: .topTrailing) {
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-                    .foregroundColor(SafePathColors.textSecondary)
-                    .background(Color.gray.opacity(0.4))
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                    .shadow(radius: 6)
-                
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 14))
-                    .foregroundColor(.white)
-                    .frame(width: 24, height: 24)
-                    .background(SafePathColors.dangerRed)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                    .offset(x: 4, y: -4)
-            }
-            .offset(x: 10, y: 15)
-        }
-    }
     
+
     private var memberBottomSheet: some View {
         Group {
             if let member = selectedMember {
@@ -250,7 +207,7 @@ struct LiveLocationFamilyView: View {
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(SafePathColors.textSecondary)
                         .tracking(1)
-                    Text("Near Shelter Balai Kota")
+                    Text(String(format: "Lat: %.4f, Lon: %.4f", member.lastLatitude ?? 0, member.lastLongitude ?? 0))
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundColor(SafePathColors.textPrimary)
                 }
@@ -327,5 +284,5 @@ struct LiveLocationFamilyView: View {
 
 #Preview {
     LiveLocationFamilyView()
+        .environmentObject(UserManagementViewModel())
 }
-

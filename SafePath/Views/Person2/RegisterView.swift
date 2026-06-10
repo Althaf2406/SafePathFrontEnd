@@ -12,13 +12,8 @@ struct RegisterView: View {
     @State private var isPasswordVisible: Bool = false
     @State private var isConfirmVisible:  Bool = false
 
-    @StateObject private var viewModel = UserManagementViewModel()
+    @EnvironmentObject private var viewModel: UserManagementViewModel
     @State private var showAlert = false
-
-    // NOTE: @StateObject left here intentionally — RegisterView is pushed
-    // inside LoginView's NavigationStack which already has the @EnvironmentObject.
-    // We override with a local copy to avoid the "already logged in" state
-    // causing double-dismiss issues during registration flow.
 
     var body: some View {
         ScrollView {
@@ -50,22 +45,26 @@ struct RegisterView: View {
 
                 // MARK: - Register Button
                 Button(action: {
+                    let vm = viewModel
                     Task {
                         guard password == confirmPassword else {
-                            viewModel.errorMessage = "Passwords do not match."
+                            vm.errorMessage = "Passwords do not match."
                             showAlert = true
                             return
                         }
                         guard !fullName.trimmingCharacters(in: .whitespaces).isEmpty else {
-                            viewModel.errorMessage = "Please enter your full name."
+                            vm.errorMessage = "Please enter your full name."
                             showAlert = true
                             return
                         }
-                        await viewModel.register(name: fullName, email: email, password: password)
-                        if viewModel.isLoggedIn {
-                            dismiss()
-                        } else if viewModel.errorMessage != nil {
-                            showAlert = true
+                        await vm.register(name: fullName, email: email, password: password)
+                        
+                        await MainActor.run {
+                            if vm.errorMessage != nil {
+                                showAlert = true
+                            } else {
+                                dismiss() // Kembali ke LoginView
+                            }
                         }
                     }
                 }) {
@@ -250,5 +249,6 @@ struct RegisterView: View {
 #Preview {
     NavigationStack {
         RegisterView()
+            .environmentObject(UserManagementViewModel())
     }
 }

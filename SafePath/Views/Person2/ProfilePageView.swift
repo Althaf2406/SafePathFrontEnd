@@ -17,22 +17,28 @@ struct ProfilePageView: View {
     @State private var goToSettings     = false
 
     @EnvironmentObject var userVM: UserManagementViewModel
+    @StateObject private var familyVM = FamilySafetyViewModel()
 
     // MARK: - UI States
     @State private var showLogoutConfirm = false
     @State private var showLogoutToast   = false
+    @State private var profileImageData: Data?
 
     // Computed properties mapped to UserManagementViewModel
-    private var userName: String { userVM.currentUser?.name ?? "Muhammad Althaf" }
-    private var userEmail: String { userVM.currentUser?.email ?? "althaf.m@example.com" }
+    private var userName: String { userVM.currentUser?.name ?? "" }
+    private var userEmail: String { userVM.currentUser?.email ?? "" }
     private var userLocation: String {
         if let lat = userVM.currentUser?.lastLatitude, let lon = userVM.currentUser?.lastLongitude {
             return String(format: "%.4f, %.4f", lat, lon)
         }
-        return "Surabaya, East Java"
+        return "Location not set"
     }
     private var initials: String {
-        let name = userVM.currentUser?.name ?? "MA"
+        let name = userVM.currentUser?.name ?? ""
+        let parts = name.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        }
         return String(name.prefix(2)).uppercased()
     }
 
@@ -96,10 +102,24 @@ struct ProfilePageView: View {
             .navigationDestination(isPresented: $goToSettings) {
                 SettingView()
             }
+            .onAppear {
+                if let uid = userVM.currentUser?.id {
+                    profileImageData = UserDefaults.standard.data(forKey: "profile_image_\(uid)")
+                }
+                // Fetch family data jika user sudah punya group
+                if let groupID = userVM.currentUser?.familyGroupIDs.first {
+                    Task {
+                        await familyVM.fetchGroup(groupID: groupID)
+                    }
+                }
+            }
             .confirmationDialog("Are you sure you want to log out?", isPresented: $showLogoutConfirm, titleVisibility: .visible) {
                 Button("Logout", role: .destructive) {
+                    Task {
+                        await userVM.logout()
+                    }
                     withAnimation { showLogoutToast = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                         withAnimation { showLogoutToast = false }
                     }
                 }
@@ -135,15 +155,24 @@ struct ProfilePageView: View {
 
             // Avatar + Info
             HStack(alignment: .bottom, spacing: 16) {
-                // Avatar Circle with Initials
+                // Avatar Circle with Initials or Photo
                 ZStack {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 88, height: 88)
-                        .shadow(color: .black.opacity(0.15), radius: 10, y: 4)
-                    Text(initials)
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundColor(SafePathColors.primaryBlue)
+                    if let data = profileImageData, let uiImage = UIImage(data: data) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 88, height: 88)
+                            .clipShape(Circle())
+                            .shadow(color: .black.opacity(0.15), radius: 10, y: 4)
+                    } else {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 88, height: 88)
+                            .shadow(color: .black.opacity(0.15), radius: 10, y: 4)
+                        Text(initials)
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundColor(SafePathColors.primaryBlue)
+                    }
 
                     // Online badge
                     Circle()
@@ -180,11 +209,16 @@ struct ProfilePageView: View {
 
     private var quickStatsRow: some View {
         HStack(spacing: 0) {
-            statCell(value: "4", label: "Family Members", icon: "person.2.fill", color: SafePathColors.primaryBlue)
+            statCell(
+                value: familyVM.members.isEmpty ? "-" : "\(familyVM.members.count)",
+                label: "Family Members",
+                icon: "person.2.fill",
+                color: SafePathColors.primaryBlue
+            )
             Divider().frame(height: 40)
             statCell(value: "Safe", label: "My Status", icon: "checkmark.shield.fill", color: SafePathColors.safeGreen)
             Divider().frame(height: 40)
-            statCell(value: "85%", label: "Battery", icon: "battery.75", color: SafePathColors.warningOrange)
+            statCell(value: userVM.currentUser?.familyGroupIDs.isEmpty == false ? "Active" : "None", label: "Family Group", icon: "figure.2.and.child.holdinghands", color: SafePathColors.primaryBlue)
         }
         .padding(.vertical, 16)
         .background(Color.white)
@@ -283,7 +317,7 @@ struct ProfilePageView: View {
                         Text("Emergency Contact")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(SafePathColors.textPrimary)
-                        Text("Primary: Sarah Althaf")
+                        Text(userVM.currentUser?.phone != nil ? "Primary: \(userVM.currentUser!.phone!)" : "No emergency contact set")
                             .font(.system(size: 13))
                             .foregroundColor(SafePathColors.textSecondary)
                     }
@@ -315,7 +349,9 @@ struct ProfilePageView: View {
                             Text("Family Group")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(SafePathColors.textPrimary)
-                            Text("Althaf Family (4 Members)")
+                            let groupName = familyVM.familyGroup?.name ?? (userVM.currentUser?.familyGroupIDs.isEmpty == false ? "Loading..." : "No group yet")
+                            let memberCount = familyVM.members.count
+                            Text(memberCount > 0 ? "\(groupName) (\(memberCount) Member\(memberCount == 1 ? "" : "s"))" : groupName)
                                 .font(.system(size: 13))
                                 .foregroundColor(SafePathColors.textSecondary)
                         }

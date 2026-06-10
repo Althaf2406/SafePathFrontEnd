@@ -6,9 +6,10 @@ struct CreateFamilyGroupView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var groupName: String = ""
-    @State private var inviteCode: String = "SAFE-2941"
-    @State private var isCodeGenerated: Bool = true
+    @State private var inviteCode: String = ""
+    @State private var isCodeGenerated: Bool = false
     @State private var showCopiedAlert = false
+    @State private var showErrorAlert  = false
     
     @EnvironmentObject var userVM: UserManagementViewModel
     @StateObject private var familyVM = FamilySafetyViewModel()
@@ -67,6 +68,11 @@ struct CreateFamilyGroupView: View {
                     .foregroundColor(SafePathColors.primaryBlue)
             }
         }
+        .alert("Failed to Create Group", isPresented: $showErrorAlert) {
+            Button("OK") { familyVM.clearError() }
+        } message: {
+            Text(familyVM.errorMessage ?? "Something went wrong. Please try again.")
+        }
         .overlay(
             Group {
                 if showCopiedAlert {
@@ -93,22 +99,34 @@ struct CreateFamilyGroupView: View {
                 )
             
             Button(action: {
+                guard !groupName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
                 Task {
                     await familyVM.createGroup(name: groupName)
-                    
-                    if familyVM.errorMessage == nil, let createdGroup = familyVM.familyGroup {
-                        inviteCode = createdGroup.inviteCode
+
+                    if let createdGroup = familyVM.familyGroup {
+                        // Tampilkan invite code yang baru dibuat
+                        inviteCode      = createdGroup.inviteCode
+                        isCodeGenerated = true
+
+                        // Tunggu 2 detik agar user sempat lihat invite code
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
                         
-                        // Update local user state so AppRouter switches to ActiveFamilyDashboardView
-                        if var user = userVM.currentUser {
-                            user.familyGroupIDs.append(createdGroup.id)
-                            userVM.currentUser = user
-                        }
+                        // Tutup layar (kembali ke FamilyDashboardView) terlebih dahulu
+                        dismiss()
                         
-                        // Wait a moment for them to see the real invite code before dismissing
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            dismiss()
+                        // Update userVM setelah layar ditutup agar AppRouter aman saat melakukan switch ke EmergencyStatusView
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            if var user = userVM.currentUser {
+                                if !user.familyGroupIDs.contains(createdGroup.id) {
+                                    user.familyGroupIDs.append(createdGroup.id)
+                                    userVM.currentUser = user
+                                    SessionManager.shared.saveUser(user)
+                                }
+                            }
                         }
+                    } else {
+                        // Ada error yang ditangkap (seharusnya tidak terjadi karena ada mock)
+                        showErrorAlert = familyVM.errorMessage != nil
                     }
                 }
             }) {
@@ -245,5 +263,8 @@ struct CreateFamilyGroupView: View {
 }
 
 #Preview {
-    CreateFamilyGroupView()
+    NavigationStack {
+        CreateFamilyGroupView()
+            .environmentObject(UserManagementViewModel())
+    }
 }

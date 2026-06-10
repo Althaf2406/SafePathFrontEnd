@@ -2,7 +2,8 @@ import SwiftUI
 
 struct EmergencyStatusView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var userVM: UserManagementViewModel// Menggunakan ViewModel asli kamu
+    @EnvironmentObject var userVM: UserManagementViewModel
+    @StateObject private var familyVM = FamilySafetyViewModel()
     @State private var navigateToNotifications = false
     
     var body: some View {
@@ -49,11 +50,25 @@ struct EmergencyStatusView: View {
                             .padding(.leading, 4)
                         
                         VStack(spacing: 12) {
-                            // Mengambil nama user secara dinamis dari currentUser kamu jika tersedia
-                            memberRow(name: userVM.currentUser?.name ?? "Muhammad Althaf", status: "Safe", battery: 96, color: SafePathColors.safeGreen, icon: "checkmark.shield.fill")
-                            memberRow(name: "Nevandio", status: "Safe", battery: 82, color: SafePathColors.safeGreen, icon: "checkmark.shield.fill")
-                            memberRow(name: "Dzaky", status: "Need Help", battery: 46, color: SafePathColors.dangerRed, icon: "exclamationmark.triangle.fill", isAlert: true)
-                            memberRow(name: "Louie", status: "Offline", battery: 18, color: .gray, icon: "person.fill.viewfinder")
+                            // Current user — selalu tampil di atas
+                            memberRow(
+                                name: (userVM.currentUser?.name ?? "You") + " (You)",
+                                status: "Safe",
+                                battery: 96,
+                                color: SafePathColors.safeGreen,
+                                icon: "checkmark.shield.fill"
+                            )
+                            // Anggota keluarga lain dari backend
+                            ForEach(familyVM.members.filter { $0.id != userVM.currentUser?.id }) { member in
+                                memberRow(
+                                    name: member.name,
+                                    status: member.status == .safe ? "Safe" : member.status == .needHelp ? "Need Help" : member.status == .sos ? "SOS" : "Offline",
+                                    battery: 50,
+                                    color: member.isInEmergency ? SafePathColors.dangerRed : (member.status == .unknown ? .gray : SafePathColors.safeGreen),
+                                    icon: member.isInEmergency ? "exclamationmark.triangle.fill" : "checkmark.shield.fill",
+                                    isAlert: member.isInEmergency
+                                )
+                            }
                         }
                     }
                     .padding(.horizontal, 20)
@@ -109,6 +124,13 @@ struct EmergencyStatusView: View {
         }
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
         .navigationBarHidden(true)
+        .onAppear {
+            if let groupID = userVM.currentUser?.familyGroupIDs.first {
+                Task {
+                    await familyVM.fetchGroup(groupID: groupID)
+                }
+            }
+        }
         // Direct routing ke halaman notifikasi menggunakan fitur native iOS 16+
         .navigationDestination(isPresented: $navigateToNotifications) {
             FamilyNotificationsView()
@@ -166,10 +188,10 @@ struct EmergencyStatusView: View {
     private var familyHeader: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Althaf Family")
+                Text(familyVM.familyGroup?.name ?? userVM.currentUser?.name.components(separatedBy: " ").first.map { "\($0) Family" } ?? "My Family")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(SafePathColors.textPrimary)
-                Text("4 members connected")
+                Text(familyVM.members.isEmpty ? "Loading members..." : "\(familyVM.members.count) member\(familyVM.members.count == 1 ? "" : "s") connected")
                     .font(.system(size: 14))
                     .foregroundColor(SafePathColors.textSecondary)
             }
@@ -179,12 +201,14 @@ struct EmergencyStatusView: View {
                     Text("Family Invite Code")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(SafePathColors.textSecondary)
-                    Text("SAFE-2941")
+                    Text(familyVM.familyGroup?.inviteCode ?? "-")
                         .font(.system(size: 22, weight: .black, design: .monospaced))
                         .foregroundColor(SafePathColors.primaryBlue)
                 }
                 Spacer()
-                Button(action: {}) {
+                Button(action: {
+                    UIPasteboard.general.string = familyVM.familyGroup?.inviteCode
+                }) {
                     Image(systemName: "doc.on.doc")
                         .foregroundColor(SafePathColors.primaryBlue)
                         .padding(10)
@@ -247,6 +271,7 @@ struct EmergencyStatusView: View {
     }
 }
 
-#Preview{
+#Preview {
     EmergencyStatusView()
+        .environmentObject(UserManagementViewModel())
 }

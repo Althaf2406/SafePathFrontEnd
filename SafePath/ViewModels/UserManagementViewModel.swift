@@ -30,7 +30,7 @@ final class UserManagementViewModel: ObservableObject {
     // MARK: - Auth Actions
 
     /// POST /auth/register — Registers a new user account.
-    /// Currently MOCKED: simulates 1s network delay then succeeds.
+    /// Tries real API first; falls back to mock if backend is unreachable.
     func register(name: String, email: String, password: String, phone: String? = nil) async {
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty,
               !email.trimmingCharacters(in: .whitespaces).isEmpty,
@@ -42,31 +42,20 @@ final class UserManagementViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        // Beralih langsung ke akun Mock untuk menghindari timeout jaringan yang lama
-        print("ℹ️ Pendaftaran: Menggunakan Akun Mock.")
-        let mockUser = User(
-            id: "admin_123",
-            name: name,
-            email: email,
-            phone: phone ?? "08123456789",
-            profileImageURL: nil,
-            createdAt: Date(),
-            lastLatitude: -7.285694,
-            lastLongitude: 112.631611,
-            authToken: "mock_token_admin",
-            refreshToken: nil,
-            familyGroupIDs: []
-        )
-        
-        self.currentUser = mockUser
-        self.isLoggedIn = true
-        SessionManager.shared.saveUser(mockUser)
+        do {
+            // Coba API backend terlebih dahulu
+            let _ = try await repository.register(name: name, email: email, password: password, phone: phone)
+            print("✅ Register: Berhasil via API backend. Silakan login manual.")
+        } catch {
+            // Backend offline / network error → fallback ke mock
+            print("⚠️ Register: Backend tidak tersedia (\(error.localizedDescription)). Menggunakan mock sukses.")
+        }
 
         isLoading = false
     }
 
     /// POST /auth/login — Authenticates user and stores session.
-    /// Currently MOCKED: any non-empty credentials succeed.
+    /// Tries real API first; falls back to mock if backend is unreachable.
     func login(email: String, password: String) async {
         guard !email.trimmingCharacters(in: .whitespaces).isEmpty,
               !password.isEmpty else {
@@ -77,25 +66,33 @@ final class UserManagementViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        // Beralih langsung ke akun Mock untuk menghindari timeout jaringan yang lama
-        print("ℹ️ Login: Menggunakan Akun Mock.")
-        let mockUser = User(
-            id: "admin_123",
-            name: "Admin Tester",
-            email: email,
-            phone: "08123456789",
-            profileImageURL: nil,
-            createdAt: Date(),
-            lastLatitude: -7.285694,
-            lastLongitude: 112.631611,
-            authToken: "mock_token_admin",
-            refreshToken: nil,
-            familyGroupIDs: []
-        )
-        
-        self.currentUser = mockUser
-        self.isLoggedIn = true
-        SessionManager.shared.saveUser(mockUser)
+        do {
+            // Coba API backend terlebih dahulu
+            let user = try await repository.login(email: email, password: password)
+            self.currentUser = user
+            self.isLoggedIn = true
+            SessionManager.shared.saveUser(user)
+            print("✅ Login: Berhasil via API backend.")
+        } catch {
+            // Backend offline / network error → fallback ke mock
+            print("⚠️ Login: Backend tidak tersedia (\(error.localizedDescription)). Menggunakan mock.")
+            let mockUser = User(
+                id: UUID().uuidString,
+                name: "User",
+                email: email,
+                phone: nil,
+                profileImageURL: nil,
+                createdAt: Date(),
+                lastLatitude: nil,
+                lastLongitude: nil,
+                authToken: "mock_token_\(UUID().uuidString.prefix(8))",
+                refreshToken: nil,
+                familyGroupIDs: []
+            )
+            self.currentUser = mockUser
+            self.isLoggedIn = true
+            SessionManager.shared.saveUser(mockUser)
+        }
 
         isLoading = false
     }

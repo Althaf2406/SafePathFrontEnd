@@ -13,45 +13,16 @@ struct ActiveFamilyDashboardView: View {
     
     @State private var showLeaveConfirm = false
     
-    // Mock Data for UI
-    
-    struct Member: Identifiable {
-        let id = UUID()
-        let name: String
-        let status: Status
-        let battery: Int
-        
-        enum Status {
-            case safe, needHelp, offline
-            
-            var color: Color {
-                switch self {
-                case .safe: return SafePathColors.safeGreen
-                case .needHelp: return SafePathColors.dangerRed
-                case .offline: return Color.gray.opacity(0.5)
-                }
-            }
-            
-            var text: String {
-                switch self {
-                case .safe: return "Safe"
-                case .needHelp: return "Need Help"
-                case .offline: return "Offline"
-                }
-            }
-        }
+    // Data dinamis dari familyVM
+    private var familyName: String {
+        familyVM.familyGroup?.name ?? userVM.currentUser?.name.components(separatedBy: " ").first.map { "\($0) Family" } ?? "My Family"
     }
-    
-    let members: [Member] = [
-        Member(name: "Jae (You)", status: .safe, battery: 85),
-        Member(name: "Mom", status: .safe, battery: 60),
-        Member(name: "Dad", status: .offline, battery: 12),
-        Member(name: "Sis", status: .needHelp, battery: 45)
-    ]
-    
-    let familyName = "The Johnsons"
-    let connectedMembers = 4
-    let inviteCode = "JHN-2026"
+    private var connectedMembers: Int {
+        familyVM.members.isEmpty ? 0 : familyVM.members.count
+    }
+    private var inviteCode: String {
+        familyVM.familyGroup?.inviteCode ?? "-"
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -109,55 +80,59 @@ struct ActiveFamilyDashboardView: View {
                             .foregroundColor(SafePathColors.textPrimary)
                             .padding(.horizontal, 20)
                         
-                        VStack(spacing: 12) {
-                            ForEach(members) { member in
-                                HStack(spacing: 16) {
-                                    // Profile Avatar Placeholder
-                                    Circle()
-                                        .fill(SafePathColors.primaryBlue.opacity(0.1))
-                                        .frame(width: 46, height: 46)
-                                        .overlay(
-                                            Text(String(member.name.prefix(1)))
-                                                .font(.system(size: 20, weight: .bold))
-                                                .foregroundColor(SafePathColors.primaryBlue)
-                                        )
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(member.name)
-                                            .font(.system(size: 16, weight: .bold))
-                                            .foregroundColor(SafePathColors.textPrimary)
-                                        
-                                        HStack(spacing: 6) {
-                                            Circle()
-                                                .fill(member.status.color)
-                                                .frame(width: 8, height: 8)
-                                            
-                                            Text(member.status.text)
-                                                .font(.system(size: 13, weight: .medium))
-                                                .foregroundColor(member.status.color)
-                                        }
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    // Battery Indicator
-                                    HStack(spacing: 4) {
-                                        Text("\(member.battery)%")
-                                            .font(.system(size: 13, weight: .bold))
-                                            .foregroundColor(member.battery <= 20 ? SafePathColors.dangerRed : SafePathColors.textSecondary)
-                                        
-                                        Image(systemName: member.battery <= 20 ? "battery.25" : "battery.100")
-                                            .foregroundColor(member.battery <= 20 ? SafePathColors.dangerRed : SafePathColors.textSecondary)
-                                            .font(.system(size: 12))
-                                    }
-                                }
+                        if familyVM.isLoading {
+                            ProgressView("Loading members...")
                                 .padding()
-                                .background(Color.white)
-                                .cornerRadius(16)
-                                .shadow(color: Color.black.opacity(0.04), radius: 5, y: 2)
+                        } else if familyVM.members.isEmpty {
+                            Text("No members yet.")
+                                .font(.system(size: 14))
+                                .foregroundColor(SafePathColors.textSecondary)
+                                .padding(.horizontal, 20)
+                        } else {
+                            VStack(spacing: 12) {
+                                ForEach(familyVM.members) { member in
+                                    HStack(spacing: 16) {
+                                        // Profile Avatar
+                                        Circle()
+                                            .fill(SafePathColors.primaryBlue.opacity(0.1))
+                                            .frame(width: 46, height: 46)
+                                            .overlay(
+                                                Text(String(member.name.prefix(1)))
+                                                    .font(.system(size: 20, weight: .bold))
+                                                    .foregroundColor(SafePathColors.primaryBlue)
+                                            )
+                                        
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(member.name)
+                                                .font(.system(size: 16, weight: .bold))
+                                                .foregroundColor(SafePathColors.textPrimary)
+                                            
+                                            HStack(spacing: 6) {
+                                                Circle()
+                                                    .fill(member.isInEmergency ? SafePathColors.dangerRed : (member.status == .unknown ? Color.gray.opacity(0.5) : SafePathColors.safeGreen))
+                                                    .frame(width: 8, height: 8)
+                                                
+                                                Text(member.status == .safe ? "Safe" : member.status == .needHelp ? "Need Help" : member.status == .sos ? "SOS" : member.status == .evacuating ? "Evacuating" : "Offline")
+                                                    .font(.system(size: 13, weight: .medium))
+                                                    .foregroundColor(member.isInEmergency ? SafePathColors.dangerRed : (member.status == .unknown ? Color.gray.opacity(0.5) : SafePathColors.safeGreen))
+                                            }
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        // Last Updated
+                                        Text(member.lastUpdatedDescription)
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(SafePathColors.textSecondary)
+                                    }
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(16)
+                                    .shadow(color: Color.black.opacity(0.04), radius: 5, y: 2)
+                                }
                             }
+                            .padding(.horizontal, 20)
                         }
-                        .padding(.horizontal, 20)
                     }
                     
                     // MARK: - Box Buttons for Navigation
@@ -257,6 +232,13 @@ struct ActiveFamilyDashboardView: View {
         }
         .background(SafePathColors.backgroundLight.ignoresSafeArea())
         .navigationBarHidden(true)
+        .onAppear {
+            if let groupID = userVM.currentUser?.familyGroupIDs.first {
+                Task {
+                    await familyVM.fetchGroup(groupID: groupID)
+                }
+            }
+        }
         .confirmationDialog("Leave Family Group?", isPresented: $showLeaveConfirm, titleVisibility: .visible) {
             Button("Leave Group", role: .destructive) {
                 Task {

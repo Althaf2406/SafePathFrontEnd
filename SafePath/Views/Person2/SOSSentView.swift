@@ -3,6 +3,7 @@ import SwiftUI
 struct SOSSentView: View {
     @EnvironmentObject var userVM: UserManagementViewModel
     @EnvironmentObject var emergencyVM: EmergencyStatusViewModel
+    @StateObject private var familyVM = FamilySafetyViewModel()
     @State private var isNotified = false
     @Environment(\.dismiss) var dismiss
     
@@ -42,17 +43,35 @@ struct SOSSentView: View {
                         // Table-like Success View
                         VStack(spacing: 1) {
                             successRow(label: "Status", value: "Need Help", isBadge: true)
-                            successRow(label: "Location", value: "Surabaya, East Java")
+                            let locationStr: String = {
+                                if let lat = userVM.currentUser?.lastLatitude,
+                                   let lon = userVM.currentUser?.lastLongitude {
+                                    return String(format: "%.4f, %.4f", lat, lon)
+                                }
+                                return "Location unavailable"
+                            }()
+                            successRow(label: "Location", value: locationStr)
                             successRow(label: "Time", value: "Just now")
                         }
                         .background(Color.white)
                         .cornerRadius(12)
                     } else {
-                        // Notifying List
+                        // Notifying List — dari familyVM.members atau placeholder
                         VStack(spacing: 12) {
-                            notifyingRow(name: "Nevandio")
-                            notifyingRow(name: "Dzaky")
-                            notifyingRow(name: "Louie")
+                            if familyVM.members.isEmpty {
+                                HStack {
+                                    Spacer()
+                                    ProgressView("Finding members...")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                }
+                                .padding()
+                            } else {
+                                ForEach(familyVM.members.filter { $0.id != userVM.currentUser?.id }) { member in
+                                    notifyingRow(name: member.name)
+                                }
+                            }
                         }
                     }
                 }
@@ -73,12 +92,16 @@ struct SOSSentView: View {
         }
         .onAppear {
             Task {
+                // Fetch family members untuk tampilkan notifying list
+                if let groupID = userVM.currentUser?.familyGroupIDs.first {
+                    await familyVM.fetchGroup(groupID: groupID)
+                }
                 // 1. Call real backend API
                 let lat = userVM.currentUser?.lastLatitude
                 let lon = userVM.currentUser?.lastLongitude
                 await emergencyVM.triggerSOS(latitude: lat, longitude: lon)
                 
-                // 2. Simulate delay for the UI notification effect (or fallback if API fails)
+                // 2. Simulate delay for the UI notification effect
                 try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
                 withAnimation(.spring()) {
                     isNotified = true
@@ -123,6 +146,8 @@ struct SOSSentView: View {
     }
 }
 
-#Preview{
+#Preview {
     SOSSentView()
+        .environmentObject(UserManagementViewModel())
+        .environmentObject(EmergencyStatusViewModel())
 }
