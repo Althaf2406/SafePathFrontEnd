@@ -9,7 +9,13 @@ protocol UserRepositoryProtocol {
         name: String?,
         phone: String?,
         profileImageURL: String?,
+        bloodType: String?,
+        medicalConditions: String?,
+        emergencyContactName: String?,
+        emergencyContactPhone: String?,
         latitude: Double?,
-        longitude: Double?
+        longitude: Double?,
+        deviceToken: String?,
+        preferences: UserPreferences?
     ) async throws -> User
 }

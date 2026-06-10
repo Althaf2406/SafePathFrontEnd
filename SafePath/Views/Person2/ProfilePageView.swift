@@ -98,9 +98,8 @@ struct ProfilePageView: View {
             }
             .confirmationDialog("Are you sure you want to log out?", isPresented: $showLogoutConfirm, titleVisibility: .visible) {
                 Button("Logout", role: .destructive) {
-                    withAnimation { showLogoutToast = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        withAnimation { showLogoutToast = false }
+                    Task {
+                        await userVM.logout()
                     }
                 }
                 Button("Cancel", role: .cancel) {}

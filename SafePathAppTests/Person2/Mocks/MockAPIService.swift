@@ -7,7 +7,6 @@ final class MockAPIService: APIServiceProtocol {
 
     func send<T>(
         _ endpoint: APIEndpoint,
-        authToken: String?,
         body: [String : Any]?
     ) async throws -> T where T : Decodable {
         if shouldThrowError { throw URLError(.badServerResponse) }
@@ -19,7 +18,6 @@ final class MockAPIService: APIServiceProtocol {
 
     func sendVoid(
         _ endpoint: APIEndpoint,
-        authToken: String?,
         body: [String : Any]?
     ) async throws {
         if shouldThrowError { throw URLError(.badServerResponse) }
