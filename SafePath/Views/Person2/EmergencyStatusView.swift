@@ -275,3 +275,6 @@ struct EmergencyStatusView: View {
     EmergencyStatusView()
         .environmentObject(UserManagementViewModel())
 }
+
+
+//teetst

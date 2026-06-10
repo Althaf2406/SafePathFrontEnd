@@ -151,3 +151,6 @@ struct SOSSentView: View {
         .environmentObject(UserManagementViewModel())
         .environmentObject(EmergencyStatusViewModel())
 }
+
+
+//tt
