@@ -33,6 +33,7 @@
 		897226367EF64DE9F481ECBF /* SafePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792389F4C12265320F6D004 /* SafePathTests.swift */; };
 		B825191B2FD1A38600C16BEC /* TestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = B825191A2FD1A38600C16BEC /* TestPlan.xctestplan */; };
 		B8C346532FD96E1C00D2F5AE /* SafePathWatchApp Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = B8C346332FD96E1B00D2F5AE /* SafePathWatchApp Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B8C347592FD973DE00D2F5AE /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8C347582FD973DE00D2F5AE /* WatchConnectivity.framework */; };
 		BCD9119433A2363263984DE9 /* LocationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962E7BDDC4D0C13722FFA1B9 /* LocationServiceTests.swift */; };
 		C1D9845FBBF9EBCD172C4B14 /* MockFamilyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F926F6579787D941EA1D15A /* MockFamilyRepository.swift */; };
 		C53FA26539EBF6EF798740DE /* MockFirstAidRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398DD9C699F3AEF2CF43E87A /* MockFirstAidRepository.swift */; };
@@ -60,13 +61,6 @@
 			remoteInfo = "SafePathWatchApp Watch App";
 		};
 		B8C3464A2FD96E1C00D2F5AE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 526630E62FA39A560003F97E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B8C346322FD96E1B00D2F5AE;
-			remoteInfo = "SafePathWatchApp Watch App";
-		};
-		B8C346512FD96E1C00D2F5AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 526630E62FA39A560003F97E /* Project object */;
 			proxyType = 1;
@@ -123,6 +117,7 @@
 		B8C346332FD96E1B00D2F5AE /* SafePathWatchApp Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SafePathWatchApp Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8C3463F2FD96E1C00D2F5AE /* SafePathWatchApp Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SafePathWatchApp Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8C346492FD96E1C00D2F5AE /* SafePathWatchApp Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SafePathWatchApp Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8C347582FD973DE00D2F5AE /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS26.5.sdk/System/Library/Frameworks/WatchConnectivity.framework; sourceTree = DEVELOPER_DIR; };
 		BEAA62EEE2F72DE7CA447DBB /* MockEmergencyStatusRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockEmergencyStatusRepository.swift; sourceTree = "<group>"; };
 		BEB840357D81C728A99CF2F5 /* ShelterViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShelterViewModelTests.swift; sourceTree = "<group>"; };
 		C5ED7091D806A52D8C4E0E23 /* PreparednessViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PreparednessViewModelTests.swift; sourceTree = "<group>"; };
@@ -181,6 +176,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8C347592FD973DE00D2F5AE /* WatchConnectivity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,6 +312,7 @@
 		B8C346272FD96C7A00D2F5AE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B8C347582FD973DE00D2F5AE /* WatchConnectivity.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -354,7 +351,6 @@
 			);
 			dependencies = (
 				B8C3462D2FD96C8700D2F5AE /* PBXTargetDependency */,
-				B8C346522FD96E1C00D2F5AE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				526630F02FA39A560003F97E /* SafePath */,
@@ -619,11 +615,6 @@
 			isa = PBXTargetDependency;
 			target = B8C346322FD96E1B00D2F5AE /* SafePathWatchApp Watch App */;
 			targetProxy = B8C3464A2FD96E1C00D2F5AE /* PBXContainerItemProxy */;
-		};
-		B8C346522FD96E1C00D2F5AE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B8C346322FD96E1B00D2F5AE /* SafePathWatchApp Watch App */;
-			targetProxy = B8C346512FD96E1C00D2F5AE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
