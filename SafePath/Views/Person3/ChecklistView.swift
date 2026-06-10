@@ -17,6 +17,16 @@ struct ChecklistView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
 
+                    // Offline banner
+                    if viewModel.isOffline {
+                        offlineBanner
+                    }
+
+                    // Pending sync badge
+                    if viewModel.pendingCount > 0 {
+                        pendingBadge
+                    }
+
                     // 1. Overall Readiness Progress Card
                     readinessCard
 
@@ -62,6 +72,50 @@ struct ChecklistView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Offline Banner
+
+    private var offlineBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "wifi.slash")
+                .font(.system(size: 14, weight: .bold))
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Mode Offline")
+                    .font(.system(size: 14, weight: .bold))
+                Text("Anda bisa centang & tambah item. Perubahan dikirim saat online.")
+                    .font(.system(size: 12))
+                    .opacity(0.85)
+            }
+            Spacer()
+        }
+        .foregroundColor(.white)
+        .padding(12)
+        .background(
+            LinearGradient(
+                colors: [Color(red: 0.96, green: 0.62, blue: 0.04),
+                         Color(red: 0.85, green: 0.47, blue: 0.02)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
+        .cornerRadius(12)
+    }
+
+    // MARK: - Pending Sync Badge
+
+    private var pendingBadge: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
+                .foregroundColor(SafePathColors.primaryBlue)
+            Text("\(viewModel.pendingCount) perubahan menunggu sinkronisasi")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(SafePathColors.primaryBlue)
+            Spacer()
+        }
+        .padding(10)
+        .background(SafePathColors.primaryBlue.opacity(0.08))
+        .cornerRadius(10)
     }
 
     // MARK: - Overall Readiness Card

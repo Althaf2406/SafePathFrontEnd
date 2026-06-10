@@ -2,44 +2,96 @@ import Foundation
 import Combine
 
 /// Person 3: Manages customize checklist view state and actions.
+/// Fully offline-capable: add/toggle/delete items are queued when offline
+/// and flushed to the backend automatically when connectivity is restored.
 @MainActor
 final class CustomizeChecklistViewModel: ObservableObject {
-    
+
+    // MARK: - Form Fields
     @Published var itemName: String = ""
     @Published var selectedCategory: KitCategory = .lighting
     @Published var quantity: Int = 1
     @Published var priority: ChecklistPriority = .high
     @Published var disasterType: String = "Flood"
-    
+
+    // MARK: - State
+    @Published var isOffline: Bool = false
+    @Published var pendingCount: Int = 0
+    @Published var showOfflineBanner: Bool = false
+    @Published var isSaving: Bool = false
+    @Published var errorMessage: String? = nil
+
+    // Live item list — mirrors PreparednessViewModel.emergencyKit
     @Published var customItems: [ChecklistItem] = []
-    
-    private let repository: ChecklistRepositoryProtocol
-    private var cancellables = Set<AnyCancellable>()
-    
+
     let categories = KitCategory.allCases
     let disasterTypes = ["All", "Flood", "Earthquake", "Tsunami", "Volcano", "Wildfire"]
-    
-    init(repository: ChecklistRepositoryProtocol? = nil) {
-        self.repository = repository ?? ChecklistRepository()
-        loadCustomItems()
+
+    // MARK: - Dependencies
+    private var preparednessVM: PreparednessViewModel?
+    private let queue = PendingChecklistQueue.shared
+    private let networkMonitor = NetworkMonitor.shared
+    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Placeholder (used before EnvironmentObject is available)
+
+    /// A lightweight placeholder VM used only so @StateObject can be created before
+    /// the EnvironmentObject is injected via syncWith(_:).
+    static var _placeholder: CustomizeChecklistViewModel {
+        CustomizeChecklistViewModel()
     }
-    
-    func loadCustomItems() {
-        repository.fetchCustomItems()
+
+    // MARK: - Init
+
+    init() {
+        setupNetworkObserver()
+    }
+
+    // MARK: - Wiring
+
+    /// Called from the View's .onAppear to inject the shared PreparednessViewModel.
+    func syncWith(_ vm: PreparednessViewModel) {
+        guard preparednessVM == nil else { return } // only wire once
+        self.preparednessVM = vm
+
+        // Mirror the item list from the shared VM
+        vm.$emergencyKit
             .receive(on: RunLoop.main)
-            .sink { completion in
-                if case .failure(let error) = completion {
-                    print("Error fetching custom items: \(error)")
-                }
-            } receiveValue: { [weak self] items in
+            .sink { [weak self] items in
                 self?.customItems = items
             }
             .store(in: &cancellables)
+
+        // Seed immediately
+        customItems = vm.emergencyKit
+        pendingCount = queue.pendingCount()
     }
-    
+
+    // MARK: - Network Observer
+
+    private func setupNetworkObserver() {
+        networkMonitor.$isConnected
+            .map { !$0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] offline in
+                self?.isOffline = offline
+                self?.showOfflineBanner = offline
+                self?.pendingCount = PendingChecklistQueue.shared.pendingCount()
+            }
+            .store(in: &cancellables)
+
+        isOffline = !networkMonitor.isConnected
+        showOfflineBanner = isOffline
+    }
+
+    // MARK: - Save Item (Add)
+
+    /// Add a new item. Works offline — the item is immediately visible in the
+    /// shared list and the create operation is queued for backend sync.
     func saveItem() {
-        guard !itemName.isEmpty else { return }
-        
+        guard !itemName.isEmpty, let vm = preparednessVM else { return }
+        isSaving = true
+
         let newItem = ChecklistItem(
             id: UUID().uuidString,
             name: itemName,
@@ -49,27 +101,50 @@ final class CustomizeChecklistViewModel: ObservableObject {
             priority: priority,
             disasterType: disasterType
         )
-        
-        repository.saveCustomItem(newItem)
-            .receive(on: RunLoop.main)
-            .sink { _ in } receiveValue: { [weak self] _ in
-                self?.loadCustomItems()
-                self?.resetForm()
+
+        Task {
+            await vm.addItem(newItem)
+            await MainActor.run {
+                self.isSaving = false
+                self.resetForm()
+                self.pendingCount = self.queue.pendingCount()
             }
-            .store(in: &cancellables)
+        }
     }
-    
+
+    // MARK: - Toggle Item
+
+    /// Toggle the checked state. Works offline.
+    func toggleItem(_ item: ChecklistItem) {
+        guard let vm = preparednessVM else { return }
+        Task {
+            await vm.toggleItem(item)
+            await MainActor.run {
+                self.pendingCount = self.queue.pendingCount()
+            }
+        }
+    }
+
+    // MARK: - Delete Item
+
     func deleteItem(id: String) {
-        repository.deleteCustomItem(id: id)
-            .receive(on: RunLoop.main)
-            .sink { _ in } receiveValue: { [weak self] _ in
-                self?.loadCustomItems()
+        guard let vm = preparednessVM else { return }
+        Task {
+            await vm.deleteItem(id: id)
+            await MainActor.run {
+                self.pendingCount = self.queue.pendingCount()
             }
-            .store(in: &cancellables)
+        }
     }
-    
+
+    // MARK: - Reset Form
+
     func resetForm() {
         itemName = ""
         quantity = 1
+        selectedCategory = .lighting
+        priority = .high
+        disasterType = "Flood"
+        errorMessage = nil
     }
 }

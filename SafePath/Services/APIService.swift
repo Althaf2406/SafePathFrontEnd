@@ -1,4 +1,4 @@
-import Foundation
+    import Foundation
 import Combine
 
 /// Generic wrapper for SafePath API responses: { success, count, data }.
