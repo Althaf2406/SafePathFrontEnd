@@ -24,6 +24,19 @@ struct UserPreferences: Codable, Equatable {
         case familyPrivacyOn = "family_privacy_on"
     }
 
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.notificationsOn = try container.decodeIfPresent(Bool.self, forKey: .notificationsOn) ?? true
+        self.disasterAlerts = try container.decodeIfPresent(Bool.self, forKey: .disasterAlerts) ?? true
+        self.familyStatus = try container.decodeIfPresent(Bool.self, forKey: .familyStatus) ?? true
+        self.sosAlerts = try container.decodeIfPresent(Bool.self, forKey: .sosAlerts) ?? true
+        self.prepReminders = try container.decodeIfPresent(Bool.self, forKey: .prepReminders) ?? false
+        self.selectedThreshold = try container.decodeIfPresent(Int.self, forKey: .selectedThreshold) ?? 1
+        self.liveMonitoring = try container.decodeIfPresent(Bool.self, forKey: .liveMonitoring) ?? true
+        self.locationSharingMode = try container.decodeIfPresent(String.self, forKey: .locationSharingMode) ?? "realtime"
+        self.familyPrivacyOn = try container.decodeIfPresent(Bool.self, forKey: .familyPrivacyOn) ?? true
+    }
+
     /// Default initialization for new users or empty JSON.
     init(
         notificationsOn: Bool = true,

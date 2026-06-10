@@ -6,7 +6,7 @@ import Combine
 enum AppConstants {
     
     /// Backend API base URL (change for production deployment)
-    static let apiBaseURL = "http://localhost:3000/api"
+    static let apiBaseURL = "http://127.0.0.1:3000/api"
     
     /// Default search radius in km for nearby queries
     static let defaultRadiusKm: Double = 10.0

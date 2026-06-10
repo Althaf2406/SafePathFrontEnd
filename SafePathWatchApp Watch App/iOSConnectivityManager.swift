@@ -1,5 +1,6 @@
 import Foundation
 import WatchConnectivity
+import Combine
 
 class iOSConnectivityManager: NSObject, WCSessionDelegate, ObservableObject {
     var session: WCSession
