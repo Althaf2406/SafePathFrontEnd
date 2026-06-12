@@ -1,12 +1,18 @@
 import SwiftUI
 import Combine
+import CoreLocation
 
 /// Displays a list of active disaster alerts.
 struct DisasterAlertView: View {
     @StateObject private var viewModel = DisasterAlertViewModel()
+    @StateObject private var familyVM = FamilySafetyViewModel()
+    @StateObject private var emergencyVM = EmergencyStatusViewModel()
     @EnvironmentObject var locationService: LocationService
+    @EnvironmentObject var userVM: UserManagementViewModel
     
     @State private var showNearbyOnly = true
+    @State private var showNotifySuccess = false
+    @State private var showMarkSafeSuccess = false
     
     private var displayedAlerts: [DisasterAlert] {
         if showNearbyOnly && locationService.currentLocation != nil {
@@ -49,10 +55,64 @@ struct DisasterAlertView: View {
             }
             .task {
                 viewModel.requestNotificationPermission()
+                
+                viewModel.onNotifyFamily = { alert in
+                    if let loc = locationService.currentLocation {
+                        Task {
+                            await familyVM.shareLocation(latitude: loc.latitude, longitude: loc.longitude)
+                            await emergencyVM.updateStatus(
+                                status: .needHelp,
+                                message: "Terkena dampak \(alert.typeDisplayName) di \(alert.locationName).",
+                                latitude: loc.latitude,
+                                longitude: loc.longitude
+                            )
+                            if let currentUserId = userVM.currentUser?.id {
+                                await familyVM.updateMemberStatus(memberID: currentUserId, status: .needHelp)
+                            }
+                            showNotifySuccess = true
+                        }
+                    } else {
+                        Task {
+                            await emergencyVM.updateStatus(
+                                status: .needHelp,
+                                message: "Terkena dampak \(alert.typeDisplayName) di \(alert.locationName)."
+                            )
+                            if let currentUserId = userVM.currentUser?.id {
+                                await familyVM.updateMemberStatus(memberID: currentUserId, status: .needHelp)
+                            }
+                            showNotifySuccess = true
+                        }
+                    }
+                }
+                
+                viewModel.onMarkSafe = {
+                    Task {
+                        if let currentUserId = userVM.currentUser?.id {
+                            await familyVM.updateMemberStatus(memberID: currentUserId, status: .safe)
+                        }
+                        if let loc = locationService.currentLocation {
+                            await emergencyVM.updateStatus(status: .safe, message: "Saya aman dari bencana.", latitude: loc.latitude, longitude: loc.longitude)
+                        } else {
+                            await emergencyVM.updateStatus(status: .safe, message: "Saya aman dari bencana.")
+                        }
+                        showMarkSafeSuccess = true
+                    }
+                }
+                
                 await viewModel.fetchAllAlerts()
                 if let loc = locationService.currentLocation {
                     await viewModel.fetchNearbyAlerts(location: loc)
                 }
+            }
+            .alert("Family Notified", isPresented: $showNotifySuccess) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Notifikasi bahaya telah dikirim ke grup keluarga Anda.")
+            }
+            .alert("Marked Safe", isPresented: $showMarkSafeSuccess) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Status keselamatan Anda telah diperbarui menjadi Aman.")
             }
         }
     }

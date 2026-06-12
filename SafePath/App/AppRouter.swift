@@ -15,7 +15,7 @@ struct AppRouter: View {
         case family   = "Family"      // Person 2
         case prep     = "Prep"        // Person 3
     }
-    
+
     var body: some View {
         VStack(spacing: 0) {
             customTopBar
@@ -78,6 +78,7 @@ struct AppRouter: View {
                 .tag(Tab.prep)
         }
         }
+        .environment(\.selectedTab, $selectedTab)
         .tint(SafePathColors.primaryBlue)
         .fullScreenCover(isPresented: $showProfile) {
             if UIDevice.current.userInterfaceIdiom == .pad {
@@ -132,3 +133,14 @@ struct AppRouter_Previews: PreviewProvider {
     }
 }
 #endif
+
+struct TabSelectionKey: EnvironmentKey {
+    static let defaultValue: Binding<AppRouter.Tab> = .constant(.home)
+}
+
+extension EnvironmentValues {
+    var selectedTab: Binding<AppRouter.Tab> {
+        get { self[TabSelectionKey.self] }
+        set { self[TabSelectionKey.self] = newValue }
+    }
+}

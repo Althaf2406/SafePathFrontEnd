@@ -10,8 +10,8 @@ struct EvacuationMapView: UIViewRepresentable {
     let shelters: [Shelter]
     let selectedShelter: Shelter?
     let alerts: [DisasterAlert]
-    let primaryRoute: MKRoute?
-    let alternativeRoutes: [MKRoute]
+    let primaryRoute: EvacuationRoute?
+    let alternativeRoutes: [EvacuationRoute]
     let isEmergencyMode: Bool
     let centerUserTrigger: Bool
     let zoomTrigger: Int
@@ -70,14 +70,14 @@ struct EvacuationMapView: UIViewRepresentable {
         
         // Add alternative route overlays (gray, drawn first so they're behind primary)
         for route in alternativeRoutes {
-            let polyline = route.polyline
-            polyline.title = "alternative"
-            mapView.addOverlay(polyline, level: .aboveRoads)
+            if let polyline = route.polyline {
+                polyline.title = "alternative"
+                mapView.addOverlay(polyline, level: .aboveRoads)
+            }
         }
         
         // Add primary route overlay (blue, drawn last so it's on top)
-        if let primaryRoute = primaryRoute {
-            let polyline = primaryRoute.polyline
+        if let primaryRoute = primaryRoute, let polyline = primaryRoute.polyline {
             polyline.title = "primary"
             mapView.addOverlay(polyline, level: .aboveRoads)
         }
@@ -146,8 +146,8 @@ struct EvacuationMapView: UIViewRepresentable {
                 )
             )
             mapView.setRegion(region, animated: true)
-        } else if let route = primaryRoute {
-            let rect = route.polyline.boundingMapRect
+        } else if let route = primaryRoute, let polyline = route.polyline {
+            let rect = polyline.boundingMapRect
             let insets = UIEdgeInsets(top: 80, left: 40, bottom: 200, right: 40)
             mapView.setVisibleMapRect(rect, edgePadding: insets, animated: true)
         } else if let userCoord = userCoordinate, selectedShelter == nil && alerts.isEmpty && primaryRoute == nil {

@@ -43,12 +43,20 @@ final class UserManagementViewModel: ObservableObject {
 
         do {
             let newUser = try await repository.register(name: name, email: email, password: password, phone: phone)
-            self.currentUser = newUser
-            self.isLoggedIn = true
-            SessionManager.shared.saveUser(newUser)
+            
+            if newUser.authToken != nil && !newUser.authToken!.isEmpty {
+                self.currentUser = newUser
+                self.isLoggedIn = true
+                SessionManager.shared.saveUser(newUser)
+                self.isLoading = false
+            } else {
+                // Jika backend tidak mengirimkan token saat register, langsung panggil login
+                await login(email: email, password: password)
+            }
         } catch {
             errorMessage = error.localizedDescription
             self.isLoggedIn = false
+            self.isLoading = false
         }
 
         isLoading = false

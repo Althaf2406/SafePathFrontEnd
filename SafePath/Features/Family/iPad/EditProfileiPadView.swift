@@ -5,6 +5,7 @@ import PhotosUI
 struct EditProfileiPadView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userVM: UserManagementViewModel
+    @EnvironmentObject var locationService: LocationService
     
     @State private var fullName: String = ""
     @State private var email: String = ""
@@ -81,8 +82,19 @@ struct EditProfileiPadView: View {
                 fullName = user.name
                 email = user.email
                 phone = user.phone ?? ""
-                if let lat = user.lastLatitude { latitude = String(lat) }
-                if let lon = user.lastLongitude { longitude = String(lon) }
+                emergencyContact = user.emergencyContactPhone ?? ""
+                
+                if let lat = user.lastLatitude {
+                    latitude = String(lat)
+                } else if let currentLat = locationService.currentLocation?.latitude {
+                    latitude = String(currentLat)
+                }
+                
+                if let lon = user.lastLongitude {
+                    longitude = String(lon)
+                } else if let currentLon = locationService.currentLocation?.longitude {
+                    longitude = String(currentLon)
+                }
             }
             if let uid = userVM.currentUser?.id {
                 profileImageData = UserDefaults.standard.data(forKey: "profile_image_\(uid)")
@@ -299,7 +311,7 @@ struct EditProfileiPadView: View {
                 Task {
                     let lat = Double(latitude) ?? 0.0
                     let lon = Double(longitude) ?? 0.0
-                    await userVM.updateProfile(name: fullName, phone: phone, latitude: lat, longitude: lon)
+                    await userVM.updateProfile(name: fullName, phone: phone, emergencyContactPhone: emergencyContact, latitude: lat, longitude: lon)
                     withAnimation { showSavedToast = true }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                         withAnimation { showSavedToast = false }

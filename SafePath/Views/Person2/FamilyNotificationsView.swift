@@ -158,6 +158,12 @@ struct FamilyNotificationsView: View {
     // Formatter for relative time
     private func timeAgo(from date: Date?) -> String {
         guard let date = date else { return "Recent" }
+        
+        // Fix timezone offset issue from backend (e.g. showing "in 7 hours")
+        if date > Date() {
+            return "Just now"
+        }
+        
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())

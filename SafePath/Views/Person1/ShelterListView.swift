@@ -5,6 +5,7 @@ import Combine
 struct ShelterListView: View {
     @StateObject private var viewModel = ShelterViewModel()
     @EnvironmentObject var locationService: LocationService
+    @Environment(\.selectedTab) var selectedTab
     
     /// Callback when user wants to navigate to a shelter on the map.
     var onSelectShelterForRoute: ((Shelter) -> Void)?
@@ -167,6 +168,7 @@ struct ShelterListView: View {
 struct ShelterCard: View {
     let shelter: Shelter
     var onRoute: (() -> Void)?
+    @Environment(\.selectedTab) var selectedTab
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -232,7 +234,14 @@ struct ShelterCard: View {
                         .cornerRadius(10)
                 }
                 
-                Button(action: { onRoute?() }) {
+                Button(action: {
+                    if let onRoute = onRoute {
+                        onRoute()
+                    } else {
+                        NotificationCenter.default.post(name: NSNotification.Name("RouteToShelter"), object: shelter)
+                        selectedTab.wrappedValue = .map
+                    }
+                }) {
                     Label("Route", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
                         .font(SafePathFonts.caption)
                         .foregroundColor(.white)

@@ -9,6 +9,16 @@ struct ShelterDetailView: View {
     
     @State private var mapRegion: MKCoordinateRegion
     
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.selectedTab) var selectedTab
+    @EnvironmentObject var locationService: LocationService
+    @EnvironmentObject var userVM: UserManagementViewModel
+    
+    @StateObject private var familyVM = FamilySafetyViewModel()
+    @StateObject private var emergencyVM = EmergencyStatusViewModel()
+    
+    @State private var showShareSuccess = false
+    
     init(shelter: Shelter, viewModel: ShelterViewModel) {
         self.shelter = shelter
         self.viewModel = viewModel
@@ -199,9 +209,13 @@ struct ShelterDetailView: View {
     
     private var actionButtons: some View {
         VStack(spacing: 10) {
-            // Select as destination
-            Button(action: { viewModel.selectShelter(shelter) }) {
-                Label("Select as Evacuation Destination", systemImage: "mappin.and.ellipse")
+            // Start route
+            Button(action: {
+                NotificationCenter.default.post(name: NSNotification.Name("RouteToShelter"), object: shelter)
+                selectedTab.wrappedValue = .map
+                dismiss()
+            }) {
+                Label("Start Route", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
                     .font(SafePathFonts.buttonLabel)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -210,9 +224,36 @@ struct ShelterDetailView: View {
                     .cornerRadius(14)
             }
             
-            // Start route
-            Button(action: { viewModel.selectShelter(shelter) }) {
-                Label("Start Route", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
+            // Share with Family
+            Button(action: {
+                if let loc = locationService.currentLocation {
+                    Task {
+                        await familyVM.shareLocation(latitude: loc.latitude, longitude: loc.longitude)
+                        if let currentUserId = userVM.currentUser?.id {
+                            await familyVM.updateMemberStatus(memberID: currentUserId, status: .evacuating)
+                        }
+                        await emergencyVM.updateStatus(
+                            status: .evacuating,
+                            message: "Evakuasi ke shelter: \(shelter.name)",
+                            latitude: loc.latitude,
+                            longitude: loc.longitude
+                        )
+                        showShareSuccess = true
+                    }
+                } else {
+                    Task {
+                        if let currentUserId = userVM.currentUser?.id {
+                            await familyVM.updateMemberStatus(memberID: currentUserId, status: .evacuating)
+                        }
+                        await emergencyVM.updateStatus(
+                            status: .evacuating,
+                            message: "Evakuasi ke shelter: \(shelter.name)"
+                        )
+                        showShareSuccess = true
+                    }
+                }
+            }) {
+                Label("Share to Family Alerts", systemImage: "person.2.fill")
                     .font(SafePathFonts.buttonLabel)
                     .foregroundColor(SafePathColors.accentBlue)
                     .frame(maxWidth: .infinity)
@@ -220,30 +261,11 @@ struct ShelterDetailView: View {
                     .background(SafePathColors.accentBlue.opacity(0.1))
                     .cornerRadius(14)
             }
-            
-            HStack(spacing: 10) {
-                // Person 2 placeholder: Share with Family
-                Button(action: { viewModel.onShareWithFamily?(shelter) }) {
-                    Label("Share", systemImage: "person.2.fill")
-                        .font(SafePathFonts.caption)
-                        .foregroundColor(SafePathColors.accentBlue)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(SafePathColors.accentBlue.opacity(0.1))
-                        .cornerRadius(12)
-                }
-                
-                // Person 3 placeholder: Save Offline
-                Button(action: { viewModel.onSaveShelterOffline?(shelter) }) {
-                    Label("Save Offline", systemImage: "arrow.down.circle.fill")
-                        .font(SafePathFonts.caption)
-                        .foregroundColor(SafePathColors.offlineGray)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(SafePathColors.offlineGray.opacity(0.1))
-                        .cornerRadius(12)
-                }
-            }
+        }
+        .alert("Shared", isPresented: $showShareSuccess) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Tujuan evakuasi Anda berhasil dibagikan ke grup keluarga.")
         }
     }
 }

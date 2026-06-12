@@ -286,26 +286,26 @@ struct MapBottomSheetView: View {
             
             HStack(spacing: 8) {
                 // Person 3 placeholder
-                Button(action: { onSaveOffline?() }) {
-                    Label("Save Offline", systemImage: "arrow.down.circle.fill")
-                        .font(.system(size: 11))
-                        .foregroundColor(SafePathColors.offlineGray)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(SafePathColors.offlineGray.opacity(0.08))
-                        .cornerRadius(8)
-                }
+//                Button(action: { onSaveOffline?() }) {
+//                    Label("Save Offline", systemImage: "arrow.down.circle.fill")
+//                        .font(.system(size: 11))
+//                        .foregroundColor(SafePathColors.offlineGray)
+//                        .frame(maxWidth: .infinity)
+//                        .padding(.vertical, 8)
+//                        .background(SafePathColors.offlineGray.opacity(0.08))
+//                        .cornerRadius(8)
+//                }
                 
                 // Person 3 placeholder
-                Button(action: { onSaveOffline?() }) {
-                    Label("Download Map", systemImage: "map.fill")
-                        .font(.system(size: 11))
-                        .foregroundColor(SafePathColors.offlineGray)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(SafePathColors.offlineGray.opacity(0.08))
-                        .cornerRadius(8)
-                }
+//                Button(action: { onSaveOffline?() }) {
+//                    Label("Download Map", systemImage: "map.fill")
+//                        .font(.system(size: 11))
+//                        .foregroundColor(SafePathColors.offlineGray)
+//                        .frame(maxWidth: .infinity)
+//                        .padding(.vertical, 8)
+//                        .background(SafePathColors.offlineGray.opacity(0.08))
+//                        .cornerRadius(8)
+//                }
             }
         }
         .padding(16)

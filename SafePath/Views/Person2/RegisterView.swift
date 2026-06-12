@@ -66,9 +66,12 @@ struct RegisterView: View {
                         await userVM.register(name: fullName, email: email, password: password)
                         print("👉 [DEBUG] Selesai memanggil backend. Error: \(String(describing: userVM.errorMessage)), isLoggedIn: \(userVM.isLoggedIn)")
                         
-                        if userVM.errorMessage != nil && !userVM.isLoggedIn {
-                            print("👉 [DEBUG] Menampilkan alert error!")
-                            showAlert = true
+                        await MainActor.run {
+                            if userVM.errorMessage != nil {
+                                showAlert = true
+                            } else if !userVM.isLoggedIn {
+                                dismiss()
+                            }
                         }
                     }
                 }) {

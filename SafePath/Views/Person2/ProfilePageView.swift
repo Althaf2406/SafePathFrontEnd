@@ -66,20 +66,20 @@ struct ProfilePageView: View {
                     safetyConnectionsSection
                         .padding(.top, 24)
 
-                    // MARK: - Device Status
-                    deviceStatusSection
-                        .padding(.top, 24)
+//                    // MARK: - Device Status
+//                    deviceStatusSection
+//                        .padding(.top, 24)
 
                     // MARK: - Logout Button
                     logoutButton
                         .padding(.horizontal, 16)
                         .padding(.top, 28)
                     
-                    // MARK: - Debug Watch SOS
-                    debugWatchSOSButton
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                        .padding(.bottom, 40)
+//                    // MARK: - Debug Watch SOS
+//                    debugWatchSOSButton
+//                        .padding(.horizontal, 16)
+//                        .padding(.top, 12)
+//                        .padding(.bottom, 40)
                 }
             }
             .background(SafePathColors.backgroundLight.ignoresSafeArea())
@@ -107,9 +107,9 @@ struct ProfilePageView: View {
             .navigationDestination(isPresented: $goToEditProfile) {
                 EditProfileView()
             }
-            .navigationDestination(isPresented: $goToSettings) {
-                SettingView()
-            }
+//            .navigationDestination(isPresented: $goToSettings) {
+//                SettingView()
+//            }
             .onAppear {
                 if let uid = userVM.currentUser?.id {
                     profileImageData = UserDefaults.standard.data(forKey: "profile_image_\(uid)")
@@ -312,14 +312,14 @@ struct ProfilePageView: View {
                 Divider().padding(.leading, 60)
 
                 // Settings — uses @State navigation
-                Button(action: { goToSettings = true }) {
-                    menuRowContent(
-                        icon: "gearshape.fill",
-                        iconBg: Color.gray.opacity(0.1),
-                        iconColor: SafePathColors.textSecondary,
-                        label: "Settings"
-                    )
-                }
+//                Button(action: { goToSettings = true }) {
+//                    menuRowContent(
+//                        icon: "gearshape.fill",
+//                        iconBg: Color.gray.opacity(0.1),
+//                        iconColor: SafePathColors.textSecondary,
+//                        label: "Settings"
+//                    )
+//                }
             }
             .background(Color.white)
             .cornerRadius(16)
@@ -368,18 +368,11 @@ struct ProfilePageView: View {
                         Text("Emergency Contact")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(SafePathColors.textPrimary)
-                        Text(userVM.currentUser?.phone != nil ? "Primary: \(userVM.currentUser!.phone!)" : "No emergency contact set")
+                        Text(userVM.currentUser?.emergencyContactPhone?.isEmpty == false ? "Primary: \(userVM.currentUser!.emergencyContactPhone!)" : "No emergency contact set")
                             .font(.system(size: 13))
                             .foregroundColor(SafePathColors.textSecondary)
                     }
                     Spacer()
-                    Button("Manage") {}
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundColor(SafePathColors.primaryBlue)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(SafePathColors.primaryBlue.opacity(0.08))
-                        .cornerRadius(8)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)

@@ -73,7 +73,48 @@ final class FamilySafetyViewModel: ObservableObject {
         errorMessage = nil
         do {
             familyGroup = try await repository.fetchGroup(groupID: groupID)
-            members = familyGroup?.members ?? []
+            var fetchedMembers = familyGroup?.members ?? []
+            
+            // --- Inject Dummy Family Members for Live Map Testing ---
+            let dummyMembers = [
+                FamilyMember(
+                    id: "dummy1",
+                    name: "Budi (Ayah)",
+                    phone: "081234567890",
+                    lastLatitude: -7.2800,   // Sekitar Tunjungan Plaza
+                    lastLongitude: 112.7400,
+                    lastUpdated: Date(),
+                    status: .safe
+                ),
+                FamilyMember(
+                    id: "dummy2",
+                    name: "Ani (Ibu)",
+                    phone: "081234567891",
+                    lastLatitude: -7.2950,   // Sekitar Wonokromo
+                    lastLongitude: 112.7350,
+                    lastUpdated: Date(),
+                    status: .needHelp
+                ),
+                FamilyMember(
+                    id: "dummy3",
+                    name: "Joko (Adik)",
+                    phone: "081234567892",
+                    lastLatitude: -7.2750,   // Sekitar Gubeng
+                    lastLongitude: 112.7500,
+                    lastUpdated: Date(),
+                    status: .evacuating
+                )
+            ]
+            
+            for dummy in dummyMembers {
+                if !fetchedMembers.contains(where: { $0.id == dummy.id }) {
+                    fetchedMembers.append(dummy)
+                }
+            }
+            
+            members = fetchedMembers
+            // --------------------------------------------------------
+            
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -157,7 +198,49 @@ final class FamilySafetyViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            members = try await repository.fetchFamilyLocations(groupID: targetGroupID)
+            var fetchedMembers = try await repository.fetchFamilyLocations(groupID: targetGroupID)
+            
+            // --- Inject Dummy Family Members for Live Map Testing ---
+            let dummyMembers = [
+                FamilyMember(
+                    id: "dummy1",
+                    name: "Budi (Ayah)",
+                    phone: "081234567890",
+                    lastLatitude: -7.2800,   // Sekitar Tunjungan Plaza
+                    lastLongitude: 112.7400,
+                    lastUpdated: Date(),
+                    status: .safe
+                ),
+                FamilyMember(
+                    id: "dummy2",
+                    name: "Ani (Ibu)",
+                    phone: "081234567891",
+                    lastLatitude: -7.2950,   // Sekitar Wonokromo
+                    lastLongitude: 112.7350,
+                    lastUpdated: Date(),
+                    status: .needHelp
+                ),
+                FamilyMember(
+                    id: "dummy3",
+                    name: "Joko (Adik)",
+                    phone: "081234567892",
+                    lastLatitude: -7.2750,   // Sekitar Gubeng
+                    lastLongitude: 112.7500,
+                    lastUpdated: Date(),
+                    status: .evacuating
+                )
+            ]
+            
+            // Hindari duplikasi jika fetch dipanggil berkali-kali
+            for dummy in dummyMembers {
+                if !fetchedMembers.contains(where: { $0.id == dummy.id }) {
+                    fetchedMembers.append(dummy)
+                }
+            }
+            
+            members = fetchedMembers
+            // --------------------------------------------------------
+            
         } catch {
             errorMessage = error.localizedDescription
         }

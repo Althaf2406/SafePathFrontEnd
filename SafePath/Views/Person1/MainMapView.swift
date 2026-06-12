@@ -26,29 +26,37 @@ struct MainMapView: View {
     @State private var zoomTrigger = 0
     @State private var isZoomIn = true
     
+    private var activeAlerts: [DisasterAlert] {
+        isEmergencyMode ? alertVM.nearbyAlerts : []
+    }
+
+    private var mapViewLayer: some View {
+        EvacuationMapView(
+            userCoordinate: locationService.currentLocation,
+            shelters: shelterVM.shelters,
+            selectedShelter: shelterVM.selectedShelter,
+            alerts: activeAlerts,
+            primaryRoute: routeVM.currentRoute,
+            alternativeRoutes: routeVM.alternativeRoutes,
+            isEmergencyMode: isEmergencyMode,
+            centerUserTrigger: centerUserTrigger,
+            zoomTrigger: zoomTrigger,
+            isZoomIn: isZoomIn,
+            isNavigating: isNavigating,
+            onShelterTapped: { (shelter: Shelter) in
+                if !isNavigating {
+                    shelterVM.selectShelter(shelter)
+                    showBottomSheet = true
+                }
+            }
+        )
+        .ignoresSafeArea()
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             // Full-screen map
-            EvacuationMapView(
-                userCoordinate: locationService.currentLocation,
-                shelters: shelterVM.filteredShelters,
-                selectedShelter: shelterVM.selectedShelter,
-                alerts: isEmergencyMode ? alertVM.nearbyAlerts : [],
-                primaryRoute: routeVM.currentRoute?.mkRoute,
-                alternativeRoutes: routeVM.alternativeRoutes.compactMap(\.mkRoute),
-                isEmergencyMode: isEmergencyMode,
-                centerUserTrigger: centerUserTrigger,
-                zoomTrigger: zoomTrigger,
-                isZoomIn: isZoomIn,
-                isNavigating: isNavigating,
-                onShelterTapped: { shelter in
-                    if !isNavigating {
-                        shelterVM.selectShelter(shelter)
-                        showBottomSheet = true
-                    }
-                }
-            )
-            .ignoresSafeArea()
+            mapViewLayer
             
             // Top overlay controls
             VStack(spacing: 0) {
@@ -305,6 +313,15 @@ struct MainMapView: View {
                 if let shelter = shelterVM.selectedShelter {
                     Task { await routeVM.recalculateIfNeeded(newLocation: loc, shelter: shelter) }
                 }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("RouteToShelter"))) { notification in
+            if let shelter = notification.object as? Shelter {
+                shelterVM.selectShelter(shelter)
+                if let loc = locationService.currentLocation {
+                    Task { await routeVM.calculateRoute(from: loc, to: shelter) }
+                }
+                showBottomSheet = true
             }
         }
         .alert("Route Shared", isPresented: $showShareSuccess) {

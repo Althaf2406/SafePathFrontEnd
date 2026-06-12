@@ -11,6 +11,7 @@ struct DisasterAlertDetailView: View {
     
     @State private var mapPosition: MapCameraPosition
     @State private var showShareSheet = false
+    @Environment(\.selectedTab) var selectedTab
     
     init(alert: DisasterAlert, viewModel: DisasterAlertViewModel) {
         self.alert = alert
@@ -55,16 +56,6 @@ struct DisasterAlertDetailView: View {
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundColor(SafePathColors.primaryBlue)
             }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showShareSheet = true }) {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(SafePathColors.primaryBlue)
-                        .font(.system(size: 16, weight: .semibold))
-                }
-            }
-        }
-        .sheet(isPresented: $showShareSheet) {
-            ShareSheet(activityItems: ["SafePath Alert: \(alert.typeDisplayName) at \(alert.locationName). \(alert.instruction)"])
         }
     }
     
@@ -245,7 +236,9 @@ struct DisasterAlertDetailView: View {
     private var actionButtonsSection: some View {
         VStack(spacing: 12) {
             // View Evacuation Route Button
-            NavigationLink(destination: Text("Evacuation Map")) { // Person 1 main map/route view
+            Button(action: {
+                selectedTab.wrappedValue = .map
+            }) {
                 HStack {
                     Image(systemName: "map.fill")
                     Text("View Evacuation Route")
@@ -272,38 +265,22 @@ struct DisasterAlertDetailView: View {
                 .cornerRadius(12)
             }
             
-            HStack(spacing: 12) {
-                // Mark Safe Button
-                Button(action: { viewModel.onMarkSafe?() }) {
-                    HStack {
-                        Image(systemName: "checkmark.shield.fill")
-                        Text("Mark Safe")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
-                    }
-                    .foregroundColor(SafePathColors.primaryBlue)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(SafePathColors.primaryBlue, lineWidth: 1.5)
-                    )
-                    .cornerRadius(12)
+            // Mark Safe Button
+            Button(action: { viewModel.onMarkSafe?() }) {
+                HStack {
+                    Image(systemName: "checkmark.shield.fill")
+                    Text("Mark Safe")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                 }
-                
-                // Save Offline Button
-                Button(action: { viewModel.onSaveAlertOffline?(alert) }) {
-                    HStack {
-                        Image(systemName: "arrow.down.to.line.fill")
-                        Text("Save Offline")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
-                    }
-                    .foregroundColor(SafePathColors.primaryBlue)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(SafePathColors.backgroundLight)
-                    .cornerRadius(12)
-                }
+                .foregroundColor(SafePathColors.primaryBlue)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(SafePathColors.primaryBlue, lineWidth: 1.5)
+                )
+                .cornerRadius(12)
             }
         }
     }

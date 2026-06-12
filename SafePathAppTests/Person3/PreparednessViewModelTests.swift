@@ -20,7 +20,7 @@ struct PreparednessViewModelTests {
 
         let vm = PreparednessViewModel(repository: mockRepo)
         
-        await vm.load(lat: 0, lng: 0)
+        await vm.load(lat: 0, lng: 0, userId: "test-user-id")
 
         #expect(vm.emergencyKit.count == 2)
         #expect(vm.riskProfiles.count == 1)
@@ -39,7 +39,8 @@ struct PreparednessViewModelTests {
         ]
 
         let vm = PreparednessViewModel(repository: mockRepo)
-        await vm.getAllItem()
+        vm.setUserId("test-user-id")
+        await vm.loadCustomItems()
 
         #expect(vm.totalItemsCount == 4)
         #expect(vm.completedItemsCount == 2)
@@ -53,7 +54,8 @@ struct PreparednessViewModelTests {
         mockRepo.itemsToReturn = [item]
 
         let vm = PreparednessViewModel(repository: mockRepo)
-        await vm.getAllItem()
+        vm.setUserId("test-user-id")
+        await vm.loadCustomItems()
         
         await vm.toggleItem(item)
 
@@ -66,6 +68,7 @@ struct PreparednessViewModelTests {
     func testAddItemSuccess() async throws {
         let mockRepo = MockPreparednessRepository()
         let vm = PreparednessViewModel(repository: mockRepo)
+        vm.setUserId("test-user-id")
 
         let newItem = TestDataFactory.mockChecklistItem(name: "New Flashlight")
         await vm.addItem(newItem)
@@ -82,7 +85,8 @@ struct PreparednessViewModelTests {
         mockRepo.itemsToReturn = [item]
 
         let vm = PreparednessViewModel(repository: mockRepo)
-        await vm.getAllItem()
+        vm.setUserId("test-user-id")
+        await vm.loadCustomItems()
 
         await vm.deleteItem(id: item.id)
 
@@ -97,7 +101,7 @@ struct PreparednessViewModelTests {
 
         let vm = PreparednessViewModel(repository: mockRepo)
         
-        await vm.load(lat: 0, lng: 0)
+        await vm.load(lat: 0, lng: 0, userId: "test-user-id")
 
         // Karena repository gagal (throw), ViewModel harus mengisi dengan mock statis internalnya
         #expect(!vm.emergencyKit.isEmpty)

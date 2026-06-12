@@ -248,10 +248,10 @@ struct ProfilePageiPadView: View {
                 Button(action: { goToEditProfile = true }) {
                     menuRowContent(icon: "person.fill", iconBg: SafePathColors.primaryBlue.opacity(0.1), iconColor: SafePathColors.primaryBlue, label: "Edit Profile")
                 }
-                Divider().padding(.leading, 80)
-                Button(action: { goToSettings = true }) {
-                    menuRowContent(icon: "gearshape.fill", iconBg: Color.gray.opacity(0.1), iconColor: SafePathColors.textSecondary, label: "Settings")
-                }
+//                Divider().padding(.leading, 80)
+//                Button(action: { goToSettings = true }) {
+//                    menuRowContent(icon: "gearshape.fill", iconBg: Color.gray.opacity(0.1), iconColor: SafePathColors.textSecondary, label: "Settings")
+//                }
             }
             .background(Color.white)
             .cornerRadius(20)
@@ -299,13 +299,6 @@ struct ProfilePageiPadView: View {
                             .foregroundColor(SafePathColors.textSecondary)
                     }
                     Spacer()
-                    Button("Manage") {}
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(SafePathColors.primaryBlue)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(SafePathColors.primaryBlue.opacity(0.08))
-                        .cornerRadius(10)
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 20)

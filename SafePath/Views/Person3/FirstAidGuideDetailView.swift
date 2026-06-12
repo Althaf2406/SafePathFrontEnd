@@ -32,8 +32,8 @@ struct FirstAidGuideDetailView: View {
                 // Action Buttons
                 VStack(spacing: 12) {
                     Button(action: {
-                        let phone = userVM.currentUser?.phone ?? "911"
-                        if let url = URL(string: "tel://\(phone)") {
+                        if let phone = userVM.currentUser?.emergencyContactPhone, !phone.isEmpty,
+                           let url = URL(string: "tel://\(phone)") {
                             UIApplication.shared.open(url)
                         }
                     }) {

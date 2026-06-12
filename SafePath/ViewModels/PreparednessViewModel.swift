@@ -24,7 +24,10 @@ final class PreparednessViewModel: ObservableObject {
     private let networkMonitor = NetworkMonitor.shared
     private let context = SharedModelContainer.shared.context
 
-    private let customCacheKey = "safepath.custom_kit_cache"
+    private var currentUserId: String = "guest"
+    private var customCacheKey: String {
+        "safepath.custom_kit_cache_\(currentUserId)"
+    }
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Hardcoded mandatory items (stable IDs so SwiftData can track them)
@@ -68,8 +71,13 @@ final class PreparednessViewModel: ObservableObject {
     }
 
     // MARK: - Load
+    
+    func setUserId(_ userId: String?) {
+        self.currentUserId = userId ?? "guest"
+    }
 
-    func load(lat: Double, lng: Double) async {
+    func load(lat: Double, lng: Double, userId: String?) async {
+        setUserId(userId)
         isLoading = true
         defer { isLoading = false }
         await loadCustomItems()
@@ -78,6 +86,7 @@ final class PreparednessViewModel: ObservableObject {
 
     /// Call this after userVM is available (pass real userID so state is per-user)
     func loadMandatoryItems(userId: String?) {
+        setUserId(userId)
         guard let userId else {
             mandatoryKit = Self.mandatoryItems
             return
@@ -124,8 +133,15 @@ final class PreparednessViewModel: ObservableObject {
 
     func loadCustomItems() async {
         guard networkMonitor.isConnected else {
-            if let cached: [ChecklistItem] = storage.load(forKey: customCacheKey) {
+            if let cached: [ChecklistItem] = storage.load(forKey: customCacheKey), !cached.isEmpty {
                 customKit = cached
+            } else if let oldCached: [ChecklistItem] = storage.load(forKey: "safepath.custom_kit_cache"), !oldCached.isEmpty {
+                // Migration for old global cache
+                customKit = oldCached
+                storage.save(oldCached, forKey: customCacheKey)
+                storage.remove(forKey: "safepath.custom_kit_cache")
+            } else {
+                customKit = []
             }
             isOffline = true
             return
@@ -139,6 +155,12 @@ final class PreparednessViewModel: ObservableObject {
         } catch {
             if let cached: [ChecklistItem] = storage.load(forKey: customCacheKey), !cached.isEmpty {
                 customKit = cached
+            } else if let oldCached: [ChecklistItem] = storage.load(forKey: "safepath.custom_kit_cache"), !oldCached.isEmpty {
+                customKit = oldCached
+                storage.save(oldCached, forKey: customCacheKey)
+                storage.remove(forKey: "safepath.custom_kit_cache")
+            } else {
+                customKit = []
             }
         }
         pendingCount = queue.pendingCount()
@@ -249,7 +271,7 @@ final class PreparednessViewModel: ObservableObject {
             let profiles = try await repository.fetchRiskProfiles(lat: lat, lng: lng)
             self.riskProfiles = profiles
         } catch {
-            self.riskProfiles = Self.mockRiskProfiles
+//            self.riskProfiles = Self.mockRiskProfiles
         }
     }
 
@@ -285,7 +307,5 @@ final class PreparednessViewModel: ObservableObject {
 
     private static let mockRiskProfiles: [RiskProfile] = [
         RiskProfile(id: "1", type: "Earthquake", iconName: "waveform.path.ecg",    level: .high),
-        RiskProfile(id: "2", type: "Flood",      iconName: "cloud.heavyrain.fill",  level: .medium),
-        RiskProfile(id: "3", type: "Tsunami",    iconName: "water.waves",           level: .low),
     ]
 }

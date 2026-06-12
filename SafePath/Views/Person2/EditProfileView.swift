@@ -6,6 +6,7 @@ import PhotosUI
 struct EditProfileView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userVM: UserManagementViewModel
+    @EnvironmentObject var locationService: LocationService
     
     @State private var fullName: String = ""
     @State private var email: String = ""
@@ -48,11 +49,18 @@ struct EditProfileView: View {
                 fullName = user.name
                 email = user.email
                 phone = user.phone ?? ""
+                emergencyContact = user.emergencyContactPhone ?? ""
+                
                 if let lat = user.lastLatitude {
                     latitude = String(lat)
+                } else if let currentLat = locationService.currentLocation?.latitude {
+                    latitude = String(currentLat)
                 }
+                
                 if let lon = user.lastLongitude {
                     longitude = String(lon)
+                } else if let currentLon = locationService.currentLocation?.longitude {
+                    longitude = String(currentLon)
                 }
             }
         }
@@ -226,6 +234,35 @@ struct EditProfileView: View {
     // MARK: - Location Info Card
     private var locationInfoCard: some View {
         VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Location")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(SafePathColors.textPrimary)
+                
+                Spacer()
+                
+                Button(action: {
+                    if let loc = locationService.currentLocation {
+                        latitude = String(loc.latitude)
+                        longitude = String(loc.longitude)
+                    } else {
+                        locationService.requestPermission()
+                        locationService.startUpdating()
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "location.fill")
+                        Text("Use Current")
+                    }
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(SafePathColors.primaryBlue)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(SafePathColors.primaryBlue.opacity(0.1))
+                    .cornerRadius(8)
+                }
+            }
+            
             // Latitude
             VStack(alignment: .leading, spacing: 6) {
                 Text("Latitude")
@@ -347,7 +384,7 @@ struct EditProfileView: View {
                 Task {
                     let lat = Double(latitude)
                     let lon = Double(longitude)
-                    await userVM.updateProfile(name: fullName, phone: phone, latitude: lat, longitude: lon)
+                    await userVM.updateProfile(name: fullName, phone: phone, emergencyContactPhone: emergencyContact, latitude: lat, longitude: lon)
                     withAnimation {
                         showSavedToast = true
                     }

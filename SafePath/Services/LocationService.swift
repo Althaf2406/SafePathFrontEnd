@@ -35,10 +35,7 @@ final class LocationService: NSObject, LocationServiceProtocol, CLLocationManage
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.distanceFilter = 50 // Update every 50m
         
-        #if targetEnvironment(simulator)
-        // Default to Universitas Ciputra Surabaya coordinates for simulator/testing
-        self.currentLocation = CLLocationCoordinate2D(latitude: -7.285694, longitude: 112.631611)
-        #endif
+        // Removed hardcoded simulator initial location
     }
     
     // MARK: - Public API
@@ -78,13 +75,8 @@ final class LocationService: NSObject, LocationServiceProtocol, CLLocationManage
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        #if targetEnvironment(simulator)
-        // Kunci koordinat ke Universitas Ciputra Surabaya 
-        currentLocation = CLLocationCoordinate2D(latitude: -7.285694, longitude: 112.631611)
-        #else
         guard let loc = locations.last else { return }
         currentLocation = loc.coordinate
-        #endif
         locationError = nil
     }
     

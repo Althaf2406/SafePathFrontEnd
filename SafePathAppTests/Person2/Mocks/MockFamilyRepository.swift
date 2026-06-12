@@ -21,6 +21,15 @@ final class MockFamilyRepository: FamilyRepositoryProtocol {
         return groupToReturn
     }
 
+    func joinGroup(inviteCode: String) async throws -> FamilyGroup {
+        if shouldThrowError { throw URLError(.badServerResponse) }
+        return groupToReturn
+    }
+
+    func leaveGroup(groupID: String) async throws {
+        if shouldThrowError { throw URLError(.badServerResponse) }
+    }
+
     func fetchAllGroups() async throws -> [FamilyGroup] {
         if shouldThrowError { throw URLError(.badServerResponse) }
         return groupsToReturn

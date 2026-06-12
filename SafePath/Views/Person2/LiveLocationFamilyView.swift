@@ -300,7 +300,9 @@ struct LiveLocationFamilyView: View {
                     let dest = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lng)))
                     dest.name = member.name
                     dest.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
-                }
+                }//openinmaps dari apple kit, kek ngelempar redirect dari app kita ke app map apple
+                //mklauncoption itu membuatkan rute jalan kaki
+                //MMKapItem membuat titik tujuan di peta berdasrkan last-longtitude dari member family
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.turn.up.right")

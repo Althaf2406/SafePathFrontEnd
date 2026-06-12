@@ -31,8 +31,14 @@ final class MockUserRepository: UserRepositoryProtocol {
         name: String?,
         phone: String?,
         profileImageURL: String?,
+        bloodType: String?,
+        medicalConditions: String?,
+        emergencyContactName: String?,
+        emergencyContactPhone: String?,
         latitude: Double?,
-        longitude: Double?
+        longitude: Double?,
+        deviceToken: String?,
+        preferences: UserPreferences?
     ) async throws -> User {
         if shouldThrowError { throw URLError(.badServerResponse) }
         var updated = userToReturn
