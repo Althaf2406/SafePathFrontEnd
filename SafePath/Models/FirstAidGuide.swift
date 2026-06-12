@@ -14,3 +14,5 @@ struct FirstAidGuide: Codable, Identifiable {
     var requiredKit: [FirstAidKitItem] = []
     var detailedSteps: [FirstAidStep] = []
 }
+
+//

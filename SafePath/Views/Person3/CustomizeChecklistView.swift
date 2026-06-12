@@ -438,3 +438,5 @@ private extension Color {
     CustomizeChecklistView()
         .environmentObject(PreparednessViewModel())
 }
+
+//

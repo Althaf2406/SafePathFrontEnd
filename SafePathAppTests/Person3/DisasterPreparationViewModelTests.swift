@@ -47,3 +47,5 @@ struct DisasterPreparationViewModelTests {
         #expect(!vm.checklistItems.contains(where: { $0.name == "N95 Mask" }))
     }
 }
+
+//

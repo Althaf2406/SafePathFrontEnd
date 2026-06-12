@@ -26,3 +26,5 @@ struct RiskProfile: Codable, Identifiable {
     var iconName: String  // SF Symbol name
     var level: RiskLevel
 }
+
+//

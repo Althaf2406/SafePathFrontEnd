@@ -17,3 +17,5 @@ final class MockFirstAidRepository: FirstAidRepositoryProtocol {
             .eraseToAnyPublisher()
     }
 }
+
+//

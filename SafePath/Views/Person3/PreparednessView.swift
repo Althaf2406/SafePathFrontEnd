@@ -249,3 +249,5 @@ struct PreparednessView_Previews: PreviewProvider {
             .environmentObject(PreparednessViewModel())
     }
 }
+
+//

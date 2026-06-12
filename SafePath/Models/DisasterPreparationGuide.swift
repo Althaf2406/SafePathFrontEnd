@@ -9,3 +9,5 @@ struct DisasterPreparationGuide: Codable, Identifiable {
     var handlingProcedures: [String]
     var iconName: String
 }
+
+//

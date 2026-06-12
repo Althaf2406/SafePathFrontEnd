@@ -80,3 +80,5 @@ struct CustomizeChecklistViewModelTests {
         #expect(mockRepo.deletedItemIds.contains(idToDelete))
     }
 }
+
+//
