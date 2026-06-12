@@ -4,6 +4,7 @@ import Foundation
 struct EmergencyStatus: Codable, Identifiable {
     let id: String
     var userID: String
+    var userName: String?
     var status: EmergencyStatusType
     var message: String?
     var latitude: Double?
@@ -51,6 +52,7 @@ struct EmergencyStatus: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id
         case userID          = "user_id"
+        case userName        = "user_name"
         case status
         case message
         case latitude

@@ -81,15 +81,22 @@ struct FamilyNotification: Codable, Identifiable {
         type == .sos || priority == .urgent
     }
 
-    /// Returns a relative time string for display (e.g. "5m ago").
+    /// Returns a relative time string for display (e.g. "5 minutes ago").
     var timeAgoDescription: String {
         guard let date = timestamp else { return "" }
         let seconds = Int(Date().timeIntervalSince(date))
         switch seconds {
-        case 0..<60:     return "Just now"
-        case 60..<3600:  return "\(seconds / 60)m ago"
-        case 3600..<86400: return "\(seconds / 3600)h ago"
-        default:         return "\(seconds / 86400)d ago"
+        case 0..<60:
+            return "Recently"
+        case 60..<3600:
+            let mins = seconds / 60
+            return "\(mins) minute\(mins == 1 ? "" : "s") ago"
+        case 3600..<86400:
+            let hrs = seconds / 3600
+            return "\(hrs) hour\(hrs == 1 ? "" : "s") ago"
+        default:
+            let days = seconds / 86400
+            return "\(days) day\(days == 1 ? "" : "s") ago"
         }
     }
 

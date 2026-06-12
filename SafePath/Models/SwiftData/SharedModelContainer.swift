@@ -9,7 +9,8 @@ class SharedModelContainer {
     
     private init() {
         let schema = Schema([
-            SDFamilyMember.self, SDShelter.self, SDFirstAidGuide.self, SDDisasterPreparationGuide.self
+            SDFamilyMember.self, SDShelter.self, SDFirstAidGuide.self, SDDisasterPreparationGuide.self,
+            SDEmergencyKitItem.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         

@@ -36,6 +36,8 @@ final class ShelterRepository: ShelterRepositoryProtocol {
         return []
     }
     
+
+    
     /// Fetch all shelters.
     func fetchAllShelters() async throws -> [Shelter] {
         do {
@@ -43,6 +45,7 @@ final class ShelterRepository: ShelterRepositoryProtocol {
             cacheShelters(apiShelters)
             return apiShelters
         } catch {
+            print("🚨 fetchAllShelters Decoding Error: \(error)")
             let cached = getCachedShelters()
             if !cached.isEmpty { return cached }
             throw error

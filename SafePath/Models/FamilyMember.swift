@@ -62,9 +62,13 @@ struct FamilyMember: Codable, Identifiable {
         guard let date = lastUpdated else { return "Unknown" }
         let seconds = Int(Date().timeIntervalSince(date))
         switch seconds {
-        case 0..<60:    return "Just now"
-        case 60..<3600: return "\(seconds / 60)m ago"
-        default:        return "\(seconds / 3600)h ago"
+        case 0..<60:    return "Recently"
+        case 60..<3600:
+            let mins = seconds / 60
+            return "\(mins) minute\(mins == 1 ? "" : "s") ago"
+        default:
+            let hrs = seconds / 3600
+            return "\(hrs) hour\(hrs == 1 ? "" : "s") ago"
         }
     }
 

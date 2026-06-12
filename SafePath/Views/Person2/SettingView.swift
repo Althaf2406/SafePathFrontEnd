@@ -11,16 +11,58 @@ struct SettingView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userVM: UserManagementViewModel
 
-    // MARK: - Toggle States
-    @State private var notificationsOn = true
-    @State private var locationFamilyOnly = true
-    @State private var offlineDataEnabled = true
-    @State private var familyPrivacyOn = true
-    @State private var darkModeOn = false
-    @State private var accessibilityOn = false
+    @AppStorage("darkModeOn") private var darkModeOn = false
+    @AppStorage("accessibilityOn") private var accessibilityOn = false
 
     @State private var showSignOutConfirm = false
     @State private var showSavedToast = false
+    @State private var lastSyncDate: Date = Date()
+
+    // Computed properties mapped from ViewModel
+    private var preferences: UserPreferences {
+        userVM.currentUser?.preferences ?? UserPreferences()
+    }
+
+    /// Offline cache size (URLCache + app caches folder)
+    private var offlineDataSize: String {
+        let cachePath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+        let urlCacheBytes = URLCache.shared.currentDiskUsage
+        var folderBytes: Int64 = 0
+        if let path = cachePath,
+           let enumerator = FileManager.default.enumerator(at: path, includingPropertiesForKeys: [.fileSizeKey]) {
+            for case let fileURL as URL in enumerator {
+                if let size = try? fileURL.resourceValues(forKeys: [.fileSizeKey]).fileSize {
+                    folderBytes += Int64(size)
+                }
+            }
+        }
+        let total = Int64(urlCacheBytes) + folderBytes
+        return ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
+    }
+
+    /// Device language
+    private var deviceLanguage: String {
+        if let lang = Locale.current.language.languageCode?.identifier,
+           let region = Locale.current.region?.identifier {
+            let displayLang = Locale.current.localizedString(forLanguageCode: lang) ?? lang
+            return "\(displayLang) (\(region))"
+        }
+        return Locale.current.localizedString(forLanguageCode: Locale.current.language.languageCode?.identifier ?? "en") ?? "English"
+    }
+
+    /// App version from Bundle
+    private var appVersion: String {
+        let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "SafePath v\(ver) (\(build))"
+    }
+
+    /// Sync status label
+    private var syncStatusText: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        return formatter.localizedString(for: lastSyncDate, relativeTo: Date())
+    }
 
     var body: some View {
         NavigationStack {
@@ -36,7 +78,7 @@ struct SettingView: View {
                                 iconBg: SafePathColors.dangerRed.opacity(0.12),
                                 iconColor: SafePathColors.dangerRed,
                                 title: "Notification Settings",
-                                subtitle: notificationsOn ? "All On" : "Off"
+                                subtitle: preferences.notificationsOn ? "All On" : "Off"
                             )
                         }
 
@@ -49,7 +91,7 @@ struct SettingView: View {
                                 iconBg: SafePathColors.primaryBlue.opacity(0.12),
                                 iconColor: SafePathColors.primaryBlue,
                                 title: "Location Sharing",
-                                subtitle: "Family Only"
+                                subtitle: preferences.locationSharingMode.capitalized
                             )
                         }
 
@@ -61,7 +103,7 @@ struct SettingView: View {
                             iconBg: SafePathColors.safeGreen.opacity(0.12),
                             iconColor: SafePathColors.safeGreen,
                             title: "Offline Data",
-                            subtitle: "320 MB"
+                            subtitle: offlineDataSize
                         )
                     }
 
@@ -72,7 +114,14 @@ struct SettingView: View {
                             iconBg: SafePathColors.primaryBlue.opacity(0.12),
                             iconColor: SafePathColors.primaryBlue,
                             title: "Family Privacy",
-                            isOn: $familyPrivacyOn
+                            isOn: Binding(
+                                get: { self.preferences.familyPrivacyOn },
+                                set: { newValue in
+                                    var newPrefs = self.preferences
+                                    newPrefs.familyPrivacyOn = newValue
+                                    Task { await userVM.updatePreferences(newPrefs) }
+                                }
+                            )
                         )
 
                         Divider().padding(.leading, 60)
@@ -103,7 +152,7 @@ struct SettingView: View {
                             iconBg: Color.teal.opacity(0.12),
                             iconColor: Color.teal,
                             title: "Language",
-                            subtitle: "English (US)"
+                            subtitle: deviceLanguage
                         )
 
                         Divider().padding(.leading, 60)
@@ -118,7 +167,7 @@ struct SettingView: View {
                                 Text("Sync Status")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(SafePathColors.textPrimary)
-                                Text("Up to date")
+                                Text(syncStatusText)
                                     .font(.system(size: 13))
                                     .foregroundColor(SafePathColors.safeGreen)
                             }
@@ -153,7 +202,7 @@ struct SettingView: View {
                     .padding(.horizontal, 16)
 
                     // MARK: - Version Footer
-                    Text("SafePath v2.4.1 (1048)")
+                    Text(appVersion)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(SafePathColors.textSecondary.opacity(0.6))
                         .padding(.bottom, 32)
@@ -161,6 +210,9 @@ struct SettingView: View {
                 .padding(.top, 12)
             }
             .background(SafePathColors.backgroundLight.ignoresSafeArea())
+            .onAppear {
+                lastSyncDate = Date()
+            }
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -283,12 +335,9 @@ struct SettingView: View {
 
 struct NotificationSettingsView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var disasterAlerts = true
-    @State private var familyStatus = true
-    @State private var sosAlerts = true
-    @State private var prepReminders = false
-    @State private var selectedThreshold = 1
-    @State private var liveMonitoring = true
+    @EnvironmentObject var userVM: UserManagementViewModel
+    
+    @State private var prefs: UserPreferences = UserPreferences()
     @State private var showSaved = false
 
     var body: some View {
@@ -308,13 +357,13 @@ struct NotificationSettingsView: View {
 
                 // Alert Types
                 VStack(spacing: 0) {
-                    toggleRow(icon: "exclamationmark.triangle.fill", iconColor: SafePathColors.dangerRed, title: "Disaster Alerts", sub: "FEMA, NOAA, and local reports", isOn: $disasterAlerts)
+                    toggleRow(icon: "exclamationmark.triangle.fill", iconColor: SafePathColors.dangerRed, title: "Disaster Alerts", sub: "FEMA, NOAA, and local reports", isOn: $prefs.disasterAlerts)
                     Divider().padding(.leading, 60)
-                    toggleRow(icon: "person.2.fill", iconColor: SafePathColors.primaryBlue, title: "Family Status", sub: "Check-ins and safety updates", isOn: $familyStatus)
+                    toggleRow(icon: "person.2.fill", iconColor: SafePathColors.primaryBlue, title: "Family Status", sub: "Check-ins and safety updates", isOn: $prefs.familyStatus)
                     Divider().padding(.leading, 60)
-                    toggleRow(icon: "sos", iconColor: SafePathColors.dangerRed, title: "SOS Alerts", sub: "Critical life-safety broadcasts", isOn: $sosAlerts)
+                    toggleRow(icon: "sos", iconColor: SafePathColors.dangerRed, title: "SOS Alerts", sub: "Critical life-safety broadcasts", isOn: $prefs.sosAlerts)
                     Divider().padding(.leading, 60)
-                    toggleRow(icon: "checklist", iconColor: SafePathColors.safeGreen, title: "Preparedness Reminders", sub: "Kit refreshes and drills", isOn: $prepReminders)
+                    toggleRow(icon: "checklist", iconColor: SafePathColors.safeGreen, title: "Preparedness Reminders", sub: "Kit refreshes and drills", isOn: $prefs.prepReminders)
                 }
                 .background(Color.white)
                 .cornerRadius(16)
@@ -355,7 +404,7 @@ struct NotificationSettingsView: View {
                                 .foregroundColor(SafePathColors.textPrimary)
                         }
                         Spacer()
-                        Toggle("", isOn: $liveMonitoring)
+                        Toggle("", isOn: $prefs.liveMonitoring)
                             .tint(SafePathColors.primaryBlue)
                     }
                     .padding()
@@ -365,7 +414,13 @@ struct NotificationSettingsView: View {
                 .shadow(color: .black.opacity(0.04), radius: 6, y: 3)
                 .padding(.horizontal, 16)
 
-                Button(action: { withAnimation { showSaved = true }; DispatchQueue.main.asyncAfter(deadline: .now()+2){ withAnimation { showSaved = false } } }) {
+                Button(action: { 
+                    Task {
+                        await userVM.updatePreferences(prefs)
+                        withAnimation { showSaved = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now()+2) { withAnimation { showSaved = false } }
+                    }
+                }) {
                     Text("Save Preferences")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
@@ -426,15 +481,15 @@ struct NotificationSettingsView: View {
     }
 
     private func thresholdRow(title: String, sub: String, idx: Int) -> some View {
-        Button(action: { selectedThreshold = idx }) {
+        Button(action: { prefs.selectedThreshold = idx }) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(.system(size: 15, weight: .semibold)).foregroundColor(SafePathColors.textPrimary)
                     Text(sub).font(.system(size: 12)).foregroundColor(SafePathColors.textSecondary)
                 }
                 Spacer()
-                Image(systemName: selectedThreshold == idx ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(selectedThreshold == idx ? SafePathColors.primaryBlue : SafePathColors.textSecondary.opacity(0.3))
+                Image(systemName: prefs.selectedThreshold == idx ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(prefs.selectedThreshold == idx ? SafePathColors.primaryBlue : SafePathColors.textSecondary.opacity(0.3))
                     .font(.system(size: 20))
             }
             .padding(.horizontal, 16).padding(.vertical, 14)
@@ -444,10 +499,30 @@ struct NotificationSettingsView: View {
 
 struct LocationSharingSettingsView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var realtimeShare = true
-    @State private var emergencyOnly = false
-    @State private var shareOffline = true
+    @EnvironmentObject var userVM: UserManagementViewModel
+    
+    @State private var prefs: UserPreferences = UserPreferences()
     @State private var showSaved = false
+    
+    // Bindings untuk enum "realtime", "emergency", "offline_only"
+    private var realtimeShare: Binding<Bool> {
+        Binding(
+            get: { self.prefs.locationSharingMode == "realtime" },
+            set: { if $0 { self.prefs.locationSharingMode = "realtime" } }
+        )
+    }
+    private var emergencyOnly: Binding<Bool> {
+        Binding(
+            get: { self.prefs.locationSharingMode == "emergency" },
+            set: { if $0 { self.prefs.locationSharingMode = "emergency" } }
+        )
+    }
+    private var shareOffline: Binding<Bool> {
+        Binding(
+            get: { self.prefs.locationSharingMode == "offline_only" },
+            set: { if $0 { self.prefs.locationSharingMode = "offline_only" } }
+        )
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -508,7 +583,7 @@ struct LocationSharingSettingsView: View {
                             iconColor: SafePathColors.primaryBlue,
                             title: "Share real-time location",
                             sub: "Continuous updates for your circle",
-                            isOn: $realtimeShare
+                            isOn: realtimeShare
                         )
                         Divider().padding(.leading, 60)
                         sharingRow(
@@ -516,7 +591,7 @@ struct LocationSharingSettingsView: View {
                             iconColor: SafePathColors.dangerRed,
                             title: "Share only during emergency",
                             sub: "Activates only when SOS is triggered",
-                            isOn: $emergencyOnly
+                            isOn: emergencyOnly
                         )
                         Divider().padding(.leading, 60)
                         sharingRow(
@@ -524,7 +599,7 @@ struct LocationSharingSettingsView: View {
                             iconColor: SafePathColors.textSecondary,
                             title: "Share last known location when offline",
                             sub: "Preserves battery and works without signal",
-                            isOn: $shareOffline
+                            isOn: shareOffline
                         )
                     }
                     .background(Color.white)
@@ -533,7 +608,13 @@ struct LocationSharingSettingsView: View {
                 }
                 .padding(.horizontal, 16)
 
-                Button(action: { withAnimation { showSaved = true }; DispatchQueue.main.asyncAfter(deadline: .now()+2){ withAnimation { showSaved = false } } }) {
+                Button(action: { 
+                    Task {
+                        await userVM.updatePreferences(prefs)
+                        withAnimation { showSaved = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now()+2) { withAnimation { showSaved = false } }
+                    }
+                }) {
                     Text("Save Settings")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
@@ -565,6 +646,11 @@ struct LocationSharingSettingsView: View {
                 }
             }
         })
+        .onAppear {
+            if let existing = userVM.currentUser?.preferences {
+                self.prefs = existing
+            }
+        }
     }
 
     private func sharingRow(icon: String, iconColor: Color, title: String, sub: String, isOn: Binding<Bool>) -> some View {

@@ -1,4 +1,4 @@
-import Foundation
+    import Foundation
 import Combine
 
 /// Generic wrapper for SafePath API responses: { success, count, data }.
@@ -17,12 +17,30 @@ final class APIService {
     
     private init() {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 15
-        config.timeoutIntervalForResource = 30
+        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForResource = 60
         session = URLSession(configuration: config)
         
         decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        
+        let fractionalFormatter = ISO8601DateFormatter()
+        fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        let standardFormatter = ISO8601DateFormatter()
+        
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let dateString = try container.decode(String.self)
+            
+            if let date = fractionalFormatter.date(from: dateString) {
+                return date
+            }
+            if let date = standardFormatter.date(from: dateString) {
+                return date
+            }
+            
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format: \(dateString)")
+        }
     }
     
     // MARK: - Generic GET
@@ -58,6 +76,10 @@ final class APIService {
         }
         
         guard (200...299).contains(httpResponse.statusCode) else {
+            if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let errorMsg = errorDict["error"] as? String {
+                throw APIError.serverError(errorMsg)
+            }
             throw APIError.badResponse(statusCode: httpResponse.statusCode)
         }
         
@@ -85,6 +107,7 @@ extension APIService {
         _ endpoint: APIEndpoint,
         body: [String: Any]? = nil
     ) async throws -> T {
+        print("👉 [DEBUG-API] Build request untuk \(endpoint.path)")
         let request = try buildRequest(for: endpoint, body: body)
  
         logRequest(request)
@@ -93,9 +116,12 @@ extension APIService {
         let response: URLResponse
  
         do {
+            print("👉 [DEBUG-API] Memulai session.data(for: request)...")
             (data, response) = try await session.data(for: request)
+            print("👉 [DEBUG-API] Berhasil mendapat response dari server!")
             logResponse(response, data: data, error: nil)
         } catch {
+            print("👉 [DEBUG-API] Gagal mendapat response: \(error.localizedDescription)")
             logResponse(nil, data: nil, error: error, url: request.url?.absoluteString)
             throw APIError.networkFailure(error)
         }
@@ -104,6 +130,10 @@ extension APIService {
             throw APIError.badResponse(statusCode: -1)
         }
         guard (200...299).contains(http.statusCode) else {
+            if let errorDict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let errorMsg = errorDict["error"] as? String {
+                throw APIError.serverError(errorMsg)
+            }
             throw APIError.badResponse(statusCode: http.statusCode)
         }
  
@@ -124,9 +154,11 @@ extension APIService {
         logRequest(request)
  
         let response: URLResponse
+        let responseData: Data
  
         do {
-            let (responseData, res) = try await session.data(for: request)
+            let (data, res) = try await session.data(for: request)
+            responseData = data
             response = res
             logResponse(response, data: responseData, error: nil)
         } catch {
@@ -138,6 +170,10 @@ extension APIService {
             throw APIError.badResponse(statusCode: -1)
         }
         guard (200...299).contains(http.statusCode) else {
+            if let errorDict = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
+               let errorMsg = errorDict["error"] as? String {
+                throw APIError.serverError(errorMsg)
+            }
             throw APIError.badResponse(statusCode: http.statusCode)
         }
     }

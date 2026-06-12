@@ -21,6 +21,8 @@ enum APIEndpoint {
     
     //fam
     case createFamilyGroup
+    case joinFamilyGroup
+    case leaveGroup(groupID: String)
     case fetchFamilyGroup(groupID: String)
     case fetchAllFamilyGroups
     case inviteFamilyMember(groupID: String)
@@ -76,6 +78,10 @@ enum APIEndpoint {
             //fam
         case .createFamilyGroup:
             return "/family/group"
+        case .joinFamilyGroup:
+            return "/family/join"
+        case .leaveGroup(let groupID):
+            return "/family/group/\(groupID)/leave"
         case .fetchFamilyGroup(let groupID):
             return "/family/group/\(groupID)"
         case .fetchAllFamilyGroups:
@@ -123,13 +129,13 @@ enum APIEndpoint {
     var method: String {
         switch self {
         case .register, .login, .logout,
-                .createFamilyGroup, .inviteFamilyMember, .shareLocation,
+                .createFamilyGroup, .joinFamilyGroup, .inviteFamilyMember, .shareLocation,
                 .updateEmergencyStatus, .triggerSOS, .resolveSOS,
                 .createItem:
             return "POST"
         case .updateProfile, .updateFamilyMemberStatus, .updateItem:
             return "PUT"
-        case .removeFamilyMember, .deleteItem:
+        case .removeFamilyMember, .deleteItem, .leaveGroup:
             return "DELETE"
         default:
             return "GET"

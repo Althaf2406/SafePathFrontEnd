@@ -30,7 +30,6 @@ final class UserManagementViewModel: ObservableObject {
     // MARK: - Auth Actions
 
     /// POST /auth/register — Registers a new user account.
-    /// Tries real API first; falls back to mock if backend is unreachable.
     func register(name: String, email: String, password: String, phone: String? = nil) async {
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty,
               !email.trimmingCharacters(in: .whitespaces).isEmpty,
@@ -43,19 +42,19 @@ final class UserManagementViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            // Coba API backend terlebih dahulu
-            let _ = try await repository.register(name: name, email: email, password: password, phone: phone)
-            print("✅ Register: Berhasil via API backend. Silakan login manual.")
+            let newUser = try await repository.register(name: name, email: email, password: password, phone: phone)
+            self.currentUser = newUser
+            self.isLoggedIn = true
+            SessionManager.shared.saveUser(newUser)
         } catch {
-            // Backend offline / network error → fallback ke mock
-            print("⚠️ Register: Backend tidak tersedia (\(error.localizedDescription)). Menggunakan mock sukses.")
+            errorMessage = error.localizedDescription
+            self.isLoggedIn = false
         }
 
         isLoading = false
     }
 
     /// POST /auth/login — Authenticates user and stores session.
-    /// Tries real API first; falls back to mock if backend is unreachable.
     func login(email: String, password: String) async {
         guard !email.trimmingCharacters(in: .whitespaces).isEmpty,
               !password.isEmpty else {
@@ -67,45 +66,55 @@ final class UserManagementViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            // Coba API backend terlebih dahulu
             let user = try await repository.login(email: email, password: password)
             self.currentUser = user
             self.isLoggedIn = true
             SessionManager.shared.saveUser(user)
-            print("✅ Login: Berhasil via API backend.")
+
+            // Refresh full profile so family_group_ids is always up-to-date
+            if let freshUser = try? await repository.fetchProfile() {
+                // Preserve auth token from login response (fetchProfile doesn't return one)
+                var merged = freshUser
+                merged = User(
+                    id: freshUser.id, name: freshUser.name, email: freshUser.email,
+                    phone: freshUser.phone, profileImageURL: freshUser.profileImageURL,
+                    bloodType: freshUser.bloodType, medicalConditions: freshUser.medicalConditions,
+                    emergencyContactName: freshUser.emergencyContactName,
+                    emergencyContactPhone: freshUser.emergencyContactPhone,
+                    createdAt: freshUser.createdAt, lastLatitude: freshUser.lastLatitude,
+                    lastLongitude: freshUser.lastLongitude, locationUpdatedAt: freshUser.locationUpdatedAt,
+                    authToken: user.authToken, refreshToken: user.refreshToken,
+                    deviceToken: freshUser.deviceToken, familyGroupIDs: freshUser.familyGroupIDs,
+                    preferences: freshUser.preferences
+                )
+                self.currentUser = merged
+                SessionManager.shared.saveUser(merged)
+            }
         } catch {
-            // Backend offline / network error → fallback ke mock
-            print("⚠️ Login: Backend tidak tersedia (\(error.localizedDescription)). Menggunakan mock.")
-            let mockUser = User(
-                id: UUID().uuidString,
-                name: "User",
-                email: email,
-                phone: nil,
-                profileImageURL: nil,
-                createdAt: Date(),
-                lastLatitude: nil,
-                lastLongitude: nil,
-                authToken: "mock_token_\(UUID().uuidString.prefix(8))",
-                refreshToken: nil,
-                familyGroupIDs: []
-            )
-            self.currentUser = mockUser
-            self.isLoggedIn = true
-            SessionManager.shared.saveUser(mockUser)
+            errorMessage = error.localizedDescription
+            self.isLoggedIn = false
         }
 
         isLoading = false
     }
 
-    /// POST /auth/logout — Logs out and clears local session.
+    /// POST /auth/logout — Clears session.
     func logout() async {
         isLoading = true
+        errorMessage = nil
 
-        try? await repository.logout()
-
-        SessionManager.shared.clearSession()
+        // Optimistic UI update: hapus session lokal segera agar langsung redirect ke Login
         self.currentUser = nil
         self.isLoggedIn = false
+        SessionManager.shared.clearSession()
+
+        do {
+            try await repository.logout()
+        } catch {
+            errorMessage = error.localizedDescription
+            print("Backend logout failed: \(error.localizedDescription)")
+        }
+
         isLoading = false
     }
 
@@ -127,13 +136,36 @@ final class UserManagementViewModel: ObservableObject {
         isLoading = false
     }
 
-    /// PUT /user/profile — Updates name, phone, profile image, or location.
-    func updateProfile(name: String? = nil, phone: String? = nil, profileImageURL: String? = nil, latitude: Double? = nil, longitude: Double? = nil) async {
+    /// PUT /user/profile — Updates name, phone, profile image, medical info, or location.
+    func updateProfile(
+        name: String? = nil, 
+        phone: String? = nil, 
+        profileImageURL: String? = nil, 
+        bloodType: String? = nil,
+        medicalConditions: String? = nil,
+        emergencyContactName: String? = nil,
+        emergencyContactPhone: String? = nil,
+        latitude: Double? = nil, 
+        longitude: Double? = nil,
+        deviceToken: String? = nil
+    ) async {
         isLoading = true
         errorMessage = nil
 
         do {
-            let updatedUser = try await repository.updateProfile(name: name, phone: phone, profileImageURL: profileImageURL, latitude: latitude, longitude: longitude)
+            let updatedUser = try await repository.updateProfile(
+                name: name, 
+                phone: phone, 
+                profileImageURL: profileImageURL, 
+                bloodType: bloodType,
+                medicalConditions: medicalConditions,
+                emergencyContactName: emergencyContactName,
+                emergencyContactPhone: emergencyContactPhone,
+                latitude: latitude, 
+                longitude: longitude,
+                deviceToken: deviceToken,
+                preferences: nil
+            )
             self.currentUser = updatedUser
             self.isLoading   = false
             SessionManager.shared.saveUser(updatedUser)
@@ -144,6 +176,34 @@ final class UserManagementViewModel: ObservableObject {
     }
 
     // MARK: - Helpers
+
+    /// PUT /user/profile — Updates settings preferences
+    func updatePreferences(_ prefs: UserPreferences) async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let updatedUser = try await repository.updateProfile(
+                name: nil,
+                phone: nil,
+                profileImageURL: nil,
+                bloodType: nil,
+                medicalConditions: nil,
+                emergencyContactName: nil,
+                emergencyContactPhone: nil,
+                latitude: nil,
+                longitude: nil,
+                deviceToken: nil,
+                preferences: prefs
+            )
+            self.currentUser = updatedUser
+            self.isLoading = false
+            SessionManager.shared.saveUser(updatedUser)
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+        }
+    }
 
     /// Clears any displayed error message.
     func clearError() {

@@ -12,8 +12,11 @@ struct RegisterView: View {
     @State private var isPasswordVisible: Bool = false
     @State private var isConfirmVisible:  Bool = false
 
-    @EnvironmentObject private var viewModel: UserManagementViewModel
+    @EnvironmentObject var userVM: UserManagementViewModel
     @State private var showAlert = false
+
+    // Menggunakan global userVM agar ketika registrasi sukses,
+    // RootView otomatis berpindah ke AppRouter.
 
     var body: some View {
         ScrollView {
@@ -45,31 +48,32 @@ struct RegisterView: View {
 
                 // MARK: - Register Button
                 Button(action: {
-                    let vm = viewModel
                     Task {
+                        print("👉 [DEBUG] Tombol Register ditekan!")
                         guard password == confirmPassword else {
-                            vm.errorMessage = "Passwords do not match."
+                            print("👉 [DEBUG] Gagal: Password tidak sama.")
+                            userVM.errorMessage = "Passwords do not match."
                             showAlert = true
                             return
                         }
                         guard !fullName.trimmingCharacters(in: .whitespaces).isEmpty else {
-                            vm.errorMessage = "Please enter your full name."
+                            print("👉 [DEBUG] Gagal: Nama kosong.")
+                            userVM.errorMessage = "Please enter your full name."
                             showAlert = true
                             return
                         }
-                        await vm.register(name: fullName, email: email, password: password)
+                        print("👉 [DEBUG] Memanggil backend userVM.register...")
+                        await userVM.register(name: fullName, email: email, password: password)
+                        print("👉 [DEBUG] Selesai memanggil backend. Error: \(String(describing: userVM.errorMessage)), isLoggedIn: \(userVM.isLoggedIn)")
                         
-                        await MainActor.run {
-                            if vm.errorMessage != nil {
-                                showAlert = true
-                            } else {
-                                dismiss() // Kembali ke LoginView
-                            }
+                        if userVM.errorMessage != nil && !userVM.isLoggedIn {
+                            print("👉 [DEBUG] Menampilkan alert error!")
+                            showAlert = true
                         }
                     }
                 }) {
                     HStack {
-                        if viewModel.isLoading {
+                        if userVM.isLoading {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                 .padding(.trailing, 8)
@@ -84,7 +88,7 @@ struct RegisterView: View {
                         .cornerRadius(14)
                         .shadow(color: SafePathColors.primaryBlue.opacity(0.3), radius: 8, y: 4)
                 }
-                .disabled(viewModel.isLoading)
+                .disabled(userVM.isLoading)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 20)
 
@@ -161,10 +165,10 @@ struct RegisterView: View {
         .navigationBarBackButtonHidden(true)
         .alert("Registration Failed", isPresented: $showAlert) {
             Button("OK", role: .cancel) {
-                viewModel.clearError()
+                userVM.clearError()
             }
         } message: {
-            Text(viewModel.errorMessage ?? "An unknown error occurred.")
+            Text(userVM.errorMessage ?? "An unknown error occurred.")
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -249,6 +253,5 @@ struct RegisterView: View {
 #Preview {
     NavigationStack {
         RegisterView()
-            .environmentObject(UserManagementViewModel())
     }
 }

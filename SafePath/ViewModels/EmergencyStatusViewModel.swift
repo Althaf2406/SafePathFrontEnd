@@ -18,8 +18,31 @@ final class EmergencyStatusViewModel: ObservableObject {
     private let repository: EmergencyStatusRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
 
-    init(repository: EmergencyStatusRepositoryProtocol? = nil) {
+    init(repository: EmergencyStatusRepositoryProtocol? = nil, isPrimaryObserver: Bool = false) {
         self.repository = repository ?? EmergencyStatusRepository()
+        
+        if isPrimaryObserver {
+            NotificationCenter.default.addObserver(forName: Notification.Name("WatchDidTriggerSOS"), object: nil, queue: .main) { [weak self] _ in
+                print("🚨 [EmergencyStatusViewModel] Notifikasi WatchDidTriggerSOS diterima!")
+                Task {
+                    await self?.triggerSOS()
+                }
+            }
+            
+            NotificationCenter.default.addObserver(forName: Notification.Name("WatchDidUpdateStatus"), object: nil, queue: .main) { [weak self] notification in
+                if let statusStr = notification.object as? String {
+                    print("🚨 [EmergencyStatusViewModel] Notifikasi WatchDidUpdateStatus (\(statusStr)) diterima!")
+                    Task {
+                        let message = "Status updated from Apple Watch: \(statusStr)"
+                        if statusStr == "Safe" {
+                            await self?.updateStatus(status: .safe, message: message)
+                        } else if statusStr == "Need Help" {
+                            await self?.updateStatus(status: .sos, message: message)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Status Actions
@@ -49,6 +72,18 @@ final class EmergencyStatusViewModel: ObservableObject {
     /// Convenience — marks user as safe and updates status.
     func markSafe(latitude: Double? = nil, longitude: Double? = nil) async {
         await updateStatus(status: .safe, latitude: latitude, longitude: longitude)
+    }
+
+    /// GET /emergency/status/:userId — Fetches current user's status
+    func fetchStatus(userID: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            currentStatus = try await repository.fetchStatus(userID: userID)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
 
     /// GET /emergency/family/:groupId/statuses — Fetches statuses for all family members.
