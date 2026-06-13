@@ -28,11 +28,6 @@ struct ChecklistPadView: View {
             .navigationDestination(isPresented: $isNavigatingToCustomize) {
                 CustomizeChecklistPadView()
             }
-            .task {
-                if viewModel.emergencyKit.isEmpty {
-                    await viewModel.getAllItem()
-                }
-            }
         }
     }
 

@@ -34,7 +34,7 @@ struct PreparednessPadView: View {
             .task {
                 let lat = userVM.currentUser?.lastLatitude ?? -7.2504
                 let lng = userVM.currentUser?.lastLongitude ?? 112.7688
-                await viewModel.load(lat: lat, lng: lng)
+                await viewModel.load(lat: lat, lng: lng, userId: userVM.currentUser?.id)
             }
         }
     }

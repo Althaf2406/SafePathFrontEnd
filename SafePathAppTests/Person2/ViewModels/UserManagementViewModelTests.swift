@@ -57,10 +57,10 @@ struct UserManagementViewModelTests {
         
         await vm.login(email: "test@test.com", password: "password")
         
-        // Karena ada mekanisme langsung menggunakan akun mock, login akan selalu berhasil
-        // dan tidak akan menghasilkan errorMessage meskipun repository harusnya error.
-        #expect(vm.errorMessage == nil)
-        #expect(vm.isLoggedIn == true)
+        // Karena mekanisme mock dicabut (API integration enforce), login akan gagal
+        // dan menghasilkan errorMessage
+        #expect(vm.errorMessage != nil)
+        #expect(vm.isLoggedIn == false)
         #expect(vm.isLoading == false)
     }
 

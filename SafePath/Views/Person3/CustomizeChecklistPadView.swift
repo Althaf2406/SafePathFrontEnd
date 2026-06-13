@@ -6,7 +6,7 @@ struct CustomizeChecklistPadView: View {
     
     @State private var newItemName = ""
     @State private var newItemQuantity = "1"
-    @State private var selectedCategory: KitCategory = .waterFood
+    @State private var selectedCategory: KitCategory = .water
     @State private var selectedPriority: ChecklistPriority = .medium
 
     var body: some View {
@@ -105,14 +105,18 @@ struct CustomizeChecklistPadView: View {
         let name = newItemName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }
         
+        let quantityInt = Int(newItemQuantity) ?? 1
         let item = ChecklistItem(
+            id: UUID().uuidString,
             name: name,
+            isChecked: false,
             category: selectedCategory,
+            quantity: quantityInt,
             priority: selectedPriority,
-            quantity: newItemQuantity.isEmpty ? nil : newItemQuantity
+            disasterType: "All"
         )
         Task {
-            await viewModel.addCustomItem(item)
+            await viewModel.addItem(item)
             dismiss()
         }
     }

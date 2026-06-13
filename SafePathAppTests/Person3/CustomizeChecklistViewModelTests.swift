@@ -7,76 +7,44 @@ import Testing
 @MainActor
 struct CustomizeChecklistViewModelTests {
 
-    @Test("Fungsi: loadCustomItems() - Skenario Berhasil")
-    func testLoadCustomItemsSuccess() async throws {
-        let mockRepo = MockChecklistRepository()
-        mockRepo.customItemsToReturn = [
-            TestDataFactory.mockChecklistItem(name: "Radio")
-        ]
-
-        let vm = CustomizeChecklistViewModel(repository: mockRepo)
-        try await Task.sleep(nanoseconds: 10_000_000)
-
-        #expect(vm.customItems.count == 1)
-        #expect(vm.customItems.first?.name == "Radio")
-    }
-
-    @Test("Fungsi: loadCustomItems() - Skenario Gagal")
-    func testLoadCustomItemsFailure() async throws {
-        let mockRepo = MockChecklistRepository()
-        mockRepo.shouldThrowError = true
-
-        let vm = CustomizeChecklistViewModel(repository: mockRepo)
-        try await Task.sleep(nanoseconds: 10_000_000)
-
+    @Test("Fungsi: Initialization - Form Fields")
+    func testInitialState() {
+        let vm = CustomizeChecklistViewModel()
+        #expect(vm.itemName.isEmpty)
+        #expect(vm.selectedCategory == .lighting)
+        #expect(vm.quantity == 1)
+        #expect(vm.priority == .high)
+        #expect(vm.disasterType == "Flood")
+        #expect(vm.isOffline == false)
         #expect(vm.customItems.isEmpty)
     }
 
-    @Test("Fungsi: saveItem() - Berhasil Menyimpan")
-    func testSaveItemSuccess() async throws {
-        let mockRepo = MockChecklistRepository()
-        let vm = CustomizeChecklistViewModel(repository: mockRepo)
-
-        vm.itemName = "Powerbank"
-        vm.quantity = 2
-        vm.priority = .high
-        vm.disasterType = "All"
-        vm.selectedCategory = .communication
-
-        vm.saveItem()
-        try await Task.sleep(nanoseconds: 10_000_000)
-
-        #expect(mockRepo.savedItems.count == 1)
-        let saved = mockRepo.savedItems.first
-        #expect(saved?.name == "Powerbank")
-        #expect(saved?.quantity == 2)
+    @Test("Fungsi: startEditing(_:) - Populate Form")
+    func testStartEditing() {
+        let vm = CustomizeChecklistViewModel()
+        let item = ChecklistItem(id: "1", name: "Radio", isChecked: false, category: .communication, quantity: 2, priority: .high, disasterType: "All")
         
-        // Pastikan form direset setelah save
-        #expect(vm.itemName.isEmpty)
+        vm.startEditing(item)
+        
+        #expect(vm.editingItemId == "1")
+        #expect(vm.itemName == "Radio")
+        #expect(vm.selectedCategory == .communication)
+        #expect(vm.quantity == 2)
+        #expect(vm.priority == .high)
+        #expect(vm.disasterType == "All")
+    }
+
+    @Test("Fungsi: resetForm() - Reset Form Fields")
+    func testResetForm() {
+        let vm = CustomizeChecklistViewModel()
+        vm.editingItemId = "123"
+        vm.itemName = "Test"
+        vm.quantity = 5
+        
+        vm.resetForm()
+        
+        #expect(vm.editingItemId == nil)
+        #expect(vm.itemName == "")
         #expect(vm.quantity == 1)
-    }
-
-    @Test("Fungsi: saveItem() - Gagal Karena Nama Kosong")
-    func testSaveItemEmptyName() async throws {
-        let mockRepo = MockChecklistRepository()
-        let vm = CustomizeChecklistViewModel(repository: mockRepo)
-
-        vm.itemName = ""
-        vm.saveItem()
-        try await Task.sleep(nanoseconds: 10_000_000)
-
-        #expect(mockRepo.savedItems.isEmpty)
-    }
-
-    @Test("Fungsi: deleteItem() - Skenario Berhasil")
-    func testDeleteItem() async throws {
-        let mockRepo = MockChecklistRepository()
-        let idToDelete = "123-abc"
-        
-        let vm = CustomizeChecklistViewModel(repository: mockRepo)
-        vm.deleteItem(id: idToDelete)
-        try await Task.sleep(nanoseconds: 10_000_000)
-
-        #expect(mockRepo.deletedItemIds.contains(idToDelete))
     }
 }

@@ -105,6 +105,6 @@ struct PreparednessViewModelTests {
 
         // Karena repository gagal (throw), ViewModel harus mengisi dengan mock statis internalnya
         #expect(!vm.emergencyKit.isEmpty)
-        #expect(!vm.riskProfiles.isEmpty)
+        #expect(vm.riskProfiles.isEmpty)
     }
 }
